@@ -1,5 +1,5 @@
 import React from 'react';
 
-export function ProfileHeader() {
+export function MainSocial() {
   // return ();
 }
