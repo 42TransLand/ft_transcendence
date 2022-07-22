@@ -1,12 +1,14 @@
 import React from 'react';
-import BlackBox from './UI/Atoms/BlackBox';
+import { Box, ChakraProvider } from '@chakra-ui/react';
 import Login from './UI/Pages/Login';
 
 function App() {
   return (
-    <BlackBox>
-      <Login />
-    </BlackBox>
+    <ChakraProvider>
+      <Box color="#000">
+        <Login />
+      </Box>
+    </ChakraProvider>
   );
 }
 
