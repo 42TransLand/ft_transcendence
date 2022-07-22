@@ -1,7 +1,13 @@
 import React from 'react';
+import BlackBox from './UI/Atoms/BlackBox';
+import Login from './UI/Pages/Login';
 
 function App() {
-  return <h1>hello world!</h1>;
+  return (
+    <BlackBox>
+      <Login />
+    </BlackBox>
+  );
 }
 
 export default App;
