@@ -1,9 +1,9 @@
+import { Button } from '@chakra-ui/react';
 import React from 'react';
-import Button from 'react-bootstrap/Button';
 
 function LogInButton() {
   return (
-    <Button variant="light" size="lg">
+    <Button colorScheme="gray" size="lg">
       LOGIN
     </Button>
   );
