@@ -1,0 +1,21 @@
+name: Automatic pull from github
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull from github
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            whoami
+            cd ~/ft_transcendence
+            git pull origin master
+            cd front-end
+            npm i
+            npm run build
