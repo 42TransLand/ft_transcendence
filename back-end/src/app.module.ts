@@ -9,10 +9,10 @@ import { FriendModule } from './friend/friend.module';
 
 @Module({
   imports: [
-    UsersModule,
-    GameModule,
-    TypeOrmModule.forRoot(typeORMConfig),
-    FriendModule,
+    // UsersModule,
+    // GameModule,
+    // TypeOrmModule.forRoot(typeORMConfig),
+    // FriendModule,
   ],
   controllers: [AppController],
   providers: [AppService],
