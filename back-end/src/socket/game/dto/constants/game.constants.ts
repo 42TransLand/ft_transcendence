@@ -39,6 +39,24 @@ const PLAYER_SCORE_FONT_STYLE = {
 };
 
 const BALL_RADIUS = 20;
+const BALL_INITIAL_SPEED = 10;
+
+const GAME_TIME_INTERVAL = 10;
+
+enum SocketEventName {
+  GAME_CREATE_REQ = 'game-create-req',
+  GAME_JOIN_REQ = 'game-join-req',
+  PLAYER_MOVE_REQ = 'player-move-req',
+
+  BALL_MOVE_NOTIFY = 'ball-move-notify',
+  GAME_CREATE_RES = 'game-create-res',
+  GAME_END_NOTIFY = 'game-end-notify',
+  GAME_JOIN_RES = 'game-join-res',
+  GAME_READY_NOTIFY = 'game-ready-notify',
+  GAME_SCORE_NOTIFY = 'game-score-notify',
+  GAME_STATE_NOTIFY = 'game-state-notify',
+  PLAYER_MOVE_NOTIFY = 'player-move-notify',
+}
 
 export {
   GAME_SCREEN_WIDTH,
@@ -54,4 +72,7 @@ export {
   PLAYER_SCORE_FONT_STYLE,
   PLAYER_SCORE_PIVOT,
   BALL_RADIUS,
+  BALL_INITIAL_SPEED,
+  GAME_TIME_INTERVAL,
+  SocketEventName,
 };

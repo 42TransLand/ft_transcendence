@@ -1,4 +1,4 @@
-export default interface BallMoveDto {
+export default interface BallMoveNotifyDto {
   x: number;
   y: number;
   vecX: number;

@@ -1,12 +1,35 @@
-import { Socket } from 'socket.io';
+import { UserContext } from 'src/socket/class/user.class';
+import {
+  GAME_SCREEN_HEIGHT,
+  PLAYER_RACKET_HEIGHT,
+  PLAYER_RACKET_INIT_POS,
+} from '../dto/constants/game.constants';
 
 export class Player {
-  private score = 0;
+  public score = 0;
+
+  private x: number;
+
+  private y: number;
 
   constructor(
-    public readonly socket: Socket,
-    public readonly id: number,
-    public readonly x: number,
-    public readonly y: number,
-  ) {}
+    public readonly user: UserContext,
+    public readonly index: number,
+  ) {
+    this.x = PLAYER_RACKET_INIT_POS[index].x;
+    this.y = PLAYER_RACKET_INIT_POS[index].y;
+  }
+
+  public get pos() {
+    return { x: this.x, y: this.y };
+  }
+
+  public set pos(pos: { x: number; y: number }) {
+    const MIN = 0 + PLAYER_RACKET_HEIGHT / 2;
+    const MAX = GAME_SCREEN_HEIGHT - PLAYER_RACKET_HEIGHT / 2;
+
+    this.y = pos.y;
+    if (this.y < MIN) this.y = MIN;
+    if (this.y > MAX) this.y = MAX;
+  }
 }
