@@ -35,7 +35,7 @@ services:
       - 80:80
 
   database:
-    image: postgres:14.4
+    image: postgres:14-alpine
     env_file:
       - .env
     volumes:
