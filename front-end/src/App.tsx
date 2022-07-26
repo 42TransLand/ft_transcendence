@@ -1,13 +1,15 @@
 import React from 'react';
-import { Box, ChakraProvider } from '@chakra-ui/react';
-import Login from './UI/Pages/Login';
+import { /* Box,  */ ChakraProvider, theme } from '@chakra-ui/react';
+// import Login from './UI/Pages/Login';
+import Main from './UI/Pages/Main';
 
 function App() {
   return (
-    <ChakraProvider>
-      <Box color="#000">
+    <ChakraProvider theme={theme}>
+      {/* <Box color="#000">
         <Login />
-      </Box>
+      </Box> */}
+      <Main />
     </ChakraProvider>
   );
 }
