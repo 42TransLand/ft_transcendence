@@ -1,5 +1,8 @@
 name: Automatic pull from github
-on: [push]
+on:
+  push:
+    branches:
+      - master
 jobs:
   build:
     name: Build
@@ -16,6 +19,4 @@ jobs:
             whoami
             cd ~/ft_transcendence
             git pull origin master
-            cd front-end
-            npm i
-            npm run build
+            docker-compose up --build -d
