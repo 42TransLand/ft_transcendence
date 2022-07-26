@@ -3,11 +3,13 @@ import { Text, HStack, Spacer, Avatar, AvatarBadge } from '@chakra-ui/react';
 
 function FriendElement(props: { userName: string; connectionStatus: string }) {
   const { userName, connectionStatus } = props;
-  let status;
+  const StatusColors: { [key: string]: string } = {
+    online: 'green.500',
+    offline: 'red.500',
+    ingame: 'yellow.500',
+  };
+  const statusColor = StatusColors[connectionStatus];
 
-  if (connectionStatus === 'online') status = 'green.500';
-  else if (connectionStatus === 'offline') status = 'red.500';
-  else if (connectionStatus === 'ingame') status = 'yellow.500';
   return (
     <HStack
       bgColor="blue.200"
@@ -18,7 +20,7 @@ function FriendElement(props: { userName: string; connectionStatus: string }) {
       justify="center"
     >
       <Avatar boxSize="1.25em" name={userName} size="sm">
-        <AvatarBadge boxSize="0.3em" borderColor={status} />
+        <AvatarBadge boxSize="0.3em" borderColor={statusColor} />
       </Avatar>
       <Spacer />
       <Text>{userName}</Text>
