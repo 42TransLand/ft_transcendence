@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  front-end:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    depends_on:
+      - back-end
+    restart: unless-stopped
+
+  back-end:
+    build:
+      context: ./back-end
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    links:
+      - database
+    depends_on:
+      - database
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:stable-alpine
+    links:
+      - front-end
+      - back-end
+    depends_on:
+      - front-end
+      - back-end
+    volumes:
+      - "./config/nginx/reverse-proxy.conf:/etc/nginx/conf.d/default.conf"
+    ports:
+      - 80:80
+
+  database:
+    image: postgres:14.4
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/postgresql/data/pgdata
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - 8000:80
+    env_file:
+      - .env
+    depends_on:
+      - database
+    links:
+      - database
+    restart: unless-stopped
+
+volumes:
+  db-data:
