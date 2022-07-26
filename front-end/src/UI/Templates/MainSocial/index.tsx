@@ -1,5 +1,18 @@
 import React from 'react';
+import MyProfile from '../../Organisms/MainSocialMyProfile';
+import MainSocialSocial from '../../Organisms/MainSocialSocial';
 
-export function MainSocial() {
-  // return ();
+function MainSocial() {
+  return (
+    <>
+      <div>
+        <MyProfile />
+      </div>
+      <div>
+        <MainSocialSocial />
+      </div>
+    </>
+  );
 }
+
+export default MainSocial;
