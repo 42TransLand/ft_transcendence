@@ -19,8 +19,11 @@ const PLAYER_RACKET_INIT_X_POS = 60;
 const PLAYER_RACKET_WIDTH = 20;
 const PLAYER_RACKET_HEIGHT = 175;
 const PLAYER_RACKET_INIT_POS = [
-  { x: PLAYER_RACKET_INIT_X_POS, y: 0 },
-  { x: GAME_SCREEN_WIDTH - PLAYER_RACKET_INIT_X_POS, y: 0 },
+  { x: PLAYER_RACKET_INIT_X_POS, y: GAME_SCREEN_HEIGHT / 2 },
+  {
+    x: GAME_SCREEN_WIDTH - PLAYER_RACKET_INIT_X_POS,
+    y: GAME_SCREEN_HEIGHT / 2,
+  },
 ];
 const PLAYER_RACKET_MOVE_SPEED = 20;
 const PLAYER_SCORE_POS = [
@@ -42,15 +45,18 @@ const BALL_RADIUS = 20;
 const BALL_INITIAL_SPEED = 10;
 
 const GAME_TIME_INTERVAL = 10;
+const GAME_SCORE_FOR_WIN_LADDER = 10;
 
 enum SocketEventName {
   GAME_CREATE_REQ = 'game-create-req',
+  GAME_ENQUEUE_MATCH_REQ = 'game-enqueue-match-req',
   GAME_JOIN_REQ = 'game-join-req',
   PLAYER_MOVE_REQ = 'player-move-req',
 
   BALL_MOVE_NOTIFY = 'ball-move-notify',
   GAME_CREATE_RES = 'game-create-res',
   GAME_END_NOTIFY = 'game-end-notify',
+  GAME_ENQUEUE_MATCH_RES = 'game-enqueue-match-res',
   GAME_JOIN_RES = 'game-join-res',
   GAME_READY_NOTIFY = 'game-ready-notify',
   GAME_SCORE_NOTIFY = 'game-score-notify',
@@ -74,5 +80,6 @@ export {
   BALL_RADIUS,
   BALL_INITIAL_SPEED,
   GAME_TIME_INTERVAL,
+  GAME_SCORE_FOR_WIN_LADDER,
   SocketEventName,
 };

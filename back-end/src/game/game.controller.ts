@@ -8,11 +8,6 @@ import { GameRecord } from './entities/game.entity';
 export class GameController {
   constructor(private gameService: GameService) {}
 
-  @Post()
-  createGame(@Body() gameRecodDto: GameRecodDto): Promise<void> {
-    return this.gameService.createGame(gameRecodDto);
-  }
-
   @Get()
   getGamesByUserId(@Body() user: UserDto): Promise<GameRecord[]> {
     return this.gameService.getGamesByUserId(user);

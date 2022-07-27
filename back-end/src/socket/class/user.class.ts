@@ -6,6 +6,10 @@ export class UserContext {
 
   public readonly gamesOnView: Set<Room>;
 
+  // DM
+  // 채팅방
+  // 알림
+
   constructor(
     public readonly id: string,
     public readonly server: Server,

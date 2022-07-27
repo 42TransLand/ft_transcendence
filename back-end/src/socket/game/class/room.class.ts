@@ -1,17 +1,17 @@
 import { Player } from './player.class';
 import { Ball } from './ball.class';
-import GameState from '../dto/constants/game.state.enum';
 import {
   GAME_SCREEN_WIDTH,
   GAME_TIME_INTERVAL,
   SocketEventName,
-} from '../dto/constants/game.constants';
+} from '../constants/game.constants';
 import { UserContext } from 'src/socket/class/user.class';
 import GameEndNotifyDto from '../dto/res/game.end.notify.dto';
 import PlayerMoveResDto from '../dto/res/player.move.notify.dto';
 import GameScoreDto from '../dto/res/game.score.notify.dto';
 import GameReadyNotifyDto from '../dto/res/game.ready.notify.dto';
 import GameStateNotifyDto from '../dto/res/game.state.notify.dto';
+import GameState from '../constants/game.state.enum';
 
 export class Room {
   private players: Map<string, Player>;
@@ -45,6 +45,7 @@ export class Room {
 
   public set state(value: GameState) {
     if (this.gameState === value) return;
+    console.log(`[GAME-${this.id}] Update game state to ${value}`);
     this.gameState = value;
     this.gameTime = 0;
     this.broadcast(SocketEventName.GAME_STATE_NOTIFY, <GameStateNotifyDto>{
@@ -64,16 +65,20 @@ export class Room {
     }
   }
 
+  public isEmpty() {
+    return this.players.size === 0 && this.gameTime > 10000;
+  }
+
   public isFull() {
     return this.players.size > 2;
   }
 
   public join(user: UserContext, index: number) {
-    this.players[user.id] = new Player(user, index);
+    this.players.set(user.id, new Player(user, index));
   }
 
   public joinSpectator(user: UserContext) {
-    this.spectators[user.id] = user;
+    this.spectators.set(user.id, user);
   }
 
   public leave(user: UserContext) {
@@ -130,7 +135,7 @@ export class Room {
 
   private updateReady() {
     if (this.gameTime < 4000) {
-      const time = Math.floor(4000 - this.gameTime);
+      const time = Math.floor((4000 - this.gameTime) / 1000);
       if (this.readyCountDown !== time) {
         this.readyCountDown = time;
         this.broadcast(SocketEventName.GAME_READY_NOTIFY, <GameReadyNotifyDto>{
@@ -140,6 +145,14 @@ export class Room {
     } else {
       this.state = GameState.PLAYING;
       this.readyCountDown = -1;
+      this.broadcast(SocketEventName.GAME_SCORE_NOTIFY, <GameScoreDto>{
+        playerIndex: 0,
+        score: 0,
+      });
+      this.broadcast(SocketEventName.GAME_SCORE_NOTIFY, <GameScoreDto>{
+        playerIndex: 1,
+        score: 0,
+      });
     }
   }
 

@@ -3,7 +3,7 @@ import {
   GAME_SCREEN_HEIGHT,
   PLAYER_RACKET_HEIGHT,
   PLAYER_RACKET_INIT_POS,
-} from '../dto/constants/game.constants';
+} from '../constants/game.constants';
 
 export class Player {
   public score = 0;
