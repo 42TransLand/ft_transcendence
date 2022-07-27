@@ -45,7 +45,6 @@ export class Room {
 
   public set state(value: GameState) {
     if (this.gameState === value) return;
-    console.log(`[GAME-${this.id}] Update game state to ${value}`);
     this.gameState = value;
     this.gameTime = 0;
     this.broadcast(SocketEventName.GAME_STATE_NOTIFY, <GameStateNotifyDto>{
@@ -53,6 +52,8 @@ export class Room {
     });
     if (value === GameState.READY) {
       this.ball.reset();
+      this.players[0]?.reset();
+      this.players[1]?.reset();
       this.broadcast(SocketEventName.BALL_MOVE_NOTIFY, this.ball.dto);
     } else if (value === GameState.PLAYING) {
       this.ball.begin();
@@ -95,8 +96,7 @@ export class Room {
   public move(user: UserContext, move: PlayerMoveResDto) {
     const player = this.players.get(user.id);
     if (player) {
-      player.pos.x = move.x;
-      player.pos.y = move.y;
+      player.pos = { x: move.x, y: move.y };
       this.broadcast(SocketEventName.PLAYER_MOVE_NOTIFY, <PlayerMoveResDto>{
         playerIndex: player.index,
         x: move.x,
@@ -134,8 +134,8 @@ export class Room {
   }
 
   private updateReady() {
-    if (this.gameTime < 4000) {
-      const time = Math.floor((4000 - this.gameTime) / 1000);
+    if (this.gameTime < 3000) {
+      const time = Math.floor((3000 - this.gameTime) / 1000);
       if (this.readyCountDown !== time) {
         this.readyCountDown = time;
         this.broadcast(SocketEventName.GAME_READY_NOTIFY, <GameReadyNotifyDto>{
@@ -145,13 +145,11 @@ export class Room {
     } else {
       this.state = GameState.PLAYING;
       this.readyCountDown = -1;
-      this.broadcast(SocketEventName.GAME_SCORE_NOTIFY, <GameScoreDto>{
-        playerIndex: 0,
-        score: 0,
-      });
-      this.broadcast(SocketEventName.GAME_SCORE_NOTIFY, <GameScoreDto>{
-        playerIndex: 1,
-        score: 0,
+      this.players.forEach((player) => {
+        this.broadcast(SocketEventName.GAME_SCORE_NOTIFY, <GameScoreDto>{
+          playerIndex: player.index,
+          score: player.score,
+        });
       });
     }
   }

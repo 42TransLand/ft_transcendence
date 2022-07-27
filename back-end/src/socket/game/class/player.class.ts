@@ -16,8 +16,7 @@ export class Player {
     public readonly user: UserContext,
     public readonly index: number,
   ) {
-    this.x = PLAYER_RACKET_INIT_POS[index].x;
-    this.y = PLAYER_RACKET_INIT_POS[index].y;
+    this.reset();
   }
 
   public get pos() {
@@ -31,5 +30,10 @@ export class Player {
     this.y = pos.y;
     if (this.y < MIN) this.y = MIN;
     if (this.y > MAX) this.y = MAX;
+  }
+
+  public reset() {
+    this.x = PLAYER_RACKET_INIT_POS[this.index].x;
+    this.y = PLAYER_RACKET_INIT_POS[this.index].y;
   }
 }

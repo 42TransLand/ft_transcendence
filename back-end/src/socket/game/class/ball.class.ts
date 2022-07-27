@@ -7,6 +7,8 @@ import {
   PLAYER_RACKET_WIDTH,
   PLAYER_RACKET_HEIGHT,
   BALL_INITIAL_SPEED,
+  GAME_SCREEN_UNIT,
+  BALL_DEFAULT_ACCELATION,
 } from '../constants/game.constants';
 import BallDirection from '../constants/ball.enum';
 import { Player } from './player.class';
@@ -27,7 +29,7 @@ export class Ball {
   constructor() {
     this.vecX = 0;
     this.vecY = 0;
-    this.accelation = 0.0;
+    this.accelation = BALL_DEFAULT_ACCELATION;
   }
 
   public get pos() {
@@ -57,17 +59,15 @@ export class Ball {
 
     this.vecX = Math.cos(initAngle) * BALL_INITIAL_SPEED;
     this.vecY = Math.sin(initAngle) * BALL_INITIAL_SPEED;
-
-    console.log(`Ball init vector: ${this.vecX}, ${this.vecY}`);
   }
 
   public update(players: (Player | null)[]) {
     const newPos = { x: this.x, y: this.y };
     const boundary = {
-      l: this.radius,
-      r: GAME_SCREEN_WIDTH - this.radius,
-      t: this.radius,
-      b: GAME_SCREEN_HEIGHT - this.radius,
+      l: 0,
+      r: GAME_SCREEN_WIDTH,
+      t: GAME_SCREEN_UNIT + this.radius,
+      b: GAME_SCREEN_HEIGHT - GAME_SCREEN_UNIT - this.radius,
     };
     const delta = GAME_TIME_INTERVAL / 1000;
 
@@ -96,7 +96,30 @@ export class Ball {
       const intersect = this.intersect(player, deltaX, deltaY);
       if (intersect) {
         newPos.x = intersect.x;
-        this.vecX *= -1;
+
+        const xDirection = Math.sign(-this.vecX);
+        let yDirection = Math.sign(-this.vecY || intersect.yNormalized);
+        const vecLen = Math.sqrt(this.vecX * this.vecX + this.vecY * this.vecY);
+        const abs = Math.abs(intersect.yNormalized);
+        const threshold = 0.5;
+        let angle: number | undefined;
+        if (abs < threshold) {
+          // 정면으로 맞은 것으로 취급 -> 입사각 = 반사각.
+          // 그러나, 입사각이 30도를 초과할 경우, 반사각은 30도로 조정.
+          if (Math.atan2(this.vecY, this.vecX) > Math.PI / 6) {
+            angle = Math.PI / 6;
+          } else {
+            this.vecX *= -1;
+          }
+        } else {
+          // 끄트머리는 (threshold * 60D) ~ 60D
+          angle = (abs * Math.PI) / 3;
+          yDirection *= 1;
+        }
+        if (angle !== undefined) {
+          this.vecX = vecLen * Math.cos(angle) * xDirection;
+          this.vecY = vecLen * -Math.sin(angle) * yDirection;
+        }
       }
     }
 
@@ -104,116 +127,51 @@ export class Ball {
     this.y = newPos.y;
   }
 
-  // 선분교차
-  // ref: https://gaussian37.github.io/math-algorithm-line_intersection/
-  // https://jordano-jackson.tistory.com/27
-  // https://sncap.tistory.com/910
   private intersect(player: Player, deltaX: number, deltaY: number) {
+    // x1, y1 은 현재 공의 좌표
     const x1 = this.x;
     const y1 = this.y;
+
+    // x2, y2 는 새로운 공의 좌표
     const x2 = this.x + deltaX;
     const y2 = this.y + deltaY;
 
+    // 공의 방향
     const direction = deltaX < 0 ? BallDirection.LEFT : BallDirection.RIGHT;
 
-    let x3: number;
+    let lineX: number;
     let y3: number;
-    let x4: number;
     let y4: number;
 
     switch (direction) {
       case BallDirection.LEFT:
-        x3 = player.pos.x + PLAYER_RACKET_WIDTH / 2 + this.radius; // rt.x
-        x4 = player.pos.x + PLAYER_RACKET_WIDTH / 2 + this.radius; // rb.x
+        lineX = player.pos.x + PLAYER_RACKET_WIDTH / 2 + this.radius; // rt.x
         y3 = player.pos.y - PLAYER_RACKET_HEIGHT / 2 - this.radius; // rt.y
         y4 = player.pos.y + PLAYER_RACKET_HEIGHT / 2 + this.radius; // rb.y
+        if (x1 <= lineX || x2 > lineX) {
+          return null;
+        }
         break;
       case BallDirection.RIGHT:
-        x3 = player.pos.x - PLAYER_RACKET_WIDTH / 2 - this.radius; // lt.x
-        x4 = player.pos.x - PLAYER_RACKET_WIDTH / 2 - this.radius; // lb.x
+        lineX = player.pos.x - PLAYER_RACKET_WIDTH / 2 - this.radius; // lt.x
         y3 = player.pos.y - PLAYER_RACKET_HEIGHT / 2 - this.radius; // lt.y
         y4 = player.pos.y + PLAYER_RACKET_HEIGHT / 2 + this.radius; // lb.y
+        if (x1 >= lineX || x2 < lineX) {
+          return null;
+        }
         break;
       default:
         throw new Error();
     }
 
-    // if (nx < 0) {
-    //   pt = Pong.Helper.intercept(ball.x, ball.y, ball.x + nx, ball.y + ny,
-    //                              rect.right  + ball.radius,
-    //                              rect.top    - ball.radius,
-    //                              rect.right  + ball.radius,
-    //                              rect.bottom + ball.radius,
-    //                              "right");
-    // }
-    // else if (nx > 0) {
-    //   pt = Pong.Helper.intercept(ball.x, ball.y, ball.x + nx, ball.y + ny,
-    //                              rect.left   - ball.radius,
-    //                              rect.top    - ball.radius,
-    //                              rect.left   - ball.radius,
-    //                              rect.bottom + ball.radius,
-    //                              "left");
-    // }
-
-    const denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
-    if (denom !== 0) {
-      const ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
-      if (ua >= 0 && ua <= 1) {
-        const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
-        if (ub >= 0 && ub <= 1) {
-          const x = x1 + ua * (x2 - x1);
-          const y = y1 + ua * (y2 - y1);
-          return { x, y, direction };
-        }
-      }
+    const d = (y2 - y1) / (x2 - x1);
+    const yHit = d * (lineX - x1) + y1;
+    if (yHit < y3 || yHit > y4) {
+      return null;
     }
-    return null;
+    const xBounced = 2 * lineX - x2;
+    const yNormalized = ((yHit - y3) / (y4 - y3)) * 2 - 1;
 
-    // const a = playerEndY - playerBeginY;
-    // const b = playerBeginX - playerEndX;
-    // const e = a * playerBeginX + b * playerBeginY;
-
-    // const c = ballNewY - ballY;
-    // const d = ballX - ballNewX;
-    // const f = c * ballX + d * ballY;
-
-    // const denom = a * d - b * c;
-    // if (denom === 0) {
-    //   return null;
-    // }
-
-    // let x = (e * d - b * f) / denom;
-
-    // if (deltaX < 0) {
-    //   if (x < playerBeginX) x = playerBeginX;
-    // } else if (deltaX > 0) {
-    //   if (x > playerBeginX) x = playerBeginX;
-    // }
-    // return { x, direction };
-
-    // const denom =
-    //   (playerEndY - playerBeginY) * (ballNewX - ballX) -
-    //   (playerEndX - playerBeginX) * (ballNewY - ballY);
-    // if (denom === 0) {
-    //   return null;
-    // }
-    // const ua =
-    //   ((playerEndX - playerBeginX) * (ballY - playerBeginY) -
-    //     (playerEndY - playerBeginY) * (ballX - playerBeginX)) /
-    //   denom;
-    // if (ua < 0 || ua > 1) {
-    //   return null;
-    // }
-    // const ub =
-    //   ((ballNewX - ballX) * (ballY - playerBeginY) -
-    //     (ballNewY - ballY) * (ballX - playerBeginX)) /
-    //   denom;
-    // if (ub < 0 || ub > 1) {
-    //   return null;
-    // }
-
-    // const x = ballX + ua * (ballNewX - ballX);
-    // const y = ballY + ua * (ballNewY - ballY);
-    // return { x, y, direction };
+    return { x: xBounced, yNormalized, direction };
   }
 }
