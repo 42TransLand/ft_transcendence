@@ -6,8 +6,6 @@ function AcceptDeclineButtons(props: {
   handleClick: (AcceptanceVal: boolean) => void;
 }) {
   const { handleClick } = props;
-  const onClickAccept = () => handleClick(true);
-  const onClickDecline = () => handleClick(false);
 
   return (
     <div>
@@ -17,14 +15,14 @@ function AcceptDeclineButtons(props: {
           aria-label="accept"
           icon={<CheckIcon />}
           size="sm"
-          onClick={onClickAccept}
+          onClick={() => handleClick(true)}
         />
         <IconButton
           colorScheme="red"
           aria-label="decline"
           icon={<CloseIcon />}
           size="sm"
-          onClick={onClickDecline}
+          onClick={() => handleClick(false)}
         />
       </HStack>
     </div>
@@ -34,6 +32,7 @@ function AcceptDeclineButtons(props: {
 function AcceptanceResult(props: { isAccepted: boolean }) {
   const { isAccepted } = props;
   const color = isAccepted ? 'blue.400' : 'red.400';
+
   return (
     <Center
       w="100%"
@@ -49,18 +48,19 @@ function AcceptanceResult(props: { isAccepted: boolean }) {
 }
 
 function AcceptanceButton() {
-  const [isChecked, setIsChecked] = useState(false);
-  const [isAccepted, setIsAccepted] = useState(false);
+  const [AcceptanceState, setAcceptanceState] = useState({
+    isChecked: false,
+    isAccepted: false,
+  });
 
   const handleClick = (AcceptanceVal: boolean) => {
-    setIsChecked(true);
-    setIsAccepted(AcceptanceVal);
+    setAcceptanceState({ isChecked: true, isAccepted: AcceptanceVal });
   };
 
   return (
     <Box w="65px" h="32px">
-      {isChecked ? (
-        <AcceptanceResult isAccepted={isAccepted} />
+      {AcceptanceState.isChecked ? (
+        <AcceptanceResult isAccepted={AcceptanceState.isAccepted} />
       ) : (
         <AcceptDeclineButtons handleClick={handleClick} />
       )}
