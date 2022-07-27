@@ -63,6 +63,7 @@ export class FriendRepository extends Repository<Friend> {
       block: false,
     });
     await this.save(friend);
+    
   }
 
   async rejectFriend(requestor: User, receiver: User): Promise<void> {

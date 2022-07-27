@@ -6,6 +6,7 @@ import { GameModule } from './game/game.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
 import { FriendModule } from './friend/friend.module';
+import { AlertModule } from './alert/alert.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { FriendModule } from './friend/friend.module';
     GameModule,
     TypeOrmModule.forRoot(typeORMConfig),
     FriendModule,
+    AlertModule,
   ],
   controllers: [AppController],
   providers: [AppService],
