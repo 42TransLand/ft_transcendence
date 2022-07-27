@@ -11,7 +11,7 @@ export class FriendRepository extends Repository<Friend> {
   async requestFriend(requestor: User, receiver: User): Promise<void> {
     // 친구 요청을 했는데, 상대방이 이 친구를 차단했다면 요청 자체가 안가도록.
     const resultOp = await this.findRow(receiver, requestor);
-    if (resultOp.block === true) {
+    if (resultOp !== null && resultOp.block === true) {
       throw new ConflictException([`상대방이 차단, 요청 불가`]);
     }
 
@@ -63,7 +63,6 @@ export class FriendRepository extends Repository<Friend> {
       block: false,
     });
     await this.save(friend);
-    
   }
 
   async rejectFriend(requestor: User, receiver: User): Promise<void> {

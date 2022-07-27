@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { FriendDto } from './dto/friend.dto';
+import { FriendAlertDto } from './dto/friendAlert.dto';
 import { FriendService } from './friend.service';
 
 @Controller('friend')
@@ -22,16 +23,16 @@ export class FriendController {
   }
 
   @Post('accept')
-  acceptFriend(@Body() friendDto: FriendDto): Promise<void> {
-    return this.friendService.acceptFriend(friendDto);
+  acceptFriend(@Body() friendAlertDto: FriendAlertDto): Promise<void> {
+    return this.friendService.acceptFriend(friendAlertDto);
   }
 
   // 201: success , 404: error
   @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 404, description: '실패' })
   @Delete('reject')
-  rejectFriend(@Body() friendDto: FriendDto): Promise<void> {
-    return this.friendService.rejectFriend(friendDto);
+  rejectFriend(@Body() friendAlertDto: FriendAlertDto): Promise<void> {
+    return this.friendService.rejectFriend(friendAlertDto);
   }
 
   @Post('block')

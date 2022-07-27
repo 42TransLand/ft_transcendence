@@ -27,8 +27,8 @@ export class AlertService {
 
   //async findAll() {}
 
-  findOne(id: number) {
-    return `This action returns a #${id} alert`;
+  async findOneById(id: string): Promise<Alert> {
+    return this.alertRepository.findOneById(id);
   }
 
   update(id: number, alertDto: AlertDto) {

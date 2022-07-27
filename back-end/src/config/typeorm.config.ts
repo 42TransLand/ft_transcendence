@@ -6,10 +6,12 @@ import { User } from 'src/users/entities/user.entity';
 
 export const typeORMConfig: TypeOrmModuleOptions = {
   type: 'postgres',
-  host: 'database' || 'localhost',
+  // host: 'database'
+  host: 'localhost',
   password: 'password',
   port: 5432,
-  username: 'transland' || 'postgres',
+  // username: 'transland',
+  username: 'postgres',
   database: 'transcendence',
   autoLoadEntities: true,
   entities: [User, GameRecord, Friend, Alert],

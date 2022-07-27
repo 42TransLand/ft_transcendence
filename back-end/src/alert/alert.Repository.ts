@@ -1,6 +1,6 @@
 import { CustomRepository } from 'src/custom/typeorm.decorator';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { Equal, Repository } from 'typeorm';
 import { AlertDto } from './dto/alert.dto';
 import { Alert } from './entities/alert.entity';
 
@@ -13,5 +13,18 @@ export class AlertRepository extends Repository<Alert> {
       read: false,
     });
     await this.save(alert);
+  }
+
+  async findOneById(id: string): Promise<Alert> {
+    const result = await this.findOne({
+      relations: {
+        requestor: true,
+        receiver: true,
+      },
+      where: {
+        id: Equal(id),
+      },
+    });
+    return result;
   }
 }

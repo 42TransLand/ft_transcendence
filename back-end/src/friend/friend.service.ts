@@ -5,6 +5,8 @@ import { FriendDto } from './dto/friend.dto';
 import { FriendRepository } from './friend.repository';
 import { AlertService } from 'src/alert/alert.service';
 import { AlertDto } from 'src/alert/dto/alert.dto';
+import { FriendAlertDto } from './dto/friendAlert.dto';
+import { AlertRepository } from 'src/alert/alert.Repository';
 
 @Injectable()
 export class FriendService {
@@ -26,17 +28,19 @@ export class FriendService {
     return this.alertService.createAlert(alertDto);
   }
 
-  async acceptFriend(friendDto: FriendDto): Promise<void> {
-    const { requestor, receiver } = friendDto;
+  async acceptFriend(friendAlertDto: FriendAlertDto): Promise<void> {
+    const { requestor, receiver, alertId } = friendAlertDto;
 
     const reqUser = await this.userService.findByNickname(receiver);
     const resUser = await this.userService.findByNickname(requestor);
+    const alert = await this.alertService.findOneById(alertId);
+    alert.read = true;
 
     return this.friendRepository.acceptFriend(reqUser, resUser);
   }
 
-  async rejectFriend(friendDto: FriendDto): Promise<void> {
-    const { requestor, receiver } = friendDto;
+  async rejectFriend(friendAlertDto: FriendAlertDto): Promise<void> {
+    const { requestor, receiver } = friendAlertDto;
 
     const reqUser = await this.userService.findByNickname(receiver);
     const resUser = await this.userService.findByNickname(requestor);

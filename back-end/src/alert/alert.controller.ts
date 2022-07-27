@@ -10,7 +10,7 @@ import {
 import { ApiOperation } from '@nestjs/swagger';
 import { UsersService } from 'src/users/users.service';
 import { AlertService } from './alert.service';
-import { CreateAlertDto } from './dto/create-alert.dto';
+import { AlertDto } from './dto/alert.dto';
 
 @Controller('alert')
 export class AlertController {
@@ -24,18 +24,18 @@ export class AlertController {
   //  return this.alertService.findAll();
   //}
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alertService.findOne(+id);
-  }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAlertDto: UpdateAlertDto) {
-  //   return this.alertService.update(+id, updateAlertDto);
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.alertService.findOne(+id);
   // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.alertService.remove(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() alertDto: AlertDto) {
+  //   return this.alertService.update(+id, alertDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.alertService.remove(+id);
+  // }
 }
