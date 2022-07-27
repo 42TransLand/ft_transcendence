@@ -1,15 +1,31 @@
 import React from 'react';
-import { /* Box,  */ ChakraProvider, theme } from '@chakra-ui/react';
-// import Login from './UI/Pages/Login';
+import { Box, ChakraProvider, theme } from '@chakra-ui/react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Main from './UI/Pages/Main';
+import Game from './UI/Pages/Game';
+import Login from './UI/Pages/Login';
+import { SocketProvider } from './Hooks/useSocket';
 
 function App() {
+  // TODO
+  const user = {}; // = useQuery(GET_USER);
+
   return (
     <ChakraProvider theme={theme}>
-      {/* <Box color="#000">
-        <Login />
-      </Box> */}
-      <Main />
+      <Box backgroundColor="#000">
+        {user === null ? (
+          <Login />
+        ) : (
+          <SocketProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Main />} />
+                <Route path="/game" element={<Game />} />
+              </Routes>
+            </BrowserRouter>
+          </SocketProvider>
+        )}
+      </Box>
     </ChakraProvider>
   );
 }
