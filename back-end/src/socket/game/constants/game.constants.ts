@@ -46,7 +46,7 @@ const BALL_INITIAL_SPEED = 10;
 const BALL_DEFAULT_ACCELATION = 0.2;
 
 const GAME_TIME_INTERVAL = 10;
-const GAME_SCORE_FOR_WIN_LADDER = 10;
+const GAME_SCORE_FOR_WIN_LADDER = 5;
 
 enum SocketEventName {
   GAME_CREATE_REQ = 'game-create-req',
