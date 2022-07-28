@@ -15,7 +15,10 @@ import { TypeOrmConfigFactory } from './config/typeorm.config.factory';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [`.env.dev.local`, `.env.dev`, `.env.local`, `.env`],
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'prod'}.local`,
+        `.env.${process.env.NODE_ENV || 'prod'}`,
+      ],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
