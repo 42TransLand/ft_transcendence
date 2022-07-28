@@ -7,36 +7,30 @@ function NotificationElement(props: { userName: string }) {
 
   return (
     <Grid
-      h="80px"
-      w="200px"
-      templateRows="repeat(4, 1fr)"
+      h="90px"
+      w="100%"
+      templateRows="repeat(3, 1fr)"
       templateColumns="repeat(10, 1fr)"
-      gap={1}
-      bgColor="grey"
+      bgColor="blue.200"
       borderWidth="1px"
       borderColor="black"
     >
-      <GridItem rowSpan={4} colSpan={3} bg="tomato" margin="auto">
-        <Avatar name={userName} />
-      </GridItem>
-      <GridItem rowSpan={3} colSpan={7} bg="brown" textAlign="center">
-        <Text fontSize="xs">
-          {userName}님께서
-          <br />
-        </Text>
-        <Text fontSize="xs">친구신청을 보냈습니다.</Text>
-      </GridItem>
-      <GridItem
-        rowSpan={1}
-        colSpan={2}
-        bg="pink"
-        margin="auto"
-        textAlign="center"
-      >
-        <Text fontSize="xs">방금전</Text>
+      <GridItem rowSpan={3} colSpan={1} margin="auto">
+        <Avatar name={userName} size="md" />
       </GridItem>
       <GridItem rowSpan={1} colSpan={1} />
-      <GridItem rowSpan={1} colSpan={4} bg="yellow">
+      <GridItem rowSpan={1} colSpan={8}>
+        <Text fontSize="lg">{userName}님께서</Text>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={1} />
+      <GridItem rowSpan={1} colSpan={8}>
+        <Text fontSize="lg">친구신청을 보냈습니다</Text>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={1} />
+      <GridItem rowSpan={1} colSpan={2}>
+        <Text fontSize="md">방금전</Text>
+      </GridItem>
+      <GridItem rowSpan={1} colSpan={6}>
         <AcceptanceButton />
       </GridItem>
     </Grid>
