@@ -19,12 +19,13 @@ export class GameService {
     const { leftUser, rightUser } = gameCreateDto;
 
     const findLeftUser = await this.userService.findByNickname(leftUser);
-    let findRightUser = null;
-    if (gameCreateDto.rightUser !== undefined) {
-      findRightUser = await this.userService.findByNickname(rightUser);
-      return this.gameRepository.createGameTwo(findLeftUser, findRightUser);
+    // 유저가 존재하지 않으면, null 반환하게 해야 하는데 그냥 임의로 찾아버림. friend에서는 되는데 여기서는 안됨.
+    if (rightUser !== undefined) {
+      const findRightUser = await this.userService.findByNickname(rightUser);
+      return this.gameRepository.createGame(findLeftUser, findRightUser);
     }
-    return this.gameRepository.createGameOne(findLeftUser);
+
+    return this.gameRepository.createGame(findLeftUser);
   }
 
   // 프로필에서 유저의 게임 전적 가져오기
