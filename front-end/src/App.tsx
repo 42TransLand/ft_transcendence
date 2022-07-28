@@ -19,8 +19,8 @@ function App() {
           <SocketProvider>
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Main />} />
                 <Route path="/game" element={<Game />} />
+                <Route path="/*" element={<Main />} />
               </Routes>
             </BrowserRouter>
           </SocketProvider>
