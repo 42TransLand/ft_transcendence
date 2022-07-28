@@ -16,7 +16,7 @@ function Main() {
       <Box width="full" margin="auto">
         <MainStandby />
       </Box>
-      <Box minW="425px" maxW="425px" bgColor="teal.200">
+      <Box minW="400px" maxW="400px" bgColor="teal.200">
         <MainSocial />
       </Box>
     </Flex>
