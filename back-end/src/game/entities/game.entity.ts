@@ -8,12 +8,13 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
 export class GameRecord extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   // @ManyToOne(() =>User, () => User)
   @ManyToOne(() => User, (user) => user.id) // id로 바꿔야함
@@ -22,16 +23,16 @@ export class GameRecord extends BaseEntity {
   @ManyToOne(() => User, (user) => user.id) // id로 바꿔야함
   rightUser: number;
 
-  @Column()
+  @Column({ default: 0 })
   leftUserScore: number;
 
-  @Column()
+  @Column({ default: 0 })
   rightUserScore: number;
 
-  @Column()
+  @Column({ default: 0 })
   result: number; // left_win: 1, right_win: 2
 
-  @Column()
+  @Column({ default: GameMode.LADDER_GAME })
   type: GameMode;
 
   // @Column()
@@ -40,6 +41,6 @@ export class GameRecord extends BaseEntity {
   @CreateDateColumn()
   createAt: Date;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updateAt: Date;
 }
