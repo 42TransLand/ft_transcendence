@@ -15,11 +15,11 @@ function FriendElement(props: { userName: string; connectionStatus: string }) {
       bgColor="blue.200"
       borderWidth="1px"
       borderColor="black"
-      h="30px"
-      w="200px"
+      h="100%"
+      w="100%"
       justify="center"
     >
-      <Avatar boxSize="1.25em" name={userName} size="sm">
+      <Avatar boxSize="1.25em" name={userName} size="lg">
         <AvatarBadge boxSize="0.3em" borderColor={statusColor} />
       </Avatar>
       <Spacer />
