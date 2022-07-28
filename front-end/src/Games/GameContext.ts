@@ -99,6 +99,7 @@ export default class GameContext {
     this.app.view.onclick = null;
     this.app.ticker.remove(this.input.update);
     this.input.onComponentWillUnmount();
+    this.socket.emit(SocketEventName.GAME_LEAVE_REQ);
   }
 
   private displayHud(reason: string) {
