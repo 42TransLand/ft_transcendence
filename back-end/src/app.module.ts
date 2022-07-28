@@ -6,6 +6,7 @@ import { GameModule } from './game/game.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './config/typeorm.config';
 import { FriendModule } from './friend/friend.module';
+import { AlertModule } from './alert/alert.module';
 import { SocketModule } from './socket/socket.module';
 import { ScheduleModule } from '@nestjs/schedule';
 
@@ -16,6 +17,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     TypeOrmModule.forRoot(typeORMConfig),
     ScheduleModule.forRoot(),
     FriendModule,
+    AlertModule,
     SocketModule,
   ],
   controllers: [AppController],

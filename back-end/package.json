@@ -35,8 +35,11 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "swagger-ui-express": "^4.5.0",
+    "typeorm": "^0.3.7",
+    "uuid": "^8.3.2"
     "socket.io": "^4.5.1",
-    "typeorm": "^0.3.7"
+
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
