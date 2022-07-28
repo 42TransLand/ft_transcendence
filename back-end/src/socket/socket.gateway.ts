@@ -53,7 +53,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.userContexts.delete(client.id);
     }
 
-    console.log('Client disconnected');
+    console.log(`Client ${client.id} disconnected`);
   }
 
   @SubscribeMessage(SocketEventName.GAME_ENQUEUE_MATCH_REQ)
@@ -76,6 +76,17 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         error: e.message,
       });
     }
+  }
+
+  @SubscribeMessage(SocketEventName.GAME_LEAVE_REQ)
+  handleGameLeave(@ConnectedSocket() client: Socket) {
+    const userContext = this.userContexts.get(client.id);
+
+    if (userContext) {
+      this.socketGameService.disconnect(userContext);
+    }
+
+    console.log(`Client ${client.id} leaved game screen`);
   }
 
   @SubscribeMessage(SocketEventName.PLAYER_MOVE_REQ)

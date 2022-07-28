@@ -52,6 +52,7 @@ enum SocketEventName {
   GAME_CREATE_REQ = 'game-create-req',
   GAME_ENQUEUE_MATCH_REQ = 'game-enqueue-match-req',
   GAME_JOIN_REQ = 'game-join-req',
+  GAME_LEAVE_REQ = 'game-leave-req',
   PLAYER_MOVE_REQ = 'player-move-req',
 
   BALL_MOVE_NOTIFY = 'ball-move-notify',
