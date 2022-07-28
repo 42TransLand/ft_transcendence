@@ -15,7 +15,7 @@ function FriendElement(props: { userName: string; connectionStatus: string }) {
       bgColor="blue.200"
       borderWidth="1px"
       borderColor="black"
-      h="60px"
+      h="100%"
       w="100%"
       justify="center"
     >
