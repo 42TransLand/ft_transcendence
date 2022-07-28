@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import {
   Popover,
   PopoverTrigger,
@@ -9,20 +9,20 @@ import {
 } from '@chakra-ui/react';
 
 function PopoverButton(props: {
-  InternalComponent: () => ReactElement;
-  ButtonIcon: React.ReactElement;
+  icon: React.ReactElement;
+  children: React.ReactNode;
 }) {
-  const { InternalComponent, ButtonIcon } = props;
+  const { icon: ButtonIcon, children } = props;
 
   return (
     <Popover placement="left">
       <PopoverTrigger>
         <IconButton size="sm" aria-label="PopoverTrigger" icon={ButtonIcon} />
       </PopoverTrigger>
-      <PopoverContent padding={5}>
+      <PopoverContent paddingX={5} paddingTop={10} w="400px" h="300px">
         <PopoverArrow />
         <PopoverCloseButton />
-        <InternalComponent />
+        {children}
       </PopoverContent>
     </Popover>
   );
