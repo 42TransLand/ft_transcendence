@@ -9,21 +9,25 @@ function ChannelElement(props: {
   maxHeadCount: number;
 }) {
   const { isProtected, channelName, currentHeadCount, maxHeadCount } = props;
-  const icon = isProtected ? <LockIcon /> : <UnlockIcon />;
+  const icon = isProtected ? (
+    <LockIcon boxSize="2em" />
+  ) : (
+    <UnlockIcon boxSize="2em" />
+  );
 
   return (
     <HStack
       bgColor="blue.200"
       borderWidth="1px"
       borderColor="black"
-      h="30px"
-      w="200px"
+      h="60px"
+      w="100%"
     >
       {icon}
       <Spacer />
-      <Text fontSize="xs">{channelName}</Text>
+      <Text fontSize="lg">{channelName}</Text>
       <Spacer />
-      <Text fontSize="xs">
+      <Text fontSize="lg">
         {currentHeadCount}/{maxHeadCount}
       </Text>
     </HStack>
