@@ -61,7 +61,13 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
   }
 }
 
-function SocketProvider({ children }: { children: React.ReactNode }) {
+function SocketProvider({
+  query,
+  children,
+}: {
+  query: { [key: string]: any };
+  children: React.ReactNode;
+}) {
   const [state, dispatch] = React.useReducer(SocketReducer, initialSocketState);
   const val = React.useMemo(() => ({ state, dispatch }), [state, dispatch]);
   React.useEffect(() => {
@@ -70,6 +76,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
       {
         transports: ['websocket'],
         autoConnect: false,
+        query,
       },
     );
     dispatch({ action: 'connect', socket });
@@ -80,7 +87,7 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
       dispatch({ action: 'connected' });
     });
     socket.connect();
-  }, []);
+  }, [query]);
   return (
     <SocketStateContext.Provider value={val}>
       {children}
