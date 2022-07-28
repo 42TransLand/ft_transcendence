@@ -41,6 +41,14 @@ export class SocketGameService {
     this.queues.push(user);
   }
 
+  // 큐에서 특정 유저를 삭제하기.
+  private leaveQueue(user: UserContext) {
+    const index = this.queues.indexOf(user);
+    if (index > -1) {
+      this.queues.splice(index, 1);
+    }
+  }
+
   // 게임 큐에서, 연결되어 있는 플레이어 둘을 꺼내오기.
   private dequeue(): DequeueSuccessType | DequeueFalseType {
     if (this.queues.length < 2) {
@@ -96,6 +104,9 @@ export class SocketGameService {
     // 관전중인 방도 모두 퇴장
     user.gamesOnView.forEach((room) => room.leaveSpectator(user));
     user.gamesOnView.clear();
+
+    // 큐에 있었다면, 해당 유저를 매칭 큐에서 삭제.
+    this.leaveQueue(user);
   }
 
   @Interval(GAME_TIME_INTERVAL)
