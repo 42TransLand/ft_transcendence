@@ -93,7 +93,7 @@ export class Room {
     this.spectators.delete(user.id);
   }
 
-  public move(user: UserContext, move: PlayerMoveResDto) {
+  public movePlayer(user: UserContext, move: PlayerMoveResDto) {
     const player = this.players.get(user.id);
     if (player) {
       player.pos = { x: move.x, y: move.y };
