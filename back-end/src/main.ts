@@ -5,7 +5,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+  });
 
   const config = new DocumentBuilder()
     .setTitle('NestJS API')
@@ -16,10 +18,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  
-  const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
-  });
+
   await app.listen(3000);
 
   if (module.hot) {

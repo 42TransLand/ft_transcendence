@@ -1,5 +1,5 @@
 {
-  "name": "backtest",
+  "name": "ft_transcendence",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-socket.io": "^9.0.5",
@@ -38,8 +39,6 @@
     "swagger-ui-express": "^4.5.0",
     "typeorm": "^0.3.7",
     "uuid": "^8.3.2"
-    "socket.io": "^4.5.1",
-
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
