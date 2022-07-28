@@ -1,17 +1,10 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Delete, Post } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FriendDto } from './dto/friend.dto';
 import { FriendAlertDto } from './dto/friendAlert.dto';
 import { FriendService } from './friend.service';
 
+@ApiTags('Friend')
 @Controller('friend')
 export class FriendController {
   constructor(private friendService: FriendService) {}

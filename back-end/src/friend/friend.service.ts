@@ -6,7 +6,6 @@ import { FriendRepository } from './friend.repository';
 import { AlertService } from 'src/alert/alert.service';
 import { AlertDto } from 'src/alert/dto/alert.dto';
 import { FriendAlertDto } from './dto/friendAlert.dto';
-import { AlertRepository } from 'src/alert/alert.Repository';
 
 @Injectable()
 export class FriendService {
@@ -33,17 +32,17 @@ export class FriendService {
 
     const reqUser = await this.userService.findByNickname(receiver);
     const resUser = await this.userService.findByNickname(requestor);
-    const alert = await this.alertService.findOneById(alertId);
-    alert.read = true;
+    await this.alertService.updateAlert(alertId); // [추가된 항목]
 
     return this.friendRepository.acceptFriend(reqUser, resUser);
   }
 
   async rejectFriend(friendAlertDto: FriendAlertDto): Promise<void> {
-    const { requestor, receiver } = friendAlertDto;
+    const { requestor, receiver, alertId } = friendAlertDto;
 
     const reqUser = await this.userService.findByNickname(receiver);
     const resUser = await this.userService.findByNickname(requestor);
+    await this.alertService.updateAlert(alertId); // [추가된 항목]
     return this.friendRepository.rejectFriend(reqUser, resUser);
   }
 

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -12,11 +13,17 @@ export class Alert {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  // 알림 대상
+  @ApiProperty({
+    example: 'dcho',
+    description: '알림 대상',
+  })
   @ManyToOne(() => User, (user) => user.id)
   receiver: User;
 
-  // 친구 요청 보낸사람 id
+  @ApiProperty({
+    example: 'jiholee',
+    description: '요청 보낸사람',
+  })
   @ManyToOne(() => User, (user) => user.id)
   requestor: User;
 
