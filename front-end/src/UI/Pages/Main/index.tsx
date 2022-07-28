@@ -7,14 +7,15 @@ import Loading from '../../Templates/Loading';
 
 function Main() {
   const { state } = useSocket();
-
-  if (state.socketState !== SocketState.CONNECTED) {
-    if (state.socketState === SocketState.CONNECTING) {
-      return <Loading message="서버에 접속중..." />;
+  if (process.env.REACT_APP_WEBSOCKET_REQUIRED === 'true') {
+    if (state.socketState !== SocketState.CONNECTED) {
+      if (state.socketState === SocketState.CONNECTING) {
+        return <Loading message="서버에 접속중..." />;
+      }
+      return (
+        <Loading message="서버에 연결하지 못했습니다. 나중에 다시 시도하세요." />
+      );
     }
-    return (
-      <Loading message="서버에 연결하지 못했습니다. 나중에 다시 시도하세요." />
-    );
   }
 
   return (
