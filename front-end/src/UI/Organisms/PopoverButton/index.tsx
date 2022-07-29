@@ -19,7 +19,13 @@ function PopoverButton(props: {
       <PopoverTrigger>
         <IconButton size="sm" aria-label="PopoverTrigger" icon={ButtonIcon} />
       </PopoverTrigger>
-      <PopoverContent paddingX={5} paddingTop={10} w="400px" h="300px">
+      <PopoverContent
+        paddingX={5}
+        paddingTop={10}
+        paddingBottom={5}
+        w="420px"
+        h="340px"
+      >
         <PopoverArrow />
         <PopoverCloseButton />
         {children}
