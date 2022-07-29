@@ -26,7 +26,7 @@ type DequeueFalseType = {
 export class SocketGameService {
   constructor(private readonly gameService: GameService) {}
 
-  private rooms: Map<number, Room> = new Map<number, Room>();
+  private rooms: Map<string, Room> = new Map<string, Room>();
 
   private queues: UserContext[] = [];
 
@@ -79,22 +79,25 @@ export class SocketGameService {
   }
 
   // 게임 방을 생성
-  createGame(
+  async createGame(
     user1: UserContext,
     user2: UserContext,
     gameMode: string,
     ladder: boolean,
     scoreForWin: number,
   ) {
-    const dbRecordRoom = this.testCreateRoom(); // TODO 실제 DB에서 생성된 방의 ID를 반환받아야 함.
-
-    const room = new Room(dbRecordRoom.id, gameMode, ladder, scoreForWin);
+    const dbRecordRoom = await this.gameService.createGame(
+      user1.user,
+      user2.user,
+    ); // TODO 실제 DB에서 생성된 방의 ID를 반환받아야 함.
+    // console.log(dbRecordRoom); // 테스트 필요
+    const room = new Room(dbRecordRoom, gameMode, ladder, scoreForWin);
 
     room.join(user1, 0);
     room.join(user2, 1);
     user1.gameRooms.add(room);
     user2.gameRooms.add(room);
-    this.rooms.set(dbRecordRoom.id, room);
+    this.rooms.set(dbRecordRoom, room);
     return room;
   }
 
@@ -125,14 +128,14 @@ export class SocketGameService {
     });
   }
 
-  private tryMatch() {
+  async tryMatch() {
     this.queues = this.queues.filter((user) => user.socket.connected);
 
     const matched = this.dequeue();
     if (!matched.success) return;
 
     const { user1, user2 } = matched;
-    const room = this.createGame(
+    const room = await this.createGame(
       user1,
       user2,
       'classic',
@@ -153,6 +156,4 @@ export class SocketGameService {
     });
     console.log(`Game matched between ${user1.id} and ${user2.id}`);
   }
-
-  
 }

@@ -29,7 +29,7 @@ export class Room {
   private winnerIndex = -1;
 
   constructor(
-    public readonly id: number,
+    public readonly id: string,
     public readonly gameMode: string,
     public readonly ladder: boolean,
     public readonly scoreForWin: number,
