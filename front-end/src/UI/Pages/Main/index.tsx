@@ -8,13 +8,15 @@ import Loading from '../../Templates/Loading';
 function Main() {
   const { state } = useSocket();
   if (process.env.REACT_APP_WEBSOCKET_REQUIRED === 'true') {
-    if (state.socketState !== SocketState.CONNECTED) {
-      if (state.socketState === SocketState.CONNECTING) {
+    switch (state.socketState) {
+      case SocketState.CONNECTING:
         return <Loading message="서버에 접속중..." />;
-      }
-      return (
-        <Loading message="서버에 연결하지 못했습니다. 나중에 다시 시도하세요." />
-      );
+      case SocketState.CONNECT_ERROR:
+        return <Loading message="서버에 연결하지 못했습니다." />;
+      case SocketState.DISCONNECTED:
+        return <Loading message="서버와 연결이 끊어졌습니다." />;
+      default:
+        break;
     }
   }
 
