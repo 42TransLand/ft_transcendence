@@ -5,6 +5,7 @@ import SearchBar from '../../Atoms/SearchBar';
 import PopoverButton from '../PopoverButton';
 import ElementList from '../ElementList';
 import FriendElement from '../../Molecules/FriendElement';
+import UserContextMenu from '../../Templates/UserContextMenu';
 
 function FriendTab() {
   return (
@@ -14,8 +15,12 @@ function FriendTab() {
         <SearchBar />
       </HStack>
       <ElementList>
-        <FriendElement userName="Kanye West" connectionStatus="online" />
-        <FriendElement userName="Erling Haaland" connectionStatus="offline" />
+        <UserContextMenu mode="friend">
+          <FriendElement userName="Kanye West" connectionStatus="online" />
+        </UserContextMenu>
+        <UserContextMenu mode="chat">
+          <FriendElement userName="Erling Haaland" connectionStatus="offline" />
+        </UserContextMenu>
         <FriendElement userName="Benjamin Button" connectionStatus="ingame" />
       </ElementList>
     </VStack>
