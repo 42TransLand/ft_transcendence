@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
+import { GameService } from 'src/game/game.service';
 import { User } from 'src/users/entities/user.entity';
 import { UserContext } from '../class/user.class';
 import { Room } from './class/room.class';
@@ -23,6 +24,8 @@ type DequeueFalseType = {
 
 @Injectable()
 export class SocketGameService {
+  constructor(private readonly gameService: GameService) {}
+
   private rooms: Map<number, Room> = new Map<number, Room>();
 
   private queues: UserContext[] = [];
@@ -69,13 +72,14 @@ export class SocketGameService {
 
   // 테스트용. 실제 서버에서는 아래 메서드를 사용하지 않음.
   private roomIdCounter = 0;
+
   private testCreateRoom(): { id: number } {
     this.roomIdCounter += 1;
     return { id: this.roomIdCounter };
   }
 
   // 게임 방을 생성
-  createRoom(
+  createGame(
     user1: UserContext,
     user2: UserContext,
     gameMode: string,
@@ -128,7 +132,7 @@ export class SocketGameService {
     if (!matched.success) return;
 
     const { user1, user2 } = matched;
-    const room = this.createRoom(
+    const room = this.createGame(
       user1,
       user2,
       'classic',
@@ -149,4 +153,6 @@ export class SocketGameService {
     });
     console.log(`Game matched between ${user1.id} and ${user2.id}`);
   }
+
+  
 }

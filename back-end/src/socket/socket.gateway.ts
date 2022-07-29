@@ -13,48 +13,68 @@ import { UserContext } from './class/user.class';
 import { SocketGameService } from './game/socket-game.service';
 import { SocketService } from './socket.service';
 import PlayerMoveReqDto from './game/dto/req/player.move.req.dto';
+import GameMatchDto from './game/dto/req/game.Match.dto';
 import BaseResultDto from './game/dto/base.result.dto';
 import { SocketEventName } from './game/constants/game.constants';
 import { randomUUID } from 'crypto';
 import { Room } from './game/class/room.class';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/entities/user.entity';
+import { GameService } from 'src/game/game.service';
 
 @WebSocketGateway({ transports: ['websocket'], namespace: 'socket' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  private userContexts: Map<string, UserContext> = new Map();
+  private userContexts: Map<string, UserContext> = new Map(); // key: socketId
+
+  private usersSocket: Map<number, string> = new Map(); // key: userId(나중에 string으로 교체), value: socketId
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(
     private readonly socketService: SocketService,
     private readonly socketGameService: SocketGameService,
+    private readonly userService: UsersService,
   ) {}
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    const userToken = randomUUID(); // client.handshake.query.token as string;
-    const socketId = client.id;
+    try {
+      const userToken = client.handshake.query.user as string; // nickname
+      const socketId = client.id;
+      const date = new Date();
 
-    this.userContexts.set(
-      socketId,
-      new UserContext(socketId, this.server, client, userToken),
-    );
-
-    console.log(
-      `Client connected with token: ${userToken} | socketId: ${socketId} | User: ${this.userContexts.size}`,
-    );
+      const user: User = await this.userService.findByNickname(userToken);
+      if (!user) {
+        throw new Error('User Not Found');
+      }
+      this.userContexts.set(
+        socketId,
+        new UserContext(socketId, this.server, client, userToken, user, date),
+      );
+      this.usersSocket.set(user.id, socketId);
+      console.log(
+        `Client connected with id: ${user.id} | token: ${userToken} | socketId: ${socketId} | User: ${this.userContexts.size}`,
+      );
+      console.log(this.usersSocket[user.id]);
+    } catch (error) {
+      // ignore
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleDisconnect(@ConnectedSocket() client: Socket) {
-    const userContext = this.userContexts.get(client.id);
-
-    if (userContext) {
-      this.socketGameService.disconnect(userContext);
-      this.userContexts.delete(client.id);
+    try {
+      const userContext = this.userContexts.get(client.id);
+      if (userContext) {
+        this.socketGameService.disconnect(userContext);
+        this.userContexts.delete(client.id);
+      }
+      console.log(`Client ${client.id} disconnected`);
+    } catch (error) {
+      // ignore
     }
-
-    console.log(`Client ${client.id} disconnected`);
   }
 
   @SubscribeMessage(SocketEventName.GAME_ENQUEUE_MATCH_REQ)
@@ -81,13 +101,15 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(SocketEventName.GAME_LEAVE_REQ)
   handleGameLeave(@ConnectedSocket() client: Socket) {
-    const userContext = this.userContexts.get(client.id);
-
-    if (userContext) {
-      this.socketGameService.disconnect(userContext);
+    try {
+      const userContext = this.userContexts.get(client.id);
+      if (userContext) {
+        this.socketGameService.disconnect(userContext);
+      }
+      console.log(`Client ${client.id} leaved game screen`);
+    } catch (error) {
+      // ignore
     }
-
-    console.log(`Client ${client.id} leaved game screen`);
   }
 
   @SubscribeMessage(SocketEventName.PLAYER_MOVE_REQ)
@@ -100,7 +122,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (userContext) {
         const { value: room, done } = userContext.gameRooms.values().next();
-        if (done) {                       
+        if (done) {
           throw new Error('No game');
         }
         room.movePlayer(userContext, dto);
@@ -108,6 +130,67 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       throw new Error('No user');
     } catch {
       // Ignore
+    }
+  }
+
+  @SubscribeMessage(SocketEventName.GAME_INVITE_REQ)
+  async handleGameInvite(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameMatchDto: GameMatchDto,
+  ) {
+    try {
+      const opponent: User = await this.userService.findByNickname(
+        gameMatchDto.opponentNickname,
+      );
+      if (opponent) {
+        const opponentSocket = this.usersSocket.get(opponent.id);
+        this.server.to(opponentSocket).emit('GameInvitation', {
+          mode: gameMatchDto.gameMode,
+          opponentSocket: client.id,
+        });
+
+        client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
+          success: true,
+        });
+      } else throw new Error('No user');
+    } catch (e) {
+      client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
+        success: false,
+        error: e.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(SocketEventName.GAME_ACCEPT_REQ)
+  async handleGameAccept(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameMatchDto: GameMatchDto,
+  ) {
+    try {
+      const opponent: User = await this.userService.findByNickname(
+        gameMatchDto.opponentNickname,
+      );
+      if (opponent) {
+        // find socket
+        const opponentSocket = this.usersSocket.get(opponent.id);
+
+        // find Context
+        const userContext = this.userContexts.get(client.id);
+        const opponentContext = this.userContexts.get(opponentSocket);
+
+        this.socketGameService.createGame(
+          userContext,
+          opponentContext,
+          gameMatchDto.gameMode,
+          false,
+          10,
+        );
+      } else throw new Error('No user');
+    } catch (e) {
+      client.emit(SocketEventName.GAME_ACCEPT_RES, <BaseResultDto>{
+        success: false,
+        error: e.message,
+      });
     }
   }
 }
