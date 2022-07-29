@@ -1,6 +1,7 @@
 import React from 'react';
-import { Text, HStack, Spacer } from '@chakra-ui/react';
+import { Text, HStack, Icon } from '@chakra-ui/react';
 import { LockIcon, UnlockIcon } from '@chakra-ui/icons';
+import Square from '../../Atoms/Square';
 
 function ChannelElement(props: {
   isProtected: boolean;
@@ -9,25 +10,26 @@ function ChannelElement(props: {
   maxHeadCount: number;
 }) {
   const { isProtected, channelName, currentHeadCount, maxHeadCount } = props;
-  const icon = isProtected ? (
-    <LockIcon boxSize="2em" />
-  ) : (
-    <UnlockIcon boxSize="2em" />
-  );
 
   return (
     <HStack
       bgColor="blue.200"
       borderWidth="1px"
       borderColor="black"
-      h="60px"
+      borderRadius="15px"
+      h="3.5em"
       w="100%"
+      justifyContent="space-between"
     >
-      {icon}
-      <Spacer />
-      <Text fontSize="lg">{channelName}</Text>
-      <Spacer />
-      <Text fontSize="lg">
+      <HStack h="full">
+        <Square>
+          <Icon as={isProtected ? LockIcon : UnlockIcon} boxSize="1.75em" />
+        </Square>
+        <Text fontSize="xl" marginX="0!important" noOfLines={1}>
+          {channelName}
+        </Text>
+      </HStack>
+      <Text fontSize="xl" paddingX="0.5em">
         {currentHeadCount}/{maxHeadCount}
       </Text>
     </HStack>
