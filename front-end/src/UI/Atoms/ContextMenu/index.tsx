@@ -30,6 +30,7 @@ import {
 export interface ContextMenuProps<T extends HTMLElement> {
   renderMenu: () => JSX.Element | null;
   children: (ref: MutableRefObject<T | null>) => JSX.Element | null;
+  eventType: 'contextmenu' | 'click';
   menuProps?: MenuProps;
   portalProps?: PortalProps;
   menuButtonProps?: MenuButtonProps;
@@ -61,7 +62,7 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
     }
   }, [isOpen]);
 
-  useEventListener('contextmenu', (e) => {
+  useEventListener(props.eventType, (e) => {
     if (
       targetRef.current?.contains(e.target as any) ||
       e.target === targetRef.current
