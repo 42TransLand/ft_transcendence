@@ -16,6 +16,7 @@ import PlayerMoveReqDto from './game/dto/req/player.move.req.dto';
 import BaseResultDto from './game/dto/base.result.dto';
 import { SocketEventName } from './game/constants/game.constants';
 import { randomUUID } from 'crypto';
+import { Room } from './game/class/room.class';
 
 @WebSocketGateway({ transports: ['websocket'], namespace: 'socket' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -99,10 +100,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       if (userContext) {
         const { value: room, done } = userContext.gameRooms.values().next();
-        if (done) {
+        if (done) {                       
           throw new Error('No game');
         }
-        room.move(userContext, dto);
+        room.movePlayer(userContext, dto);
       }
       throw new Error('No user');
     } catch {

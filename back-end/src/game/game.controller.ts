@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { GameService } from './game.service';
-import { GameRecodDto } from './dto/game.recode.dto';
+import { GameCreateDto } from './dto/game.create.dto';
 import { UserDto } from 'src/users/dto/userdto';
 import { GameRecord } from './entities/game.entity';
 import { ApiTags } from '@nestjs/swagger';
@@ -13,5 +13,10 @@ export class GameController {
   @Get()
   getGamesByUserId(@Body() user: UserDto): Promise<GameRecord[]> {
     return this.gameService.getGamesByUserId(user);
+  }
+
+  @Post()
+  createGame(@Body() gameCreateDto: GameCreateDto): Promise<string> {
+    return this.gameService.createGame(gameCreateDto);
   }
 }
