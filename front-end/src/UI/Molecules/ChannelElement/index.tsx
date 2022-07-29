@@ -15,7 +15,7 @@ function ChannelElement(props: {
     <HStack
       borderWidth="1px"
       borderRadius="15px"
-      h="3.5em"
+      h="4em"
       w="100%"
       justifyContent="space-between"
     >
