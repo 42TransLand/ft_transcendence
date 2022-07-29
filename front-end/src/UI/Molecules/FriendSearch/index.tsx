@@ -8,7 +8,7 @@ function FriendSearch() {
     <div>
       <HStack>
         <Search2Icon fontSize={40} />
-        <VStack>
+        <VStack width="100%">
           <Input
             value={value}
             onChange={(event) => setValue(event.target.value)}
