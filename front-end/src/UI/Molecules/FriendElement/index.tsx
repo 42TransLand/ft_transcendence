@@ -17,6 +17,7 @@ function FriendElement(props: { userName: string; connectionStatus: string }) {
       borderColor="black"
       h="60px"
       w="100%"
+      padding={3}
     >
       <Avatar boxSize="1.25em" name={userName} size="lg">
         <AvatarBadge boxSize="0.3em" borderColor={statusColor} />
