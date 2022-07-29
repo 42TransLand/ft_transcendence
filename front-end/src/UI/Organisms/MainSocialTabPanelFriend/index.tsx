@@ -6,12 +6,15 @@ import PopoverButton from '../PopoverButton';
 import ElementList from '../ElementList';
 import FriendElement from '../../Molecules/FriendElement';
 import UserContextMenu from '../../Templates/UserContextMenu';
+import FriendSearch from '../../Molecules/FriendSearch';
 
 function FriendTab() {
   return (
     <VStack w="100%">
       <HStack w="100%">
-        <PopoverButton icon={<AddIcon />}>hello</PopoverButton>
+        <PopoverButton icon={<AddIcon />}>
+          <FriendSearch />
+        </PopoverButton>
         <SearchBar />
       </HStack>
       <ElementList>
