@@ -8,9 +8,10 @@ import useGame from '../../../Hooks/useGame';
 import { useSocket } from '../../../Hooks/useSocket';
 
 const GameView = styled.div`
+  min-height: 100vh;
   display: flex;
-  width: 100%;
-  height: 100%;
+  justify-content: center;
+  align-items: center;
 `;
 
 function RealGame() {

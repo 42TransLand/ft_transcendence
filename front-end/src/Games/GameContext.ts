@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import * as PIXI from 'pixi.js';
 import { Socket } from 'socket.io-client';
 import AbstractPlayer from './AbstractPlayer';
@@ -60,7 +59,8 @@ export default class GameContext {
     });
     this.initDecorations();
     this.initHandlers();
-    this.app.view.style.width = '100%';
+    this.app.view.style.maxWidth = '100vw';
+    this.app.view.style.maxHeight = '100vh';
     this.app.view.style.height = '100%';
     this.input = new InputManager(this.app.view);
     this.ball = new Ball();
@@ -200,12 +200,10 @@ export default class GameContext {
   }
 
   private onBallMove(msg: BallMoveNotifyDto) {
-    console.log(msg);
     this.ball.onBallMove(msg);
   }
 
   private onGameCreateRes(msg: GameCreateResDto) {
-    console.log(msg);
     // 게임 정보를 서버로부터 받음 : 게임 모드, 플레이어 인덱스
     this.localIndex = msg.myIndex;
     this.remoteIndex = 1 - msg.myIndex;
@@ -215,19 +213,16 @@ export default class GameContext {
   }
 
   private onGameEndNotify(msg: GameEndNotifyDto) {
-    console.log(msg);
     this.displayHud(`Winner: Player${msg.winnerIndex + 1}`);
   }
 
   private onGameEnqueueMatchRes(msg: BaseResultDto) {
-    console.log(msg);
     if (!msg.success) {
       this.displayHud(`${msg.error}`);
     }
   }
 
   private onGameJoinRes(msg: GameJoinResDto) {
-    console.log(msg);
     // 게임 정보를 서버로부터 받음 : 게임 모드, 플레이어 인덱스
     this.localIndex = msg.myIndex;
     this.remoteIndex = 1 - msg.myIndex;
@@ -237,18 +232,15 @@ export default class GameContext {
   }
 
   private onGameReadyNotify(msg: GameReadyNotifyDto) {
-    console.log(msg);
     if (msg.readyCountDown === 0) this.displayHud('GAME START!');
     else this.displayHud(`Ready: ${msg.readyCountDown}`);
   }
 
   private onGameScoreNotify(msg: GameScoreNotifyDto) {
-    console.log(msg);
     this.players[msg.playerIndex]?.onScore(msg);
   }
 
   private onGameStateNotify(msg: GameStateNotifyDto) {
-    console.log(msg);
     if (msg.state === GameState.READY) {
       this.removeDecorations();
       this.deactivateGame();
@@ -264,7 +256,6 @@ export default class GameContext {
   }
 
   private onPlayerMoveNotify(msg: PlayerMoveNotifyDto) {
-    console.log(msg);
     this.players[msg.playerIndex]?.onMove(msg);
   }
 
