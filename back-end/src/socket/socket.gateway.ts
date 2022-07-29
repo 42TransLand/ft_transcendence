@@ -16,7 +16,6 @@ import PlayerMoveReqDto from './game/dto/req/player.move.req.dto';
 import GameMatchDto from './game/dto/req/game.Match.dto';
 import BaseResultDto from './game/dto/base.result.dto';
 import { SocketEventName } from './game/constants/game.constants';
-import { randomUUID } from 'crypto';
 import { Room } from './game/class/room.class';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
