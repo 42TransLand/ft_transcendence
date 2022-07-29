@@ -143,13 +143,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       if (opponent) {
         const opponentSocket = this.usersSocket.get(opponent.id);
-        this.server.to(opponentSocket).emit('GameInvitation', {
+        this.server.to(opponentSocket).emit(SocketEventName.GAME_INVITE_RES, {
           mode: gameMatchDto.gameMode,
           opponentSocket: client.id,
-        });
-
-        client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
-          success: true,
         });
       } else throw new Error('No user');
     } catch (e) {
@@ -184,6 +180,31 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
           false,
           10,
         );
+      } else throw new Error('No user');
+    } catch (e) {
+      client.emit(SocketEventName.GAME_ACCEPT_RES, <BaseResultDto>{
+        success: false,
+        error: e.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(SocketEventName.GAME_REFUSE_REQ)
+  async handleGameDecline(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() gameMatchDto: GameMatchDto,
+  ) {
+    try {
+      const opponent: User = await this.userService.findByNickname(
+        gameMatchDto.opponentNickname,
+      );
+      if (opponent) {
+        // find socket
+        const opponentSocket = this.usersSocket.get(opponent.id);
+
+        this.server.to(opponentSocket).emit(SocketEventName.GAME_REFUSE_RES, {
+          message: `Your invitation has been refused`,
+        });
       } else throw new Error('No user');
     } catch (e) {
       client.emit(SocketEventName.GAME_ACCEPT_RES, <BaseResultDto>{
