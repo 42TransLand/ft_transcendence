@@ -1,15 +1,26 @@
 import React from 'react';
 import { io, Socket } from 'socket.io-client';
 
+enum SocketState {
+  CONNECTING,
+  CONNECTED,
+  CONNECT_ERROR,
+  DISCONNECTED,
+}
+
 type SocketStateType = {
   socket: Socket | null;
+  socketState: SocketState;
 };
 const initialSocketState: SocketStateType = {
   socket: null,
+  socketState: SocketState.DISCONNECTED,
 };
 
 type SocketActionType =
   | { action: 'connect'; socket: Socket }
+  | { action: 'connect_failed' }
+  | { action: 'connected' }
   | { action: 'disconnect' };
 
 type SocketContextType = {
@@ -27,18 +38,36 @@ function useSocket() {
   return context as SocketContextType;
 }
 
-function SocketReducer(state: SocketStateType, action: SocketActionType) {
+function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
   switch (action.action) {
     case 'connect':
-      return { ...state, socket: action.socket };
+      return {
+        ...beforeState,
+        socket: action.socket,
+        socketState: SocketState.CONNECTING,
+      };
+    case 'connect_failed':
+      return { ...beforeState, socketState: SocketState.CONNECT_ERROR };
+    case 'connected':
+      return { ...beforeState, socketState: SocketState.CONNECTED };
     case 'disconnect':
-      return { ...state, socket: null };
+      return {
+        ...beforeState,
+        socket: null,
+        socketState: SocketState.DISCONNECTED,
+      };
     default:
-      return state;
+      return beforeState;
   }
 }
 
-function SocketProvider({ children }: { children: React.ReactNode }) {
+function SocketProvider({
+  query,
+  children,
+}: {
+  query: { [key: string]: any };
+  children: React.ReactNode;
+}) {
   const [state, dispatch] = React.useReducer(SocketReducer, initialSocketState);
   const val = React.useMemo(() => ({ state, dispatch }), [state, dispatch]);
   React.useEffect(() => {
@@ -47,11 +76,18 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
       {
         transports: ['websocket'],
         autoConnect: false,
+        query,
       },
     );
     dispatch({ action: 'connect', socket });
+    socket.on('connect_failed', () => {
+      dispatch({ action: 'connect_failed' });
+    });
+    socket.on('connect', () => {
+      dispatch({ action: 'connected' });
+    });
     socket.connect();
-  }, []);
+  }, [query]);
   return (
     <SocketStateContext.Provider value={val}>
       {children}
@@ -59,4 +95,4 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export { SocketProvider, useSocket };
+export { SocketProvider, useSocket, SocketState };

@@ -2,13 +2,20 @@ import React from 'react';
 import { Box, Flex } from '@chakra-ui/react';
 import MainSocial from '../../Templates/MainSocial';
 import MainStandby from '../../Templates/MainStandby';
-import { useSocket } from '../../../Hooks/useSocket';
+import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
 
 function Main() {
   const { state } = useSocket();
-  if (state.socket === null) {
-    return <Loading message="서버에 접속중..." />;
+  if (process.env.REACT_APP_WEBSOCKET_REQUIRED === 'true') {
+    if (state.socketState !== SocketState.CONNECTED) {
+      if (state.socketState === SocketState.CONNECTING) {
+        return <Loading message="서버에 접속중..." />;
+      }
+      return (
+        <Loading message="서버에 연결하지 못했습니다. 나중에 다시 시도하세요." />
+      );
+    }
   }
 
   return (
