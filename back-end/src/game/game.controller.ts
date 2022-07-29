@@ -14,9 +14,4 @@ export class GameController {
   getGamesByUserId(@Body() user: UserDto): Promise<GameRecord[]> {
     return this.gameService.getGamesByUserId(user);
   }
-
-  @Post()
-  createGame(@Body() gameCreateDto: GameCreateDto): Promise<string> {
-    return this.gameService.createGame(gameCreateDto);
-  }
 }
