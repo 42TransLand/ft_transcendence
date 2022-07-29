@@ -1,8 +1,16 @@
+import { VStack } from '@chakra-ui/react';
 import React from 'react';
-import { Text } from '@chakra-ui/react';
+import NotificationElement from '../../Molecules/NotificationElement';
 
 function NotificationTab() {
-  return <Text fontSize={50}>THIS IS MAIN SOCIAL NOTIFICATION TAB</Text>;
+  return (
+    <VStack>
+      <NotificationElement userName="Lil Baby" />
+      <NotificationElement userName="Lil Baby" />
+      <NotificationElement userName="Lil Baby" />
+      <NotificationElement userName="Lil Baby" />
+    </VStack>
+  );
 }
 
 export default NotificationTab;

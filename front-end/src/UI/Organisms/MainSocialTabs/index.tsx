@@ -9,7 +9,7 @@ import TabListElement from '../../Atoms/TabListElement';
 
 export default function SocialTabs() {
   return (
-    <Tabs isFitted isManual>
+    <Tabs w="100%" isFitted isManual>
       <TabList mb="1em">
         <TabListElement icon={FaUsers} label="친구" />
         <TabListElement icon={FaBell} label="알림" />
