@@ -32,8 +32,8 @@ function App() {
           <SocketProvider query={{ user: user.id }}>
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Main />} />
                 <Route path="/game" element={<Game />} />
+                <Route path="/*" element={<Main />} />
               </Routes>
             </BrowserRouter>
           </SocketProvider>
