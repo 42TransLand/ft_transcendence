@@ -5,7 +5,7 @@ import { TabPanels, TabList, Tabs, TabPanel } from '@chakra-ui/react';
 import FriendTab from '../MainSocialTabPanelFriend';
 import NotificationTab from '../MainSocialTabPanelNotification';
 import ChatTab from '../MainSocialTabPanelChat';
-import TabListElement from '../../Molecules/TabListElement';
+import TabListElement from '../../Atoms/TabListElement';
 
 export default function SocialTabs() {
   return (

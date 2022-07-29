@@ -7,7 +7,6 @@ function MainSocial() {
   return (
     <VStack h="100%">
       <MyProfile />
-      <MainSocialSocial />
       <SocialTabs />
     </VStack>
   );
