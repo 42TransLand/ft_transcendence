@@ -59,7 +59,8 @@ export default class GameContext {
     });
     this.initDecorations();
     this.initHandlers();
-    this.app.view.style.width = '100%';
+    this.app.view.style.maxWidth = '100vw';
+    this.app.view.style.maxHeight = '100vh';
     this.app.view.style.height = '100%';
     this.input = new InputManager(this.app.view);
     this.ball = new Ball();
