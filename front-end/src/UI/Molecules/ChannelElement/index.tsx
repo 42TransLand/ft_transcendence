@@ -13,9 +13,7 @@ function ChannelElement(props: {
 
   return (
     <HStack
-      bgColor="blue.200"
       borderWidth="1px"
-      borderColor="black"
       borderRadius="15px"
       h="3.5em"
       w="100%"
