@@ -5,12 +5,15 @@ import PopoverButton from '../PopoverButton';
 import SearchBar from '../../Atoms/SearchBar';
 import ElementList from '../ElementList';
 import ChannelElement from '../../Molecules/ChannelElement';
+import CreateChannel from '../../Molecules/CreateChannel';
 
 function ChatTab() {
   return (
     <VStack w="100%">
       <HStack w="100%">
-        <PopoverButton icon={<AddIcon />}>hello</PopoverButton>
+        <PopoverButton icon={<AddIcon />}>
+          <CreateChannel />
+        </PopoverButton>
         <SearchBar />
       </HStack>
       <ElementList>
