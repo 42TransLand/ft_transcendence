@@ -13,7 +13,7 @@ import { UserContext } from './class/user.class';
 import { SocketGameService } from './game/socket-game.service';
 import { SocketService } from './socket.service';
 import PlayerMoveReqDto from './game/dto/req/player.move.req.dto';
-import GameMatchDto from './game/dto/req/game.Match.dto';
+import GameMatchDto from './game/dto/req/game.match.dto';
 import BaseResultDto from './game/dto/base.result.dto';
 import { SocketEventName } from './game/constants/game.constants';
 import { Room } from './game/class/room.class';
