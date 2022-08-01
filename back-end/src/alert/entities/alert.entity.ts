@@ -14,22 +14,30 @@ export class Alert {
   id: string;
 
   @ApiProperty({
-    example: 'dcho',
-    description: '알림 대상',
+    example: 'plee',
+    description: '알림 받은 사람의 닉네임',
   })
   @ManyToOne(() => User, (user) => user.id)
   receiver: User;
 
   @ApiProperty({
-    example: 'jiholee',
-    description: '요청 보낸사람',
+    example: 'dcho',
+    description: '알람 보낸 사람의 닉네임',
   })
   @ManyToOne(() => User, (user) => user.id)
   requestor: User;
 
-  @CreateDateColumn()
-  createAt: Date;
-
+  @ApiProperty({
+    example: 'false',
+    description: '알림의 읽음 여부',
+  })
   @Column()
   read: boolean;
+
+  @ApiProperty({
+    example: '2020-01-01',
+    description: '알림의 생성 시간',
+  })
+  @CreateDateColumn()
+  createAt: Date;
 }

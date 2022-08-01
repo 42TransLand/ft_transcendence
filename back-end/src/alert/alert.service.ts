@@ -4,6 +4,7 @@ import { Alert } from './entities/alert.entity';
 import { AlertRepository } from './alert.Repository';
 import { UserRepository } from 'src/users/users.repository';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Injectable()
 export class AlertService {

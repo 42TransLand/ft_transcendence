@@ -9,9 +9,7 @@ import { Alert } from './entities/alert.entity';
 export class AlertController {
   constructor(private readonly alertService: AlertService) {}
 
-  @ApiOperation({
-    summary: '모든 알람 조회',
-  })
+  @ApiOperation({ summary: '유저 알람 조회' })
   @Get()
   findAll(@Body() alertDto: AlertDto): Promise<Alert[]> {
     const nickName = alertDto.receiver;
