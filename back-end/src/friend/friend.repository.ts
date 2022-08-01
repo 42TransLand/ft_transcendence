@@ -4,7 +4,7 @@ import { Equal, Repository } from 'typeorm';
 import { CustomRepository } from '../custom/typeorm.decorator';
 import { FriendDto } from './dto/friend.dto';
 import { Friend } from './entities/friend.entity';
-import { FriendStatus } from './friend.enum';
+import { FriendStatus } from './constants/friend.enum';
 
 @CustomRepository(Friend)
 export class FriendRepository extends Repository<Friend> {

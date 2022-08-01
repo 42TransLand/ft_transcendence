@@ -10,6 +10,7 @@ import { AlertModule } from './alert/alert.module';
 import { SocketModule } from './socket/socket.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmConfigFactory } from './config/typeorm.config.factory';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TypeOrmConfigFactory } from './config/typeorm.config.factory';
     FriendModule,
     AlertModule,
     SocketModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

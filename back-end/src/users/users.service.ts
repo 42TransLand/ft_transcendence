@@ -18,10 +18,8 @@ export class UsersService {
   async findByNickname(nickname: string): Promise<User> {
     return this.userRepository.findByNickname(nickname);
   }
-  
+
   async verifyUser(user: User): Promise<User> {
     return this.userRepository.verifyUser(user);
   }
-
-
 }

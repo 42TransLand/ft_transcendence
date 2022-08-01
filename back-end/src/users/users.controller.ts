@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/userdto';
 import { UsersService } from './users.service';
 
@@ -8,6 +8,8 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @ApiOperation({ summary: '사용자 등록' })
+  @ApiResponse({ status: 201, description: 'success' })
   @Post('/signin')
   signIn(@Body() user: UserDto): Promise<void> {
     const { nickname } = user;
