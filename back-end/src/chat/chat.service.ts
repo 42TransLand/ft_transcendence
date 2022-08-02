@@ -1,25 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ChatRoomRepository } from './chat.room.repository';
 import { ChatRoomDto } from './dto/chat.room.dto';
+import { ChatRoom } from './entities/chat.room.entity';
 
 @Injectable()
 export class ChatService {
-  create(chatRoomDto: ChatRoomDto) {
-    return 'This action adds a new chat';
-  }
+  constructor(
+    @InjectRepository(ChatRoomRepository)
+    private readonly chatRepository: ChatRoomRepository,
+  ) {}
 
-  findAll() {
-    return `This action returns all chat`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
-  }
-
-  //update(id: number, updateChatDto: UpdateChatDto) {
-  //  return `This action updates a #${id} chat`;
-  //}
-
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+  findAllChatRoom(): Promise<ChatRoom[]> {
+    return this.chatRepository.findAllChatRoom();
   }
 }

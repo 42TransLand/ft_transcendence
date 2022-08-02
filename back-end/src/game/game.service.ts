@@ -19,11 +19,8 @@ export class GameService {
   async createGame(leftUser: User, rightUser: User): Promise<string> {
     const findLeftUser = await this.userService.verifyUser(leftUser);
     // 유저가 존재하지 않으면, null 반환하게 해야 하는데 그냥 임의로 찾아버림. friend에서는 되는데 여기서는 안됨.
-    if (rightUser !== null) {
-      const findRightUser = await this.userService.verifyUser(rightUser);
-      return this.gameRepository.createGame(findLeftUser, findRightUser);
-    }
-    return this.gameRepository.createGame(leftUser, rightUser);
+    const findRightUser = await this.userService.verifyUser(rightUser);
+    return this.gameRepository.createGame(findLeftUser, findRightUser);
   }
 
   // 프로필에서 유저의 게임 전적 가져오기
