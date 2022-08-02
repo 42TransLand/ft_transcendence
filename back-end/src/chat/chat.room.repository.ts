@@ -5,14 +5,14 @@ import { ChatRoom } from './entities/chat.room.entity';
 
 @CustomRepository(ChatRoom)
 export class ChatRoomRepository extends Repository<ChatRoom> {
-  async createChat(chatroomdto: CreateChatRoomDto): Promise<string> {
+  async createChatRoom(chatroomdto: CreateChatRoomDto): Promise<ChatRoom> {
     const chatRoom = this.create({
       name: chatroomdto.name,
       type: chatroomdto.type,
       password: chatroomdto.password,
     });
     await this.save(chatRoom);
-    return chatRoom.id;
+    return chatRoom;
   }
 
   async findAllChatRoom(): Promise<ChatRoom[]> {
