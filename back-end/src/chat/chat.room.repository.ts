@@ -10,10 +10,17 @@ import { ChatType } from './constants/chat.type.enum';
 @CustomRepository(ChatRoom)
 export class ChatRoomRepository extends Repository<ChatRoom> {
   async createChatRoom(chatroomdto: CreateChatRoomDto): Promise<ChatRoom> {
+    const { name, password, type } = chatroomdto;
+    let encryptPassword: string = null;
+
+    if (password && type === 'PROTECT') {
+      const salt: string = await bcrypt.genSalt();
+      encryptPassword = await bcrypt.hash(password, salt);
+    }
     const chatRoom = this.create({
-      name: chatroomdto.name,
-      type: chatroomdto.type,
-      password: chatroomdto.password,
+      name,
+      type,
+      password: encryptPassword,
     });
     await this.save(chatRoom);
     return chatRoom;

@@ -8,6 +8,8 @@ import * as bcrypt from 'bcrypt';
 import { ChatType } from './constants/chat.type.enum';
 import { UsersService } from 'src/users/users.service';
 import { ChatUserRepository } from './chat.user.repository';
+import { ChatRole } from './constants/chat.role.enum';
+import { UpdateRoleDto } from './dto/update.role.dto';
 
 @Injectable()
 export class ChatService {
@@ -36,7 +38,7 @@ export class ChatService {
   }
 
   async updatePassword(id: string, type: ChatType, password?: string) {
-    const chatRoom = await this.chatRoomRepository.findOneById(id);
+    const chatRoom = await this.findChatRoomById(id);
     if (!chatRoom) {
       throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
     }
@@ -55,5 +57,32 @@ export class ChatService {
 
   findChatRoomById(id: string): Promise<ChatRoom> {
     return this.chatRoomRepository.findChatRoomById(id);
+  }
+
+  async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<void> {
+    // const { owner, oldAdmin, newAdmin } = updateRoleDto;
+    const chatRoom = await this.findChatRoomById(id);
+    if (!chatRoom) {
+      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    }
+    let user = await this.userService.findByNickname(updateRoleDto.owner);
+    const owner = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (owner.role !== ChatRole.OWNER) {
+      throw new ConflictException(`유저의 권한이 잘못되었습니다`);
+    }
+
+    user = await this.userService.findByNickname(updateRoleDto.oldAdmin);
+    const oldAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (oldAdmin.role !== ChatRole.ADMIN) {
+      throw new ConflictException(`유저의 권한이 admin이 아님!`);
+    }
+
+    user = await this.userService.findByNickname(updateRoleDto.newAdmin);
+    const newAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (newAdmin.role === ChatRole.ADMIN) {
+      throw new ConflictException(`이미 admin입니다.`);
+    }
+
+    this.chatUserRepository.updateRole(newAdmin, oldAdmin);
   }
 }
