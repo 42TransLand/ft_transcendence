@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ChatType } from '../constants/chat.type.enum';
 
 @Entity()
@@ -29,20 +36,20 @@ export class ChatRoom extends BaseEntity {
     example: '1qaz2wsx',
     description: '채팅방의 비밀번호',
   })
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @ApiProperty({
     example: '2020-01-01',
     description: '채팅방의 생성 시간',
   })
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
 
   @ApiProperty({
     example: '2020-01-01',
     description: '채팅방의 업데이트 시간',
   })
-  @Column()
+  @UpdateDateColumn()
   updatedAt: Date;
 }
