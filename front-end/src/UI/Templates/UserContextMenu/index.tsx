@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
 import {
   FaUserCircle,
@@ -36,7 +37,9 @@ export default function UserContextMenu({
       eventType={eventType || 'contextmenu'}
       renderMenu={() => (
         <MenuList>
-          <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
+          <Link to="/example/umjunsik">
+            <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
+          </Link>
           {mode === 'self' && (
             <MenuItem icon={<FaUserEdit />}>프로필수정</MenuItem>
           )}
