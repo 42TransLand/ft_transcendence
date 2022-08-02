@@ -32,4 +32,9 @@ export class ChatService {
   findAllChatRoom(): Promise<ChatRoom[]> {
     return this.chatRepository.findAllChatRoom();
   }
+
+  findChatRoomById(id: string): Promise<ChatRoom> {
+    console.log(id);
+    return this.chatRepository.findChatRoomById(id);
+  }
 }
