@@ -9,7 +9,7 @@ import { ChatType } from './constants/chat.type.enum';
 
 @CustomRepository(ChatRoom)
 export class ChatRoomRepository extends Repository<ChatRoom> {
-  async createChat(chatroomdto: CreateChatRoomDto): Promise<ChatRoom> {
+  async createChatRoom(chatroomdto: CreateChatRoomDto): Promise<ChatRoom> {
     const chatRoom = this.create({
       name: chatroomdto.name,
       type: chatroomdto.type,
@@ -21,15 +21,6 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
 
   async findAllChatRoom(): Promise<ChatRoom[]> {
     return this.find();
-  }
-
-  async findOneById(id: string): Promise<ChatRoom> {
-    const result = await this.findOne({
-      where: {
-        id: Equal(id),
-      },
-    });
-    return result;
   }
 
   async updatePassword(
@@ -46,5 +37,12 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
     }
     await this.save(chatRoom);
     return chatRoom;
+  }
+
+  async findChatRoomById(id: string): Promise<ChatRoom> {
+    const result = await this.findOne({
+      where: { id },
+    });
+    return result;
   }
 }

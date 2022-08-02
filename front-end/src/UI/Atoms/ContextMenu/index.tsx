@@ -90,6 +90,8 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
             gutter={0}
             {...props.menuProps}
             onClose={onCloseHandler}
+            closeOnSelect={false}
+            closeOnBlur={false}
           >
             <MenuButton
               aria-hidden

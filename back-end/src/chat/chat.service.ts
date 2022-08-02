@@ -1,22 +1,30 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatRoomRepository } from './chat.room.repository';
-import { ChatRoomDto } from './dto/chat.room.dto';
 import { ChatRoom } from './entities/chat.room.entity';
 import { CreateChatRoomDto } from './dto/create.chat.room.dto';
 import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
 import * as bcrypt from 'bcrypt';
 import { ChatType } from './constants/chat.type.enum';
+import { UsersService } from 'src/users/users.service';
+import { ChatUserRepository } from './chat.user.repository';
 
 @Injectable()
 export class ChatService {
   constructor(
     @InjectRepository(ChatRoomRepository)
     private readonly chatRoomRepository: ChatRoomRepository,
+    @InjectRepository(ChatUserRepository)
+    private readonly chatUserRepository: ChatUserRepository,
+    private readonly userService: UsersService,
   ) {}
 
-  create(chatRoomDto: CreateChatRoomDto) {
-    return this.chatRoomRepository.createChat(chatRoomDto);
+  async createChatRoom(chatRoomDto: CreateChatRoomDto): Promise<string> {
+    const user = await this.userService.findByNickname(chatRoomDto.nickname);
+    const room = await this.chatRoomRepository.createChatRoom(chatRoomDto);
+    await this.chatUserRepository.createRoomOwner(user, room);
+
+    return room.id;
   }
 
   findAll() {
@@ -43,5 +51,9 @@ export class ChatService {
 
   findAllChatRoom(): Promise<ChatRoom[]> {
     return this.chatRoomRepository.findAllChatRoom();
+  }
+
+  findChatRoomById(id: string): Promise<ChatRoom> {
+    return this.chatRoomRepository.findChatRoomById(id);
   }
 }

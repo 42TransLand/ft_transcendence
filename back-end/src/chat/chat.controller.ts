@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
-import { ChatRoomDto } from './dto/chat.room.dto';
 import { ChatRoom } from './entities/chat.room.entity';
 import { CreateChatRoomDto } from './dto/create.chat.room.dto';
 import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
@@ -21,8 +20,8 @@ export class ChatController {
 
   @ApiOperation({ summary: '채팅방 생성' })
   @Post('create')
-  create(@Body() chatRoomDto: CreateChatRoomDto) {
-    return this.chatService.create(chatRoomDto);
+  createChatRoom(@Body() chatRoomDto: CreateChatRoomDto) {
+    return this.chatService.createChatRoom(chatRoomDto);
   }
 
   @ApiOperation({ summary: '모든 방 조회' })
@@ -43,5 +42,9 @@ export class ChatController {
       updatePassword.type,
       updatePassword.password,
     );
+    
+  @Get('/:id')
+  findChatRoomById(@Param('id') id: string): Promise<ChatRoom> {
+    return this.chatService.findChatRoomById(id);
   }
 }
