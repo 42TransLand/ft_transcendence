@@ -1,9 +1,11 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { Box, Flex } from '@chakra-ui/react';
 import MainSocial from '../../Templates/MainSocial';
 import MainStandby from '../../Templates/MainStandby';
 import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
+import RoutedModalExample from '../RoutedModalExample';
 
 function Main() {
   const { state } = useSocket();
@@ -29,12 +31,9 @@ function Main() {
       <Box minW="400px" maxW="400px" maxH="100vh" bgColor="white">
         <MainSocial />
       </Box>
-      {/*
-      // 아래처럼 RoutedModal을 사용하면 된다.
       <Routes>
-        <Route path="/chat/:id" element={<ChatModal />} />
+        <Route path="/example/:name" element={<RoutedModalExample />} />
       </Routes>
-      */}
     </Flex>
   );
 }
