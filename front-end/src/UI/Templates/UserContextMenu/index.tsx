@@ -11,11 +11,11 @@ import {
 } from 'react-icons/fa';
 import { GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
 import { GoSignOut } from 'react-icons/go';
-import { MdSmartDisplay } from 'react-icons/md';
 import { TbCrown, TbCrownOff } from 'react-icons/tb';
 import styled from 'styled-components';
 import { ContextMenu } from '../../Atoms/ContextMenu';
 import InviteGameMenu from '../../Molecules/InviteGameMenu';
+import SpectateMenu from '../../Molecules/SpectateMenu';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -56,7 +56,7 @@ export default function UserContextMenu({
             <>
               <MenuDivider />
               <InviteGameMenu />
-              <MenuItem icon={<MdSmartDisplay />}>관전하기</MenuItem>
+              <SpectateMenu />
             </>
           )}
           {mode === 'chat' && (
