@@ -7,37 +7,19 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { ChatRoomDto } from './dto/chat.room.dto';
+import { ChatRoom } from './entities/chat.room.entity';
 
 @ApiTags('chat')
 @Controller('chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @Post()
-  create(@Body() chatRoomDto: ChatRoomDto) {
-    return this.chatService.create(chatRoomDto);
-  }
-
+  @ApiOperation({ summary: '모든 방 조회' })
   @Get()
-  findAll() {
-    return this.chatService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.chatService.findOne(+id);
-  }
-
-  //@Patch(':id')
-  //update(@Param('id') id: string, @Body() updateChatDto: UpdateChatDto) {
-  //  return this.chatService.update(+id, updateChatDto);
-  //}
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.chatService.remove(+id);
+  findAllChatRoom(): Promise<ChatRoom[]> {
+    return this.chatService.findAllChatRoom();
   }
 }

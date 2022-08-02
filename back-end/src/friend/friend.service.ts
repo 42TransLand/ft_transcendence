@@ -22,7 +22,7 @@ export class FriendService {
     // [Todo] re
     const reqUser = await this.userService.findByNickname(requestor);
     const resUser = await this.userService.findByNickname(receiver);
-    this.friendRepository.requestFriend(reqUser, resUser);
+    await this.friendRepository.requestFriend(reqUser, resUser);
     const alertDto: AlertDto = { requestor, receiver, read: false };
     return this.alertService.createAlert(alertDto);
   }
