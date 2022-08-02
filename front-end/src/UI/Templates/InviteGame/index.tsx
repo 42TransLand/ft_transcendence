@@ -63,4 +63,4 @@ function InviteGame() {
   );
 }
 
-export default Invitegame;
+export default InviteGame;
