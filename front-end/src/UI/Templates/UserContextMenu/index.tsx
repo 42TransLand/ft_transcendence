@@ -9,13 +9,13 @@ import {
   FaUserSlash,
   FaUserTimes,
 } from 'react-icons/fa';
-import { IoGameController } from 'react-icons/io5';
 import { GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
 import { GoSignOut } from 'react-icons/go';
 import { MdSmartDisplay } from 'react-icons/md';
 import { TbCrown, TbCrownOff } from 'react-icons/tb';
 import styled from 'styled-components';
 import { ContextMenu } from '../../Atoms/ContextMenu';
+import InviteGameMenu from '../../Molecules/InviteGameMenu';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -55,7 +55,7 @@ export default function UserContextMenu({
           {mode !== 'self' && (
             <>
               <MenuDivider />
-              <MenuItem icon={<IoGameController />}>게임초대</MenuItem>
+              <InviteGameMenu />
               <MenuItem icon={<MdSmartDisplay />}>관전하기</MenuItem>
             </>
           )}
