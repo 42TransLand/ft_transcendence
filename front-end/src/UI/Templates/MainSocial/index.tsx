@@ -6,7 +6,10 @@ import SocialTabs from '../../Organisms/MainSocialTabs';
 function MainSocial() {
   return (
     <VStack h="100%">
-      <MyProfile />
+      <MyProfile
+        userName="엄준식은살아있다"
+        userImage="https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTlfMTY5/MDAxNTkyNTAyNDM2ODcy.FVNsc1SOtS2sUfyaajXNhZpYzAKIFeUg_vCTqzHW4SIg.kQsV680NF1XfoVcDgPg64yF0RzHyRs0-raId3LTIIG4g.JPEG.wndyd75/hqdefault1.jpg?type=w2"
+      />
       <SocialTabs />
     </VStack>
   );
