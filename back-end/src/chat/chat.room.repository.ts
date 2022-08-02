@@ -18,4 +18,11 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
   async findAllChatRoom(): Promise<ChatRoom[]> {
     return this.find();
   }
+
+  async findChatRoomById(id: string): Promise<ChatRoom> {
+    const result = await this.findOne({
+      where: { id },
+    });
+    return result;
+  }
 }

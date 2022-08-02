@@ -28,4 +28,9 @@ export class ChatController {
   findAllChatRoom(): Promise<ChatRoom[]> {
     return this.chatService.findAllChatRoom();
   }
+
+  @Get('/:id')
+  findChatRoomById(@Param('id') id: string): Promise<ChatRoom> {
+    return this.chatService.findChatRoomById(id);
+  }
 }
