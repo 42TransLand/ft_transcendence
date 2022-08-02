@@ -14,7 +14,7 @@ import {
 import { Icon, ChevronDownIcon } from '@chakra-ui/icons';
 import { GrGamepad } from 'react-icons/gr';
 
-function Invitegame() {
+function InviteGame() {
   const [gameMode, setGameMode] = useState('기본모드');
   const onCliclkBasic = () => {
     setGameMode('기본모드');
