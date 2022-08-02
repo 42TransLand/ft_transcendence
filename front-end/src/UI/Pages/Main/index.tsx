@@ -7,6 +7,7 @@ import Loading from '../../Templates/Loading';
 
 function Main() {
   const { state } = useSocket();
+
   if (process.env.REACT_APP_WEBSOCKET_REQUIRED === 'true') {
     switch (state.socketState) {
       case SocketState.CONNECTING:
@@ -28,6 +29,12 @@ function Main() {
       <Box minW="400px" maxW="400px" maxH="100vh" bgColor="white">
         <MainSocial />
       </Box>
+      {/*
+      // 아래처럼 RoutedModal을 사용하면 된다.
+      <Routes>
+        <Route path="/chat/:id" element={<ChatModal />} />
+      </Routes>
+      */}
     </Flex>
   );
 }
