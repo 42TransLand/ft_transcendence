@@ -7,7 +7,7 @@ function MyProfile() {
   return (
     <UserContextMenu mode="self" eventType="click">
       <HStack
-        bgColor="orange.300"
+        bgColor="#424556"
         w="100%"
         h="175px"
         fontSize="3xl"
@@ -19,7 +19,7 @@ function MyProfile() {
           size="xl"
         />
         <FaMedal />
-        <Text>엄준식은살아있다</Text>
+        <Text textColor="white">엄준식은살아있다</Text>
       </HStack>
     </UserContextMenu>
   );

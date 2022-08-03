@@ -12,15 +12,15 @@ function FriendElement(props: { userName: string; connectionStatus: string }) {
 
   return (
     <HStack
-      bgColor="blue.200"
+      fontSize="xl"
       borderWidth="1px"
-      borderColor="black"
-      h="60px"
+      borderRadius="md"
+      h="80px"
       w="100%"
       padding={3}
     >
-      <Avatar boxSize="1.25em" name={userName} size="lg">
-        <AvatarBadge boxSize="0.3em" borderColor={statusColor} />
+      <Avatar name={userName} size="lg">
+        <AvatarBadge boxSize="1em" bgColor={statusColor} />
       </Avatar>
       <Spacer />
       <Text>{userName}</Text>
