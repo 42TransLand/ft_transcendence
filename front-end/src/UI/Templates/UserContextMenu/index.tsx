@@ -82,7 +82,7 @@ export default function UserContextMenu({
     >
       {(ref: any) => (
         <ChildView
-          style={{ cursor: eventType === 'click' ? 'pointer' : 'auto' }}
+          style={{ cursor: eventType === 'click' ? 'pointer' : 'default' }}
           ref={ref}
         >
           {children}
