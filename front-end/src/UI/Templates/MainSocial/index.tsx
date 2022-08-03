@@ -1,11 +1,11 @@
-import { VStack } from '@chakra-ui/react';
 import React from 'react';
+import { VStack } from '@chakra-ui/react';
 import MyProfile from '../../Organisms/MainSocialMyProfile';
 import SocialTabs from '../../Organisms/MainSocialTabs';
 
 function MainSocial() {
   return (
-    <VStack h="100%">
+    <VStack h="100vh">
       <MyProfile />
       <SocialTabs />
     </VStack>
