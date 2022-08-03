@@ -1,7 +1,17 @@
 import React from 'react';
-import { VStack, HStack, Avatar, Text, Box, Spacer } from '@chakra-ui/react';
+import {
+  VStack,
+  HStack,
+  Avatar,
+  Text,
+  Box,
+  Spacer,
+  ModalBody,
+  ModalCloseButton,
+} from '@chakra-ui/react';
 import { FaMedal } from 'react-icons/fa';
 import ElementList from '../ElementList';
+import RoutedModal from '../../Templates/RoutedModal';
 
 function UserProfileInfo(props: { userName: string; userImage: string }) {
   const { userName, userImage } = props;
@@ -147,4 +157,15 @@ function UserInfoContent(/* props: { isMyself: boolean } */) {
   );
 }
 
-export default UserInfoContent;
+function UserInfo() {
+  return (
+    <RoutedModal>
+      <ModalCloseButton />
+      <ModalBody>
+        <UserInfoContent />
+      </ModalBody>
+    </RoutedModal>
+  );
+}
+
+export default UserInfo;
