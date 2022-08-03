@@ -11,9 +11,8 @@ function NotificationElement(props: { userName: string }) {
       w="100%"
       templateRows="repeat(3, 1fr)"
       templateColumns="repeat(10, 1fr)"
-      bgColor="blue.200"
       borderWidth="1px"
-      borderColor="black"
+      borderRadius="md"
       paddingX={3}
       paddingY={2}
     >
