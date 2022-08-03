@@ -1,7 +1,12 @@
 import React from 'react';
-import { Text, HStack, Icon } from '@chakra-ui/react';
+import { Text, HStack, Icon, Square } from '@chakra-ui/react';
 import { LockIcon, UnlockIcon } from '@chakra-ui/icons';
-import Square from '../../Atoms/Square';
+import styled from 'styled-components';
+
+const FullSquare = styled(Square)`
+  min-height: 100%;
+  aspect-ratio: 1;
+`;
 
 function ChannelElement(props: {
   isProtected: boolean;
@@ -16,13 +21,13 @@ function ChannelElement(props: {
       borderWidth="1px"
       borderRadius="md"
       h="4em"
-      w="100%"
+      w="full"
       justifyContent="space-between"
     >
       <HStack h="full">
-        <Square>
+        <FullSquare centerContent minHeight="100%">
           <Icon as={isProtected ? LockIcon : UnlockIcon} boxSize="1.75em" />
-        </Square>
+        </FullSquare>
         <Text fontSize="xl" marginX="0!important" noOfLines={1}>
           {channelName}
         </Text>

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,6 +11,7 @@ import { SocketModule } from './socket/socket.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmConfigFactory } from './config/typeorm.config.factory';
 import { ChatModule } from './chat/chat.module';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -37,4 +38,11 @@ import { ChatModule } from './chat/chat.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+
+// forRoutes(컨트롤러)나 forRoutes(주소)로 특정 주소에만 미들웨어 적용 가능
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // 미들웨어는 consumer에다가 연결한다.
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

@@ -1,12 +1,15 @@
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { Box, Flex } from '@chakra-ui/react';
 import MainSocial from '../../Templates/MainSocial';
 import MainStandby from '../../Templates/MainStandby';
 import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
+import RoutedModalExample from '../RoutedModalExample';
 
 function Main() {
   const { state } = useSocket();
+
   if (process.env.REACT_APP_WEBSOCKET_REQUIRED === 'true') {
     switch (state.socketState) {
       case SocketState.CONNECTING:
@@ -28,6 +31,9 @@ function Main() {
       <Box minW="400px" maxW="400px" maxH="100vh" bgColor="white">
         <MainSocial />
       </Box>
+      <Routes>
+        <Route path="/example/:name" element={<RoutedModalExample />} />
+      </Routes>
     </Flex>
   );
 }

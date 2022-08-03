@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
 import {
   FaUserCircle,
@@ -8,13 +9,13 @@ import {
   FaUserSlash,
   FaUserTimes,
 } from 'react-icons/fa';
-import { IoGameController } from 'react-icons/io5';
 import { GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
 import { GoSignOut } from 'react-icons/go';
-import { MdSmartDisplay } from 'react-icons/md';
 import { TbCrown, TbCrownOff } from 'react-icons/tb';
 import styled from 'styled-components';
 import { ContextMenu } from '../../Atoms/ContextMenu';
+import InviteGameMenu from '../../Molecules/InviteGameMenu';
+import SpectateMenu from '../../Molecules/SpectateMenu';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -36,7 +37,9 @@ export default function UserContextMenu({
       eventType={eventType || 'contextmenu'}
       renderMenu={() => (
         <MenuList>
-          <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
+          <Link to="/example/umjunsik">
+            <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
+          </Link>
           {mode === 'self' && (
             <MenuItem icon={<FaUserEdit />}>프로필수정</MenuItem>
           )}
@@ -52,8 +55,8 @@ export default function UserContextMenu({
           {mode !== 'self' && (
             <>
               <MenuDivider />
-              <MenuItem icon={<IoGameController />}>게임초대</MenuItem>
-              <MenuItem icon={<MdSmartDisplay />}>관전하기</MenuItem>
+              <InviteGameMenu />
+              <SpectateMenu />
             </>
           )}
           {mode === 'chat' && (
