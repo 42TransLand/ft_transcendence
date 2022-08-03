@@ -15,6 +15,7 @@ import { CreateChatRoomDto } from './dto/create.chat.room.dto';
 import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
 import { ChatRole } from './constants/chat.role.enum';
 import { UpdateRoleDto } from './dto/update.role.dto';
+import { ChatRoomDto } from './dto/chat.room.dto';
 
 @ApiTags('chat')
 @Controller('chat')
@@ -41,7 +42,7 @@ export class ChatController {
 
   // User 구현되면, geUser로 user 받아와서 방장인지 확인하고, 방장이면 비밀번호를 변경하는 기능을 구현해야 함.
   @ApiOperation({ summary: '비밀번호 수정/삭제' })
-  @Patch('/password/:id')
+  @Patch('/:id/password')
   updatePassword(
     @Param('id') id: string,
     @Body() updatePassword: UpdateChatPasswordDto,
@@ -53,11 +54,20 @@ export class ChatController {
     );
   }
 
-  // owner가 admin 변경할 떄
-  @Patch('/role/:id')
+  @ApiOperation({ summary: '채팅방 유저 역할 변경' })
+  // owner가 admin 변경할 떄  테스트 해야함..
+  @Patch('/:id/role')
   updateRole(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.chatService.updateRole(id, updateRoleDto);
   }
 
   // owner + admin인 사람이 방을 나갔을 때 가장 오래된 유저가 owner로 자동 변경될 때
+
+  // 게임 유저 나감
+
+  @ApiOperation({ summary: '채팅방 참석' })
+  @Post('/:id/join')
+  joinChatRoom(@Param('id') id: string, @Body() chatRoomDto: ChatRoomDto) {
+    return this.chatService.joinChatRoom(id, chatRoomDto);
+  }
 }

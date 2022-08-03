@@ -20,6 +20,7 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    'no-param-reassign': 'off',
     'class-methods-use-this': 'off',
     'import/order': 'off',
     'import/prefer-default-export': 'off',
