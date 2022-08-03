@@ -8,7 +8,7 @@ import {
   Delete,
   ConsoleLogger,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { ChatRoom } from './entities/chat.room.entity';
 import { CreateChatRoomDto } from './dto/create.chat.room.dto';
@@ -55,7 +55,6 @@ export class ChatController {
   }
 
   @ApiOperation({ summary: '채팅방 유저 역할 변경' })
-  // owner가 admin 변경할 떄  테스트 해야함..
   @Patch('/:id/role')
   updateRole(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.chatService.updateRole(id, updateRoleDto);

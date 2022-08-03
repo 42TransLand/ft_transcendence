@@ -63,6 +63,7 @@ export class ChatService {
 
   async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
+    let oldAdmin = null;
     if (!chatRoom) {
       throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
     }
@@ -71,9 +72,11 @@ export class ChatService {
     if (owner.role !== ChatRole.OWNER) {
       throw new ConflictException(`권한이 없습니다.`);
     }
-    // oldAdmin 확실하게 들어온다고 가정하고 진행
+    // oldAdmin 확실하게 들어온다고 가정하고 진행, 없으면 null, 있으면 객체
     user = await this.userService.findByNickname(updateRoleDto.oldAdmin);
-    const oldAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (user !== null) {
+      oldAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
+    }
 
     user = await this.userService.findByNickname(updateRoleDto.newAdmin);
     const newAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);

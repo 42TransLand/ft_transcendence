@@ -29,10 +29,15 @@ export class ChatUserRepository extends Repository<ChatUser> {
     });
   }
 
-  async updateRole(newAdmin: ChatUser, oldAdmin?: ChatUser): Promise<void> {
+  async updateRole(
+    newAdmin: ChatUser,
+    oldAdmin?: ChatUser | null,
+  ): Promise<void> {
     newAdmin.role = ChatRole.ADMIN;
-    oldAdmin.role = ChatRole.PARTICIPANT;
-    await this.save(oldAdmin);
+    if (oldAdmin !== null) {
+      oldAdmin.role = ChatRole.PARTICIPANT;
+      await this.save(oldAdmin);
+    }
     await this.save(newAdmin);
   }
 
