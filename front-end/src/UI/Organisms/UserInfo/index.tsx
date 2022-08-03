@@ -1,24 +1,61 @@
-import React from 'react';
+import React /* , { useState } */ from 'react';
 import {
   VStack,
   HStack,
   Avatar,
+  AvatarBadge,
   Text,
   Box,
   Spacer,
   ModalBody,
   ModalCloseButton,
+  AspectRatio,
+  Input,
 } from '@chakra-ui/react';
 import { FaMedal } from 'react-icons/fa';
+import { MdAddPhotoAlternate } from 'react-icons/md';
 import ElementList from '../ElementList';
 import RoutedModal from '../../Templates/RoutedModal';
 
-function UserProfileInfo(props: { userName: string; userImage: string }) {
-  const { userName, userImage } = props;
+function UserProfileInfo(props: {
+  userName: string;
+  userImage: string;
+  isMyself: boolean;
+}) {
+  const { userName, userImage, isMyself } = props;
+  // const [isUserNameEditing, setIsUserNameEditing] = useState(false);
+
   return (
     <HStack>
-      <Avatar name={userName} src={userImage} size="xl" />
-      <Text fontSize="3xl">{userName}</Text>
+      <Avatar name={userName} src={userImage} size="xl">
+        {isMyself && (
+          <AvatarBadge borderWidth={0}>
+            <AspectRatio width="30px" ratio={1}>
+              <Box>
+                <Box
+                  position="relative"
+                  height="100%"
+                  width="100%"
+                  fontSize="3xl"
+                  color="gray"
+                >
+                  <MdAddPhotoAlternate />
+                </Box>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  position="absolute"
+                  top="0"
+                  left="0"
+                  opacity="0"
+                  cursor="pointer"
+                />
+              </Box>
+            </AspectRatio>
+          </AvatarBadge>
+        )}
+      </Avatar>
+      {isMyself ? <Text> hello</Text> : <Text fontSize="3xl">{userName}</Text>}
     </HStack>
   );
 }
@@ -131,8 +168,8 @@ function UserMatchHistory() {
   );
 }
 
-function UserInfoContent(/* props: { isMyself: boolean } */) {
-  // const {isMySelf} = props;
+function UserInfoContent(props: { isMyself: boolean }) {
+  const { isMyself } = props;
   const userName = '엄준식은살아있다';
   const userImage =
     'https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTlfMTY5/MDAxNTkyNTAyNDM2ODcy.FVNsc1SOtS2sUfyaajXNhZpYzAKIFeUg_vCTqzHW4SIg.kQsV680NF1XfoVcDgPg64yF0RzHyRs0-raId3LTIIG4g.JPEG.wndyd75/hqdefault1.jpg?type=w2';
@@ -144,7 +181,11 @@ function UserInfoContent(/* props: { isMyself: boolean } */) {
   return (
     <Box w="100%" h="500px">
       <VStack h="100%">
-        <UserProfileInfo userName={userName} userImage={userImage} />
+        <UserProfileInfo
+          userName={userName}
+          userImage={userImage}
+          isMyself={isMyself}
+        />
         <UserGameInfo
           userRating={userRating}
           userTier={userTier}
@@ -162,7 +203,7 @@ function UserInfo() {
     <RoutedModal>
       <ModalCloseButton />
       <ModalBody>
-        <UserInfoContent />
+        <UserInfoContent isMyself />
       </ModalBody>
     </RoutedModal>
   );
