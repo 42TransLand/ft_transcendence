@@ -16,6 +16,8 @@ import styled from 'styled-components';
 import { ContextMenu } from '../../Atoms/ContextMenu';
 import InviteGameMenu from '../../Molecules/InviteGameMenu';
 import SpectateMenu from '../../Molecules/SpectateMenu';
+import FriendMenu from '../../Molecules/FriendMenu';
+import BlockMenu from '../../Molecules/BlockMenu';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -46,10 +48,10 @@ export default function UserContextMenu({
           {mode !== 'self' && (
             <>
               <MenuDivider />
-              <MenuItem icon={<FaUserPlus />}>친구추가</MenuItem>
-              <MenuItem icon={<FaUserMinus />}>친구삭제</MenuItem>
-              <MenuItem icon={<FaUserSlash />}>차단하기</MenuItem>
-              <MenuItem icon={<FaUserSlash />}>차단해제</MenuItem>
+              <FriendMenu icon={FaUserPlus} label="친구추가" />
+              <FriendMenu icon={FaUserMinus} label="친구삭제" />
+              <BlockMenu icon={FaUserSlash} label="차단하기" />
+              <BlockMenu icon={FaUserSlash} label="차단해제" />
             </>
           )}
           {mode !== 'self' && (
