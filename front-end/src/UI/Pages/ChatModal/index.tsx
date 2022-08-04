@@ -32,7 +32,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '엄준식은살아있다',
         profileIcon: '/profileicons/umjunsik.jpeg',
@@ -42,7 +42,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: 'YuriMyWife',
         profileIcon: '/profileicons/yuri.jpeg',
@@ -52,7 +52,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '박수고양이',
         profileIcon: '/profileicons/catclap.gif',
@@ -62,7 +62,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '새침소녀',
         profileIcon: '/profileicons/deregirl.jpeg',
@@ -72,7 +72,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '아그래요',
         profileIcon: '/profileicons/orly.jpeg',
