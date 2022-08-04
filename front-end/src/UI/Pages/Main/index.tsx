@@ -43,7 +43,7 @@ function Main() {
       </Box>
       <Routes>
         <Route path="/example/:name" element={<RoutedModalExample />} />
-        <Route path="/chat/:id" element={<Chat />} />
+        <Route path="/chat/:id/*" element={<Chat />} />
       </Routes>
     </Flex>
   );

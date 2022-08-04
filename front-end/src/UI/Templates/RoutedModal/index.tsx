@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 export default function RoutedModal({
   children,
   closeOnOverlayClick,
+  baseUrl,
 }: {
   children: React.ReactNode;
   closeOnOverlayClick?: boolean;
+  baseUrl?: string;
 }) {
   const [isOpen, onClose] = React.useState(true);
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ export default function RoutedModal({
       isCentered
       isOpen={isOpen}
       onClose={() => onClose(false)}
-      onCloseComplete={(): void => navigate('/', { replace: true })}
+      onCloseComplete={(): void => navigate(baseUrl ?? '/', { replace: true })}
       size={{ base: 'full', lg: '6xl' }}
     >
       <ModalOverlay />
@@ -29,4 +31,5 @@ export default function RoutedModal({
 
 RoutedModal.defaultProps = {
   closeOnOverlayClick: true,
+  baseUrl: '/',
 };
