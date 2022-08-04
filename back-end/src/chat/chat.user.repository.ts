@@ -5,9 +5,7 @@ import { ChatRole } from './constants/chat.role.enum';
 import { ChatRoom } from './entities/chat.room.entity';
 import { ChatUser } from './entities/chat.user.entity';
 import * as bcrypt from 'bcrypt';
-import { NotFoundError } from 'rxjs';
 import { NotFoundException } from '@nestjs/common';
-import { type } from 'os';
 
 @CustomRepository(ChatUser)
 export class ChatUserRepository extends Repository<ChatUser> {
@@ -86,10 +84,15 @@ export class ChatUserRepository extends Repository<ChatUser> {
         throw new NotFoundException('Password is incorrect');
       }
     }
-    // 이미 채팅방에 있는 사용자
-    const alreadyUser = await this.findChatUser(user, chatRoom);
+    // 이미 채팅방에 있는 사용자인지 검사
+    const alreadyUser = this.findOne({
+      where: {
+        user: { id: Equal(user.id) },
+      },
+    });
+
     if (alreadyUser !== null) {
-      throw new NotFoundException('Already in this chat room');
+      throw new NotFoundException('Already in chat room');
     }
     // 채팅방에 사용자 추가
     const chatUser = this.create({

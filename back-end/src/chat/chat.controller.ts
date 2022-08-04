@@ -16,6 +16,7 @@ import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
 import { ChatRole } from './constants/chat.role.enum';
 import { UpdateRoleDto } from './dto/update.role.dto';
 import { ChatRoomDto } from './dto/chat.room.dto';
+import { ChatDto } from 'src/chat/dto/chat.dto';
 
 @ApiTags('chat')
 @Controller('chat')
@@ -74,5 +75,30 @@ export class ChatController {
   @Delete('/:id/leave')
   leaveChatRoom(@Param('id') id: string, @Body() chatRoomDto: ChatRoomDto) {
     return this.chatService.leaveChatRoom(id, chatRoomDto.nickname);
+    
+  @ApiOperation({ summary: '채팅 보내기' })
+  @Post('/:id/sendChat')
+  sendChat(@Param('id') id: string, @Body() chatDto: ChatDto) {
+    return this.chatService.sendChat(id, chatDto);
+  }
+
+  @ApiOperation({ summary: '해당 유저 음소거' })
+  @Patch('/:id/users/:userName/mute')
+  updateChatMute(
+    @Body() { nickname }: ChatDto, // [TODO] GetUser() 로 대체될 부분
+    @Param('id') id: string,
+    @Param('userName') userName: string,
+  ) {
+    return this.chatService.updateChatMute(id, userName, nickname);
+  }
+
+  @ApiOperation({ summary: '해당 유저 음소거 해제' })
+  @Patch('/:id/users/:userName/unMute')
+  updateChatUnMute(
+    @Body() { nickname }: ChatDto, // [TODO] GetUser() 로 대체될 부분
+    @Param('id') id: string,
+    @Param('userName') userName: string,
+  ) {
+    return this.chatService.updateChatUnMute(id, userName, nickname);
   }
 }
