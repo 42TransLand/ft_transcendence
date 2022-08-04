@@ -7,20 +7,24 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { LockIcon, UnlockIcon } from '@chakra-ui/icons';
+import { LockIcon } from '@chakra-ui/icons';
+import { IoIosChatbubbles } from 'react-icons/io';
+import { FiSend } from 'react-icons/fi';
 import { useChat } from '../../../Hooks/useChat';
 
 export default function ChatHeader() {
   const [chat] = useChat();
+  const iconType = React.useMemo(() => {
+    if (chat.chatInfo.roomType === 'public') return IoIosChatbubbles;
+    if (chat.chatInfo.roomType === 'protected') return LockIcon;
+    return FiSend;
+  }, [chat]);
 
   return (
     <HStack justifyContent="space-between">
       <HStack justifyContent="flex-start">
         <Square centerContent>
-          <Icon
-            as={chat.chatInfo.isProtected ? LockIcon : UnlockIcon}
-            boxSize="2em"
-          />
+          <Icon as={iconType} boxSize="2em" />
         </Square>
         <VStack textAlign="left">
           <Text

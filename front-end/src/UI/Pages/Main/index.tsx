@@ -43,7 +43,8 @@ function Main() {
       </Box>
       <Routes>
         <Route path="/example/:name" element={<Profile />} />
-        <Route path="/chat/:id/*" element={<Chat />} />
+        <Route path="/chat/:id/*" element={<Chat dm={false} />} />
+        <Route path="/dm/:userName/*" element={<Chat dm />} />
       </Routes>
     </Flex>
   );

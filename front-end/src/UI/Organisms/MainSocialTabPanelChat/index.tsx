@@ -25,7 +25,7 @@ function ChatTab() {
       <ElementList>
         <ChannelLink to="/chat/1">
           <ChannelElement
-            isProtected
+            roomType="protected"
             channelName="비번 걸려있는데 누가 과연 여기에 들어올 것인가?"
             currentHeadCount={20}
             maxHeadCount={30}
@@ -33,7 +33,7 @@ function ChatTab() {
         </ChannelLink>
         <ChannelLink to="/chat/2">
           <ChannelElement
-            isProtected={false}
+            roomType="public"
             channelName="엄준식 죽었잖아요"
             currentHeadCount={30}
             maxHeadCount={50}
