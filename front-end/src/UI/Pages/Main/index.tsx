@@ -5,7 +5,7 @@ import MainSocial from '../../Templates/MainSocial';
 import MainStandby from '../../Templates/MainStandby';
 import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
-import RoutedModalExample from '../RoutedModalExample';
+import Profile from '../Profile';
 import Chat from '../Chat';
 
 function Main() {
@@ -42,7 +42,7 @@ function Main() {
         <MainSocial />
       </Box>
       <Routes>
-        <Route path="/example/:name" element={<RoutedModalExample />} />
+        <Route path="/example/:name" element={<Profile />} />
         <Route path="/chat/:id/*" element={<Chat dm={false} />} />
         <Route path="/dm/:userName/*" element={<Chat dm />} />
       </Routes>
