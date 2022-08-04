@@ -52,4 +52,8 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
     });
     return result;
   }
+
+  async deleteChatRoom(id: string): Promise<void> {
+    await this.delete({ id });
+  }
 }
