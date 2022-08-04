@@ -12,6 +12,8 @@ import { ChatRole } from './constants/chat.role.enum';
 import { UpdateRoleDto } from './dto/update.role.dto';
 import { ChatRoomDto } from './dto/chat.room.dto';
 import { ChatUser } from './entities/chat.user.entity';
+import { ChatDto } from './dto/chat.dto';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
 export class ChatService {
@@ -21,6 +23,7 @@ export class ChatService {
     @InjectRepository(ChatUserRepository)
     private readonly chatUserRepository: ChatUserRepository,
     private readonly userService: UsersService,
+    private readonly socketGateway: SocketGateway,
   ) {}
 
   async createChatRoom(chatRoomDto: CreateChatRoomDto): Promise<string> {
@@ -104,5 +107,124 @@ export class ChatService {
       );
     }
     return this.chatUserRepository.joinChatRoom(user, chatRoom);
+  }
+
+  async sendChat(id: string, chatDto: ChatDto): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    if (!chatRoom) {
+      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    }
+    const user = await this.userService.findByNickname(chatDto.nickname);
+    const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (chatUser === null) {
+      throw new ConflictException([`채팅방에 접속하지 않은 유저입니다.`]);
+    }
+
+    if (chatUser.unmutedAt) {
+      const now: Date = new Date();
+      const diff = chatUser.unmutedAt.getTime() - now.getTime();
+      if (diff > 0) {
+        throw new ConflictException([
+          `${Math.floor(diff / 1000)}초 후에 채팅을 사용할 수 있습니다.`,
+        ]);
+      }
+    }
+
+    this.socketGateway.server.to(id).emit('chat', chatDto.content);
+  }
+
+  async updateChatMute(
+    id: string,
+    userName: string,
+    myNickName: string,
+  ): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    if (!chatRoom) {
+      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    }
+
+    const myUser = await this.userService.findByNickname(myNickName);
+    const myChatUser = await this.chatUserRepository.findChatUser(
+      myUser,
+      chatRoom,
+    );
+    if (myChatUser === null) {
+      throw new ConflictException([
+        `본인은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
+    }
+    const user = await this.userService.findByNickname(userName);
+    const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (chatUser === null) {
+      throw new ConflictException([
+        `상대방은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
+    }
+
+    if (
+      !(
+        (myChatUser.role === ChatRole.OWNER ||
+          myChatUser.role === ChatRole.ADMIN) &&
+        chatUser.role !== ChatRole.OWNER &&
+        chatUser.role !== ChatRole.ADMIN
+      )
+    ) {
+      throw new ConflictException(`해당 유저에게 mute를 할 수 없습니다.`);
+    }
+
+    const muteMinutes = 1;
+    const muteTime: Date = new Date();
+    muteTime.setMinutes(muteTime.getMinutes() + muteMinutes);
+
+    chatUser.unmutedAt = muteTime;
+    await this.chatUserRepository.save(chatUser);
+
+    setTimeout(async () => {
+      chatUser.unmutedAt = null;
+      await this.chatUserRepository.save(chatUser);
+    }, muteMinutes * 60 * 1000);
+  }
+
+  async updateChatUnMute(
+    id: string,
+    userName: string,
+    myNickName: string,
+  ): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    if (!chatRoom) {
+      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    }
+
+    const myUser = await this.userService.findByNickname(myNickName);
+    const myChatUser = await this.chatUserRepository.findChatUser(
+      myUser,
+      chatRoom,
+    );
+    if (myChatUser === null) {
+      throw new ConflictException([
+        `본인은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
+    }
+    const user = await this.userService.findByNickname(userName);
+    const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (chatUser === null) {
+      throw new ConflictException([
+        `상대방은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
+    }
+
+    if (
+      !(
+        (myChatUser.role === ChatRole.OWNER ||
+          myChatUser.role === ChatRole.ADMIN) &&
+        chatUser.role !== ChatRole.OWNER &&
+        chatUser.role !== ChatRole.ADMIN
+      )
+    ) {
+      throw new ConflictException(`해당 유저에게 unMute를 할 수 없습니다.`);
+    }
+
+    chatUser.unmutedAt = null;
+    await this.chatUserRepository.save(chatUser);
   }
 }
