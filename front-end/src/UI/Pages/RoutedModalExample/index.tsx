@@ -9,8 +9,16 @@ import {
 import RoutedModal from '../../Templates/RoutedModal';
 
 export default function RoutedModalExample() {
-  const { id: chatid, name } = useParams();
-  const baseUrl = chatid ? `/chat/${chatid}` : '/';
+  const { id: chatid, userName, name } = useParams();
+  const baseUrl = React.useMemo(() => {
+    if (chatid) {
+      return `/chat/${chatid}`;
+    }
+    if (userName) {
+      return `/dm/${userName}`;
+    }
+    return '/';
+  }, [chatid, userName]);
 
   return (
     <RoutedModal baseUrl={baseUrl}>
