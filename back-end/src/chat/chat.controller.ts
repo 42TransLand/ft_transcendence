@@ -69,4 +69,10 @@ export class ChatController {
   joinChatRoom(@Param('id') id: string, @Body() chatRoomDto: ChatRoomDto) {
     return this.chatService.joinChatRoom(id, chatRoomDto);
   }
+
+  @ApiOperation({ summary: '채팅방 나가기' })
+  @Delete('/:id/leave')
+  leaveChatRoom(@Param('id') id: string, @Body() chatRoomDto: ChatRoomDto) {
+    return this.chatService.leaveChatRoom(id, chatRoomDto.nickname);
+  }
 }
