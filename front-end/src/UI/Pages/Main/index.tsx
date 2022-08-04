@@ -5,7 +5,7 @@ import MainSocial from '../../Templates/MainSocial';
 import MainStandby from '../../Templates/MainStandby';
 import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
-import UserInfo from '../../Organisms/UserInfo';
+import Profile from '../Profile';
 
 function Main() {
   const { state } = useSocket();
@@ -32,7 +32,7 @@ function Main() {
         <MainSocial />
       </Box>
       <Routes>
-        <Route path="/example/:name" element={<UserInfo />} />
+        <Route path="/example/:name" element={<Profile />} />
       </Routes>
     </Flex>
   );
