@@ -9,7 +9,7 @@ function UserGameInfo(props: {
   userLosses: number;
 }) {
   const { userRating, userTier, userWins, userLosses } = props;
-  const userWinRate = (userWins / (userWins + userLosses)) * 100;
+  const userWinRate = (userWins === 0 && userLosses === 0) ? 0 : (userWins / (userWins + userLosses)) * 100;
 
   return (
     <HStack borderWidth="1px" borderRadius="md" padding={1}>
