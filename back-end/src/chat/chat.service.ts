@@ -149,12 +149,16 @@ export class ChatService {
       chatRoom,
     );
     if (myChatUser === null) {
-      throw new ConflictException([`채팅방에 접속하지 않은 유저입니다.`]);
+      throw new ConflictException([
+        `본인은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
     }
     const user = await this.userService.findByNickname(userName);
     const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (chatUser === null) {
-      throw new ConflictException([`채팅방에 접속하지 않은 유저입니다.`]);
+      throw new ConflictException([
+        `상대방은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
     }
 
     if (
@@ -197,12 +201,16 @@ export class ChatService {
       chatRoom,
     );
     if (myChatUser === null) {
-      throw new ConflictException([`채팅방에 접속하지 않은 유저입니다.`]);
+      throw new ConflictException([
+        `본인은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
     }
     const user = await this.userService.findByNickname(userName);
     const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (chatUser === null) {
-      throw new ConflictException([`채팅방에 접속하지 않은 유저입니다.`]);
+      throw new ConflictException([
+        `상대방은 채팅방에 접속하지 않은 유저입니다.`,
+      ]);
     }
 
     if (
@@ -213,7 +221,7 @@ export class ChatService {
         chatUser.role !== ChatRole.ADMIN
       )
     ) {
-      throw new ConflictException(`해당 유저에게 mute를 할 수 없습니다.`);
+      throw new ConflictException(`해당 유저에게 unMute를 할 수 없습니다.`);
     }
 
     chatUser.unmutedAt = null;

@@ -16,7 +16,6 @@ export class SocketService {
 
   handleJoinChatRoom(client: Socket, roomId: string): string {
     client.join(roomId);
-
     return 'Joined the chatRoom';
   }
 
