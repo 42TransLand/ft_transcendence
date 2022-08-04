@@ -7,7 +7,8 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { LockIcon, UnlockIcon } from '@chakra-ui/icons';
+import { LockIcon } from '@chakra-ui/icons';
+import { IoIosChatbubbles } from 'react-icons/io';
 import { useChat } from '../../../Hooks/useChat';
 
 export default function ChatHeader() {
@@ -18,7 +19,7 @@ export default function ChatHeader() {
       <HStack justifyContent="flex-start">
         <Square centerContent>
           <Icon
-            as={chat.chatInfo.isProtected ? LockIcon : UnlockIcon}
+            as={chat.chatInfo.isProtected ? LockIcon : IoIosChatbubbles}
             boxSize="2em"
           />
         </Square>

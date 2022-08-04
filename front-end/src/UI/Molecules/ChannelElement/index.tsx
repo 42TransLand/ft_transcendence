@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, HStack, Icon, Square } from '@chakra-ui/react';
-import { LockIcon, UnlockIcon } from '@chakra-ui/icons';
+import { LockIcon } from '@chakra-ui/icons';
+import { IoIosChatbubbles } from 'react-icons/io';
 import styled from 'styled-components';
 
 const FullSquare = styled(Square)`
@@ -26,7 +27,10 @@ function ChannelElement(props: {
     >
       <HStack h="full">
         <FullSquare centerContent minHeight="100%">
-          <Icon as={isProtected ? LockIcon : UnlockIcon} boxSize="1.75em" />
+          <Icon
+            as={isProtected ? LockIcon : IoIosChatbubbles}
+            boxSize="1.75em"
+          />
         </FullSquare>
         <Text fontSize="xl" marginX="0!important" noOfLines={1}>
           {channelName}
