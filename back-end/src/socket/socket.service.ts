@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Server, Socket } from 'socket.io';
 import { ChatRoomRepository } from 'src/chat/chat.room.repository';
 import { ChatUserRepository } from 'src/chat/chat.user.repository';
-import { ChatDto } from './game/dto/chat.dto';
+import { ChatDto } from '../chat/dto/chat.dto';
 
 @Injectable()
 export class SocketService {
@@ -14,18 +14,14 @@ export class SocketService {
     private readonly chatUserRepository: ChatUserRepository,
   ) {}
 
-  handleJoinChatRoom(client: Socket, id: string): string {
-    client.join(id);
+  handleJoinChatRoom(client: Socket, roomId: string): string {
+    client.join(roomId);
 
     return 'Joined the chatRoom';
   }
 
-  handleLeaveChatRoom(server: Server, client: Socket, id: string): string {
-    client.leave(id);
+  handleLeaveChatRoom(server: Server, client: Socket, roomId: string): string {
+    client.leave(roomId);
     return 'Leaved the chatRoom';
-  }
-
-  handleSendMessage(server: Server, client: Socket, chatdto: ChatDto): void {
-    server.in(chatdto.id).emit('sendToClient', chatdto.message);
   }
 }

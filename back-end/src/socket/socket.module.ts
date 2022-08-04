@@ -29,5 +29,6 @@ import { SocketService } from './socket.service';
     GameService,
     ChatService,
   ],
+  exports: [SocketGateway],
 })
 export class SocketModule {}
