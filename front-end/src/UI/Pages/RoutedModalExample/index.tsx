@@ -9,10 +9,11 @@ import {
 import RoutedModal from '../../Templates/RoutedModal';
 
 export default function RoutedModalExample() {
-  const { name } = useParams();
+  const { id: chatid, name } = useParams();
+  const baseUrl = chatid ? `/chat/${chatid}` : '/';
 
   return (
-    <RoutedModal>
+    <RoutedModal baseUrl={baseUrl}>
       <ModalHeader>
         <Text fontSize="2xl">안녕 {name}아</Text>
         <ModalCloseButton />

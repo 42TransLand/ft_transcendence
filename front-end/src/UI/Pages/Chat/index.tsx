@@ -1,19 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  Button,
-  Input,
-  InputGroup,
-  InputRightElement,
-  ModalBody,
-  ModalFooter,
-  ModalHeader,
-} from '@chakra-ui/react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
-import RoutedModal from '../../Templates/RoutedModal';
-import ChatHeader from '../../Organisms/ChatHeader';
-import ChatBody from '../../Organisms/ChatBody';
 import { ChatProvider, useChat } from '../../../Hooks/useChat';
+import ChatModal from '../../Templates/ChatModal';
 
 function ChatExample() {
   const { id } = useParams();
@@ -32,7 +20,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '엄준식은살아있다',
         profileIcon: '/profileicons/umjunsik.jpeg',
@@ -42,7 +30,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: 'YuriMyWife',
         profileIcon: '/profileicons/yuri.jpeg',
@@ -52,7 +40,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '박수고양이',
         profileIcon: '/profileicons/catclap.gif',
@@ -62,7 +50,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '새침소녀',
         profileIcon: '/profileicons/deregirl.jpeg',
@@ -72,7 +60,7 @@ function ChatExample() {
       },
     });
     dispatch({
-      action: 'updateMember',
+      action: 'insertMember',
       chatMember: {
         name: '아그래요',
         profileIcon: '/profileicons/orly.jpeg',
@@ -183,28 +171,11 @@ function ChatExample() {
   return <div />;
 }
 
-export default function ChatModal() {
+export default function Chat() {
   return (
     <ChatProvider>
       <ChatExample />
-      <RoutedModal closeOnOverlayClick={false}>
-        <ModalHeader display={{ base: 'none', lg: 'flex' }}>
-          <ChatHeader />
-        </ModalHeader>
-        <ModalBody pb={6}>
-          <ChatBody />
-        </ModalBody>
-        <ModalFooter>
-          <InputGroup size="lg">
-            <Input pr="4.5rem" textColor="black" placeholder="" />
-            <InputRightElement width="3rem">
-              <Button colorScheme="gray" size="1.5em" p={1}>
-                <ArrowBackIcon boxSize="1.5em" />
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-        </ModalFooter>
-      </RoutedModal>
+      <ChatModal />
     </ChatProvider>
   );
 }

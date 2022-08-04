@@ -11,10 +11,10 @@ interface ChatStateType {
 
 export type ChatActionType =
   | { action: 'updateInfo'; chatInfo: ChatInfoProps }
+  | { action: 'insertMember'; chatMember: ChatMemberProps }
   | { action: 'updateMember'; chatMember: ChatMemberProps }
   | { action: 'deleteMember'; name: string }
   | { action: 'chat'; name: string; message: string };
-
 type ChatContextType = {
   state: ChatStateType;
   dispatch: React.Dispatch<ChatActionType>;
@@ -26,10 +26,20 @@ function ChatReducer(state: ChatStateType, action: ChatActionType) {
   switch (action.action) {
     case 'updateInfo':
       return { ...state, chatInfo: action.chatInfo };
-    case 'updateMember':
+    case 'insertMember':
       return {
         ...state,
         chatMembers: [...state.chatMembers, action.chatMember],
+      };
+    case 'updateMember':
+      return {
+        ...state,
+        chatMembers: state.chatMembers.map((member) => {
+          if (member.name === action.chatMember.name) {
+            return action.chatMember;
+          }
+          return member;
+        }),
       };
     case 'deleteMember': {
       return {

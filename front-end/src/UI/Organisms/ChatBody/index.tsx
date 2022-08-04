@@ -8,13 +8,19 @@ import { useChat } from '../../../Hooks/useChat';
 
 export default function ChatBody() {
   const [chat] = useChat();
+  const chatViewRef = React.useRef<HTMLElement>(null);
+  const scrollBottom = React.useRef<HTMLDivElement>(null);
+  React.useLayoutEffect(() => {
+    if (scrollBottom.current) scrollBottom.current.scrollIntoView(true);
+  }, [chat]);
 
   return (
     <Sidebar header={<ChatHeader />} sidebar={<ChatMembers />}>
-      <ScrollableVStack h="70vh" paddingRight="0.5em">
+      <ScrollableVStack ref={chatViewRef} h="70vh" paddingRight="0.5em">
         {chat.chats.map((c) => (
           <ChatElement key={c.id} name={c.name} message={c.message} id={c.id} />
         ))}
+        <div ref={scrollBottom} />
       </ScrollableVStack>
     </Sidebar>
   );
