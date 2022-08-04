@@ -9,7 +9,7 @@ function MyProfile(props: { userName: string; userImage: string }) {
   return (
     <UserContextMenu mode="self" eventType="click">
       <HStack
-        bgColor="orange.300"
+        bgColor="#424556"
         w="100%"
         h="175px"
         fontSize="3xl"
@@ -17,7 +17,7 @@ function MyProfile(props: { userName: string; userImage: string }) {
       >
         <Avatar name={userName} src={userImage} size="xl" />
         <FaMedal />
-        <Text>{userName}</Text>
+        <Text textColor="white">{userName}</Text>
       </HStack>
     </UserContextMenu>
   );

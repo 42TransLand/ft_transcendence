@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { ChatRoomRepository } from 'src/chat/chat.room.repository';
+import { ChatService } from 'src/chat/chat.service';
+import { ChatUserRepository } from 'src/chat/chat.user.repository';
 import { TypeOrmExModule } from 'src/custom/typeorm.module';
 import { GameRepository } from 'src/game/game.repository';
 import { GameService } from 'src/game/game.service';
@@ -14,8 +17,17 @@ import { SocketService } from './socket.service';
   imports: [
     TypeOrmExModule.forCustomRepository([UserRepository]),
     TypeOrmExModule.forCustomRepository([GameRepository]),
-],
+    TypeOrmExModule.forCustomRepository([ChatRoomRepository]),
+    TypeOrmExModule.forCustomRepository([ChatUserRepository]),
+  ],
   controllers: [],
-  providers: [SocketGateway, SocketService, SocketGameService, UsersService, GameService],
+  providers: [
+    SocketGateway,
+    SocketService,
+    SocketGameService,
+    UsersService,
+    GameService,
+    ChatService,
+  ],
 })
 export class SocketModule {}

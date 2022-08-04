@@ -84,7 +84,7 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
     <>
       {props.children(targetRef)}
       {isRendered && (
-        <Portal {...props.portalProps}>
+        <Portal {...props.portalProps} containerRef={targetRef}>
           <Menu
             isOpen={isDeferredOpen}
             gutter={0}
@@ -98,7 +98,7 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
               w={1}
               h={1}
               style={{
-                position: 'absolute',
+                position: 'fixed',
                 left: position[0],
                 top: position[1],
                 cursor: 'default',

@@ -6,6 +6,7 @@ import MainStandby from '../../Templates/MainStandby';
 import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
 import Profile from '../Profile';
+import Chat from '../Chat';
 
 function Main() {
   const { state } = useSocket();
@@ -24,15 +25,25 @@ function Main() {
   }
 
   return (
-    <Flex minH="100vh" maxH="100vh">
-      <Box width="full" margin="auto">
+    <Flex h="100vh" flexDirection={{ base: 'column', lg: 'row' }}>
+      <Box
+        display={{ base: 'flex', lg: 'flex' }}
+        width="full"
+        justifyContent="center"
+      >
         <MainStandby />
       </Box>
-      <Box minW="400px" maxW="400px" maxH="100vh" bgColor="white">
+      <Box
+        minW={{ base: 'full', lg: '400px' }}
+        maxW="400px"
+        height="full"
+        bgColor="white"
+      >
         <MainSocial />
       </Box>
       <Routes>
         <Route path="/example/:name" element={<Profile />} />
+        <Route path="/chat/:id/*" element={<Chat />} />
       </Routes>
     </Flex>
   );

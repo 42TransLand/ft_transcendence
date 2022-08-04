@@ -8,6 +8,10 @@ import * as bcrypt from 'bcrypt';
 import { ChatType } from './constants/chat.type.enum';
 import { UsersService } from 'src/users/users.service';
 import { ChatUserRepository } from './chat.user.repository';
+import { ChatRole } from './constants/chat.role.enum';
+import { UpdateRoleDto } from './dto/update.role.dto';
+import { ChatRoomDto } from './dto/chat.room.dto';
+import { ChatUser } from './entities/chat.user.entity';
 
 @Injectable()
 export class ChatService {
@@ -36,7 +40,7 @@ export class ChatService {
   }
 
   async updatePassword(id: string, type: ChatType, password?: string) {
-    const chatRoom = await this.chatRoomRepository.findOneById(id);
+    const chatRoom = await this.findChatRoomById(id);
     if (!chatRoom) {
       throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
     }
@@ -55,5 +59,50 @@ export class ChatService {
 
   findChatRoomById(id: string): Promise<ChatRoom> {
     return this.chatRoomRepository.findChatRoomById(id);
+  }
+
+  async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    let oldAdmin = null;
+    if (!chatRoom) {
+      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    }
+    let user = await this.userService.findByNickname(updateRoleDto.owner);
+    const owner = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (owner.role !== ChatRole.OWNER) {
+      throw new ConflictException(`권한이 없습니다.`);
+    }
+    // oldAdmin 확실하게 들어온다고 가정하고 진행, 없으면 null, 있으면 객체
+    user = await this.userService.findByNickname(updateRoleDto.oldAdmin);
+    if (user !== null) {
+      oldAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
+    }
+
+    user = await this.userService.findByNickname(updateRoleDto.newAdmin);
+    const newAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (newAdmin.role === ChatRole.ADMIN) {
+      throw new ConflictException(`이미 해당 유저는 admin입니다.`);
+    }
+
+    this.chatUserRepository.updateRole(newAdmin, oldAdmin);
+  }
+
+  async joinChatRoom(id: string, chatRoomDto: ChatRoomDto): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    if (!chatRoom) {
+      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    }
+    const user = await this.userService.findByNickname(chatRoomDto.nickname);
+    if (
+      chatRoom.type === ChatType.PROTECT &&
+      chatRoomDto.password !== undefined
+    ) {
+      return this.chatUserRepository.joinChatRoom(
+        user,
+        chatRoom,
+        chatRoomDto.password,
+      );
+    }
+    return this.chatUserRepository.joinChatRoom(user, chatRoom);
   }
 }
