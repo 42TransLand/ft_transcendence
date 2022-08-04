@@ -18,11 +18,8 @@ import RoutedModalExample from '../../Pages/RoutedModalExample';
 import { useChat } from '../../../Hooks/useChat';
 
 export default function ChatModal() {
-  const [state, dispatch] = useChat();
+  const [, dispatch] = useChat();
   const chatRef = React.useRef<HTMLInputElement>(null);
-  React.useEffect(() => {
-    if (state.scrollToBottom) state.scrollToBottom(true);
-  }, [state]);
   return (
     <RoutedModal closeOnOverlayClick={false}>
       <ModalHeader display={{ base: 'none', lg: 'flex' }}>

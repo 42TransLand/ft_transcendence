@@ -7,7 +7,6 @@ interface ChatStateType {
   chatInfo: ChatInfoProps;
   chatMembers: ChatMemberProps[];
   chats: ChatElementProps[];
-  scrollToBottom: (force: boolean) => void;
 }
 
 export type ChatActionType =
@@ -15,11 +14,7 @@ export type ChatActionType =
   | { action: 'insertMember'; chatMember: ChatMemberProps }
   | { action: 'updateMember'; chatMember: ChatMemberProps }
   | { action: 'deleteMember'; name: string }
-  | { action: 'chat'; name: string; message: string }
-  | {
-      action: 'registerChatScroller';
-      scrollToBottom: (force: boolean) => void;
-    };
+  | { action: 'chat'; name: string; message: string };
 type ChatContextType = {
   state: ChatStateType;
   dispatch: React.Dispatch<ChatActionType>;
@@ -64,9 +59,6 @@ function ChatReducer(state: ChatStateType, action: ChatActionType) {
       };
       return { ...state, chats: [...state.chats, c] };
     }
-    case 'registerChatScroller': {
-      return { ...state, scrollToBottom: action.scrollToBottom };
-    }
     default:
       return state;
   }
@@ -91,7 +83,6 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     },
     chatMembers: [],
     chats: [],
-    scrollToBottom: () => {},
   });
   const val = React.useMemo(() => ({ state, dispatch }), [state, dispatch]);
 
