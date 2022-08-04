@@ -10,12 +10,19 @@ import {
   ModalHeader,
 } from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
+import { Formik, Form, Field } from 'formik';
 import RoutedModal from '../RoutedModal';
 import ChatHeader from '../../Organisms/ChatHeader';
 import ChatBody from '../../Organisms/ChatBody';
 import RoutedModalExample from '../../Pages/RoutedModalExample';
+import { useChat } from '../../../Hooks/useChat';
 
 export default function ChatModal() {
+  const [state, dispatch] = useChat();
+  const chatRef = React.useRef<HTMLInputElement>(null);
+  React.useEffect(() => {
+    if (state.scrollToBottom) state.scrollToBottom(true);
+  }, [state]);
   return (
     <RoutedModal closeOnOverlayClick={false}>
       <ModalHeader display={{ base: 'none', lg: 'flex' }}>
@@ -25,14 +32,37 @@ export default function ChatModal() {
         <ChatBody />
       </ModalBody>
       <ModalFooter>
-        <InputGroup size="lg">
-          <Input pr="4.5rem" textColor="black" placeholder="" />
-          <InputRightElement width="3rem">
-            <Button colorScheme="gray" size="1.5em" p={1}>
-              <ArrowBackIcon boxSize="1.5em" />
-            </Button>
-          </InputRightElement>
-        </InputGroup>
+        <Formik
+          initialValues={{ message: '' }}
+          onSubmit={(values, { resetForm }) => {
+            const { message } = values;
+            if (message.length === 0) return;
+            dispatch({
+              action: 'chat',
+              name: '엄준식은살아있다',
+              message,
+            });
+            resetForm();
+          }}
+        >
+          <Form style={{ width: '100%' }}>
+            <InputGroup size="lg">
+              <Field
+                name="message"
+                as={Input}
+                pr="4.5rem"
+                textColor="black"
+                placeholder=""
+                ref={chatRef}
+              />
+              <InputRightElement width="3rem">
+                <Button type="submit" colorScheme="gray" size="1.5em" p={1}>
+                  <ArrowBackIcon boxSize="1.5em" />
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </Form>
+        </Formik>
       </ModalFooter>
       <Routes>
         <Route path="/example/:name" element={<RoutedModalExample />} />
