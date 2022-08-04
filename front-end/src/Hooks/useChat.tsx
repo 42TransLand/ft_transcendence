@@ -78,7 +78,6 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
       isProtected: false,
       channelId: 0,
       channelName: '채팅방',
-      currentHeadCount: 0,
       maxHeadCount: 0,
     },
     chatMembers: [],

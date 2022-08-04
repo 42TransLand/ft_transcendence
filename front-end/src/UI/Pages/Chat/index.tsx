@@ -12,10 +12,9 @@ function ChatExample() {
     dispatch({
       action: 'updateInfo',
       chatInfo: {
-        isProtected: true,
+        isProtected: id === '1',
         channelId: 0,
         channelName: '이것이 바로 채팅방이다..!!',
-        currentHeadCount: 30,
         maxHeadCount: 50,
       },
     });
@@ -69,6 +68,18 @@ function ChatExample() {
         blocked: false,
       },
     });
+    for (let i = 0; i < 10; i += 1) {
+      dispatch({
+        action: 'insertMember',
+        chatMember: {
+          name: `아그래요${i}`,
+          profileIcon: '/profileicons/orly.jpeg',
+          role: 'member',
+          muted: true,
+          blocked: false,
+        },
+      });
+    }
     dispatch({
       action: 'chat',
       name: '엄준식은살아있다',
