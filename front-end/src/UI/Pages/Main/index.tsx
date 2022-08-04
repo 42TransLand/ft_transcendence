@@ -7,6 +7,7 @@ import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
 import RoutedModalExample from '../RoutedModalExample';
 import ChatModal from '../ChatModal';
+import OTPReviseModal from '../OTPReviseModal';
 
 function Main() {
   const { state } = useSocket();
@@ -44,6 +45,7 @@ function Main() {
       <Routes>
         <Route path="/example/:name" element={<RoutedModalExample />} />
         <Route path="/chat/:id" element={<ChatModal />} />
+        <Route path="/OTP/:name" element={<OTPReviseModal />} />
       </Routes>
     </Flex>
   );
