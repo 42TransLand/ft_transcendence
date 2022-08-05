@@ -2,11 +2,13 @@ import React from 'react';
 import ChatMemberProps from '../Props/ChatMemberProps';
 import ChatInfoProps from '../Props/ChatInfoProps';
 import ChatElementProps from '../Props/ChatElementProps';
+import ChatEvent from '../Props/ChatEvent';
 
-interface ChatStateType {
+export interface ChatStateType {
   chatInfo: ChatInfoProps;
   chatMembers: ChatMemberProps[];
   chats: ChatElementProps[];
+  events: ChatEvent[];
 }
 
 export type ChatActionType =
@@ -14,7 +16,9 @@ export type ChatActionType =
   | { action: 'insertMember'; chatMember: ChatMemberProps }
   | { action: 'updateMember'; chatMember: ChatMemberProps }
   | { action: 'deleteMember'; name: string }
-  | { action: 'chat'; name: string; message: string };
+  | { action: 'chat'; name: string; message: string }
+  | { action: 'enqueueEvent'; event: ChatEvent }
+  | { action: 'clearEvents' };
 type ChatContextType = {
   state: ChatStateType;
   dispatch: React.Dispatch<ChatActionType>;
@@ -59,6 +63,12 @@ function ChatReducer(state: ChatStateType, action: ChatActionType) {
       };
       return { ...state, chats: [...state.chats, c] };
     }
+    case 'enqueueEvent': {
+      return { ...state, events: [...state.events, action.event] };
+    }
+    case 'clearEvents': {
+      return { ...state, events: [] };
+    }
     default:
       return state;
   }
@@ -82,6 +92,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     },
     chatMembers: [],
     chats: [],
+    events: [],
   });
   const val = React.useMemo(() => ({ state, dispatch }), [state, dispatch]);
 

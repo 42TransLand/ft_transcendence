@@ -16,9 +16,12 @@ import ChatHeader from '../../Organisms/ChatHeader';
 import ChatBody from '../../Organisms/ChatBody';
 import RoutedModalExample from '../../Pages/RoutedModalExample';
 import { useChat } from '../../../Hooks/useChat';
+import useToastedChat from '../../../Hooks/useToastedChat';
 
 export default function ChatModal() {
   const [, dispatch] = useChat();
+  useToastedChat('엄준식은살아있다');
+
   return (
     <RoutedModal closeOnOverlayClick={false}>
       <ModalHeader display={{ base: 'none', lg: 'flex' }}>

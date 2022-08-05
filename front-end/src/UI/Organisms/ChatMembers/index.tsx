@@ -19,6 +19,7 @@ export default function ChatMembers() {
         {chat.chatMembers.map((member) => (
           <UserContextMenu
             key={member.name}
+            target={member.name}
             mode={chat.chatInfo.roomType === 'private' ? 'friend' : 'chat'}
             eventType="contextmenu"
           >
