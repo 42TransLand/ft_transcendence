@@ -18,13 +18,15 @@ function FriendTab() {
         <SearchBar />
       </HStack>
       <ElementList>
-        <UserContextMenu mode="friend">
+        <UserContextMenu target="Kanye West" mode="friend">
           <FriendElement userName="Kanye West" connectionStatus="online" />
         </UserContextMenu>
-        <UserContextMenu mode="chat">
+        <UserContextMenu target="Erling Haaland" mode="friend">
           <FriendElement userName="Erling Haaland" connectionStatus="offline" />
         </UserContextMenu>
-        <FriendElement userName="Benjamin Button" connectionStatus="ingame" />
+        <UserContextMenu target="Benjamin Button" mode="friend">
+          <FriendElement userName="Benjamin Button" connectionStatus="ingame" />
+        </UserContextMenu>
       </ElementList>
     </VStack>
   );
