@@ -5,6 +5,7 @@ import MainSocial from '../../Templates/MainSocial';
 import MainStandby from '../../Templates/MainStandby';
 import { SocketState, useSocket } from '../../../Hooks/useSocket';
 import Loading from '../../Templates/Loading';
+import OTPRevise from '../OTPRevise';
 import Profile from '../Profile';
 import Chat from '../Chat';
 
@@ -42,6 +43,7 @@ function Main() {
         <MainSocial />
       </Box>
       <Routes>
+        <Route path="/otp/:name" element={<OTPRevise />} />
         <Route path="/example/:name" element={<Profile />} />
         <Route path="/chat/:id/*" element={<Chat dm={false} />} />
         <Route path="/dm/:userName/*" element={<Chat dm />} />
