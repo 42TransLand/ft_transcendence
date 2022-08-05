@@ -39,7 +39,7 @@ export default function UserContextMenu({
       eventType={eventType || 'contextmenu'}
       renderMenu={() => (
         <MenuList>
-          <Link to="/example/umjunsik">
+          <Link to="example/umjunsik">
             <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
           </Link>
           {mode === 'self' && (

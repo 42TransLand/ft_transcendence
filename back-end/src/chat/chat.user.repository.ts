@@ -5,9 +5,7 @@ import { ChatRole } from './constants/chat.role.enum';
 import { ChatRoom } from './entities/chat.room.entity';
 import { ChatUser } from './entities/chat.user.entity';
 import * as bcrypt from 'bcrypt';
-import { NotFoundError } from 'rxjs';
 import { NotFoundException } from '@nestjs/common';
-import { type } from 'os';
 
 @CustomRepository(ChatUser)
 export class ChatUserRepository extends Repository<ChatUser> {
@@ -29,7 +27,16 @@ export class ChatUserRepository extends Repository<ChatUser> {
     });
   }
 
-  async updateRole(
+  async findChatRoomById(chatRoom: ChatRoom): Promise<ChatUser[]> {
+    const chatUser = await this.find({
+      where: {
+        chatRoom: { id: Equal(chatRoom.id) },
+      },
+    });
+    return chatUser;
+  }
+
+  async updateAdminRole(
     newAdmin: ChatUser,
     oldAdmin?: ChatUser | null,
   ): Promise<void> {
@@ -39,6 +46,23 @@ export class ChatUserRepository extends Repository<ChatUser> {
       await this.save(oldAdmin);
     }
     await this.save(newAdmin);
+  }
+
+  async updateOwnerRole(user: ChatUser): Promise<void> {
+    user.role = ChatRole.OWNER;
+    await this.save(user);
+  }
+
+  async findNewOwner(chatRoom: ChatRoom): Promise<ChatUser> {
+    const checkAllUsers = await this.find({
+      where: {
+        chatRoom: { id: Equal(chatRoom.id) },
+      },
+      order: {
+        createdAt: 'ASC',
+      },
+    });
+    return checkAllUsers[0];
   }
 
   async joinChatRoom(
@@ -60,10 +84,15 @@ export class ChatUserRepository extends Repository<ChatUser> {
         throw new NotFoundException('Password is incorrect');
       }
     }
-    // 이미 채팅방에 있는 사용자
-    const alreadyUser = await this.findChatUser(user, chatRoom);
+    // 이미 채팅방에 있는 사용자인지 검사
+    const alreadyUser = this.findOne({
+      where: {
+        user: { id: Equal(user.id) },
+      },
+    });
+
     if (alreadyUser !== null) {
-      throw new NotFoundException('Already in this chat room');
+      throw new NotFoundException('Already in chat room');
     }
     // 채팅방에 사용자 추가
     const chatUser = this.create({
@@ -72,5 +101,17 @@ export class ChatUserRepository extends Repository<ChatUser> {
       role: ChatRole.PARTICIPANT,
     });
     await this.save(chatUser);
+  }
+
+  async leaveChatRoom(user: User, chatRoom: ChatRoom): Promise<void> {
+    const result = await this.delete({
+      user: { id: Equal(user.id) },
+      chatRoom: { id: Equal(chatRoom.id) },
+    });
+    if (result.affected === 0) {
+      throw new NotFoundException([
+        '유저가 채팅방 유저 테이블에서 삭제되지 않았습니다',
+      ]);
+    }
   }
 }

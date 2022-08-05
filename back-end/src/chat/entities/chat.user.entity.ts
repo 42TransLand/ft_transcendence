@@ -35,6 +35,12 @@ export class ChatUser extends BaseEntity {
   @Column()
   role: ChatRole;
 
+  @Column({
+    nullable: true,
+    default: null,
+  })
+  unmutedAt: Date;
+
   @ApiProperty({
     example: '2020-01-01',
     description: '채팅방 유저 생성 시간',

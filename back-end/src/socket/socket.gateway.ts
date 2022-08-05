@@ -21,7 +21,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { GameService } from 'src/game/game.service';
-import { ChatDto } from './game/dto/chat.dto';
+import { ChatDto } from '../chat/dto/chat.dto';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -83,30 +83,20 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('joinChatRoom')
   handleJoinChatRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { id }: ChatDto,
+    @MessageBody() { roomId }: ChatDto,
   ): string {
-    return this.socketService.handleJoinChatRoom(client, id);
+    return this.socketService.handleJoinChatRoom(client, roomId);
   }
 
   @SubscribeMessage('leaveChatRoom')
   handleLeaveChatRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() { id }: ChatDto,
+    @MessageBody() { roomId }: ChatDto,
   ): string {
-    return this.socketService.handleLeaveChatRoom(this.server, client, id);
+    return this.socketService.handleLeaveChatRoom(this.server, client, roomId);
   }
 
-  // 채팅방에 메세지 보내기
-  @SubscribeMessage('sendMessage')
-  handleSendMessage(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() chatdto: ChatDto,
-  ): void {
-    this.socketService.handleSendMessage(this.server, client, chatdto);
-  }
-
-  // 채팅방
-
+  // 게임
   @SubscribeMessage(SocketEventName.GAME_ENQUEUE_MATCH_REQ)
   handleGameEnqueueMatch(@ConnectedSocket() client: Socket) {
     try {

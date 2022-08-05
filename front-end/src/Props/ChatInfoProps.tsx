@@ -1,7 +1,6 @@
 export default interface ChatInfoProps {
-  isProtected: boolean;
+  roomType: 'private' | 'protected' | 'public';
   channelId: number;
   channelName: string;
-  currentHeadCount: number;
   maxHeadCount: number;
 }
