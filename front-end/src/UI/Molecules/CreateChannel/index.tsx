@@ -55,7 +55,7 @@ function CreateChannel() {
       onSubmit={onSubmitHandler}
       validationSchema={CreateChannelScheme}
     >
-      {(props) => (
+      {({ isSubmitting }) => (
         <>
           <Form>
             <Grid
@@ -105,8 +105,7 @@ function CreateChannel() {
                   type="submit"
                   colorScheme="gray"
                   width="100%"
-                  // eslint-disable-next-line react/prop-types
-                  isLoading={props.isSubmitting}
+                  isLoading={isSubmitting}
                 >
                   채널 생성
                 </Button>

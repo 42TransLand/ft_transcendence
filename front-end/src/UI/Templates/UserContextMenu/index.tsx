@@ -43,7 +43,7 @@ export default function UserContextMenu({
             <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
           </Link>
           {mode === 'self' && (
-            <Link to="/OTP/bylee">
+            <Link to="/otp/bylee">
               <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
             </Link>
           )}
