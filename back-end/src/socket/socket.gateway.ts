@@ -21,6 +21,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { GameService } from 'src/game/game.service';
+import { ChatService } from 'src/chat/chat.service';
 import { ChatDto } from '../chat/dto/chat.dto';
 import { Injectable } from '@nestjs/common';
 
@@ -71,6 +72,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userContext = this.userContexts.get(client.id);
       if (userContext) {
         this.socketGameService.disconnect(userContext);
+
+        this.socketService.handleDisconnect(userContext);
         this.userContexts.delete(client.id);
       }
       console.log(`Client ${client.id} disconnected`);
