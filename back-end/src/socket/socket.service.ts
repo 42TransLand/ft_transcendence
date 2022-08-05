@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Server, Socket } from 'socket.io';
 import { ChatRoomRepository } from 'src/chat/chat.room.repository';
 import { ChatUserRepository } from 'src/chat/chat.user.repository';
-import { ChatDto } from '../chat/dto/chat.dto';
 import { UserContext } from './class/user.class';
 
 @Injectable()
@@ -15,20 +13,26 @@ export class SocketService {
     private readonly chatUserRepository: ChatUserRepository,
   ) {}
 
-  handleJoinChatRoom(client: Socket, roomId: string): string {
-    client.join(roomId);
-    return 'Joined the chatRoom';
+  handleJoinChatRoom(userInfo: UserContext): void {
+    userInfo.socket.join(userInfo.chatRoom);
+
+    userInfo.server.to(userInfo.chatRoom).emit(
+      'chat',
+      JSON.stringify({
+        nickname: userInfo.user.nickname,
+        content: 'chatJoin',
+      }),
+    );
   }
 
-  handleLeaveChatRoom(server: Server, client: Socket, roomId: string): string {
-    client.leave(roomId);
-    return 'Leaved the chatRoom';
-  }
-
-  handleDisconnect(user: UserContext) {
-    user.socket.rooms.forEach((room) => {
-      user.socket.leave(room);
-      user.server.to(room).emit(`${user.id}님이 나가셨습니다`);
-    });
+  handleLeaveChatRoom(userInfo: UserContext): void {
+    userInfo.socket.leave(userInfo.chatRoom);
+    userInfo.server.to(userInfo.chatRoom).emit(
+      'chat',
+      JSON.stringify({
+        nickname: userInfo.user.nickname,
+        content: 'chatLeave',
+      }),
+    );
   }
 }

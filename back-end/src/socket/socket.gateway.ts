@@ -73,7 +73,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (userContext) {
         this.socketGameService.disconnect(userContext);
 
-        this.socketService.handleDisconnect(userContext);
+        if (userContext.chatRoom) {
+          this.socketService.handleLeaveChatRoom(userContext);
+        }
         this.userContexts.delete(client.id);
       }
       console.log(`Client ${client.id} disconnected`);
@@ -87,16 +89,32 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleJoinChatRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() { roomId }: ChatDto,
-  ): string {
-    return this.socketService.handleJoinChatRoom(client, roomId);
+  ): void {
+    try {
+      const userContext = this.userContexts.get(client.id);
+      userContext.chatRoom = roomId;
+      if (userContext) {
+        this.socketService.handleJoinChatRoom(userContext);
+      }
+    } catch (error) {
+      // ignore
+    }
   }
 
   @SubscribeMessage('leaveChatRoom')
   handleLeaveChatRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() { roomId }: ChatDto,
-  ): string {
-    return this.socketService.handleLeaveChatRoom(this.server, client, roomId);
+  ): void {
+    try {
+      const userContext = this.userContexts.get(client.id);
+      userContext.chatRoom = roomId;
+      if (userContext) {
+        this.socketService.handleLeaveChatRoom(userContext);
+      }
+    } catch (error) {
+      // ignore
+    }
   }
 
   // 게임
