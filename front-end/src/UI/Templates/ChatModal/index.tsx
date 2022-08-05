@@ -19,7 +19,6 @@ import { useChat } from '../../../Hooks/useChat';
 
 export default function ChatModal() {
   const [, dispatch] = useChat();
-  const chatRef = React.useRef<HTMLInputElement>(null);
   return (
     <RoutedModal closeOnOverlayClick={false}>
       <ModalHeader display={{ base: 'none', lg: 'flex' }}>
@@ -50,7 +49,6 @@ export default function ChatModal() {
                 pr="4.5rem"
                 textColor="black"
                 placeholder=""
-                ref={chatRef}
               />
               <InputRightElement width="3rem">
                 <Button type="submit" colorScheme="gray" size="1.5em" p={1}>
