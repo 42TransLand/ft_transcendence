@@ -85,7 +85,7 @@ export class ChatUserRepository extends Repository<ChatUser> {
       }
     }
     // 이미 채팅방에 있는 사용자인지 검사
-    const alreadyUser = this.findOne({
+    const alreadyUser = await this.findOne({
       where: {
         user: { id: Equal(user.id) },
       },

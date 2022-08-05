@@ -135,8 +135,14 @@ export class ChatService {
       return `${newOwner.id}님이 채팅방 오너로 설정되었습니다.`; // 지금은 db의 PK값 반환
     }
     return `${user.nickname}님이 채팅방에서 나가셨습니다.`;
-}
+  }
+
   async sendChat(id: string, chatDto: ChatDto): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    if (!chatRoom) {
+      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    }
+
     const user = await this.userService.findByNickname(chatDto.nickname);
     const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (chatUser === null) {
@@ -153,7 +159,7 @@ export class ChatService {
       }
     }
 
-    this.socketGateway.server.to(id).emit('chat', chatDto.content);
+    this.socketGateway.server.to(id).emit('chat', chatDto);
   }
 
   async updateChatMute(

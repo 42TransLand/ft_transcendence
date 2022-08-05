@@ -9,6 +9,7 @@ export class UserContext {
 
   // DM
   // 채팅방
+  public chatRoom: string;
   // 알림
 
   constructor(

@@ -21,6 +21,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { GameService } from 'src/game/game.service';
+import { ChatService } from 'src/chat/chat.service';
 import { ChatDto } from '../chat/dto/chat.dto';
 import { Injectable } from '@nestjs/common';
 
@@ -71,6 +72,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const userContext = this.userContexts.get(client.id);
       if (userContext) {
         this.socketGameService.disconnect(userContext);
+
+        if (userContext.chatRoom) {
+          this.socketService.handleLeaveChatRoom(userContext);
+        }
         this.userContexts.delete(client.id);
       }
       console.log(`Client ${client.id} disconnected`);
@@ -84,16 +89,32 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleJoinChatRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() { roomId }: ChatDto,
-  ): string {
-    return this.socketService.handleJoinChatRoom(client, roomId);
+  ): void {
+    try {
+      const userContext = this.userContexts.get(client.id);
+      userContext.chatRoom = roomId;
+      if (userContext) {
+        this.socketService.handleJoinChatRoom(userContext);
+      }
+    } catch (error) {
+      // ignore
+    }
   }
 
   @SubscribeMessage('leaveChatRoom')
   handleLeaveChatRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() { roomId }: ChatDto,
-  ): string {
-    return this.socketService.handleLeaveChatRoom(this.server, client, roomId);
+  ): void {
+    try {
+      const userContext = this.userContexts.get(client.id);
+      userContext.chatRoom = roomId;
+      if (userContext) {
+        this.socketService.handleLeaveChatRoom(userContext);
+      }
+    } catch (error) {
+      // ignore
+    }
   }
 
   // 게임
