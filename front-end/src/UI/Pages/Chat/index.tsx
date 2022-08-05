@@ -205,7 +205,7 @@ function ChatExampleDM() {
       chatMember: {
         name: '엄준식은살아있다',
         profileIcon: '/profileicons/umjunsik.jpeg',
-        role: 'owner',
+        role: 'member',
         muted: false,
         blocked: false,
       },
@@ -215,7 +215,7 @@ function ChatExampleDM() {
       chatMember: {
         name: 'YuriMyWife',
         profileIcon: '/profileicons/yuri.jpeg',
-        role: 'admin',
+        role: 'member',
         muted: false,
         blocked: false,
       },

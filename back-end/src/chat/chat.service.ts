@@ -4,7 +4,6 @@ import { ChatRoomRepository } from './chat.room.repository';
 import { ChatRoom } from './entities/chat.room.entity';
 import { CreateChatRoomDto } from './dto/create.chat.room.dto';
 import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
-import * as bcrypt from 'bcrypt';
 import { ChatType } from './constants/chat.type.enum';
 import { UsersService } from 'src/users/users.service';
 import { ChatUserRepository } from './chat.user.repository';
@@ -87,7 +86,7 @@ export class ChatService {
       throw new ConflictException(`이미 해당 유저는 admin입니다.`);
     }
 
-    this.chatUserRepository.updateRole(newAdmin, oldAdmin);
+    this.chatUserRepository.updateAdminRole(newAdmin, oldAdmin);
   }
 
   async joinChatRoom(id: string, chatRoomDto: ChatRoomDto): Promise<void> {
@@ -109,11 +108,35 @@ export class ChatService {
     return this.chatUserRepository.joinChatRoom(user, chatRoom);
   }
 
-  async sendChat(id: string, chatDto: ChatDto): Promise<void> {
+  async leaveChatRoom(id: string, nickname: string): Promise<string> {
     const chatRoom = await this.findChatRoomById(id);
     if (!chatRoom) {
       throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
     }
+    const user = await this.userService.findByNickname(nickname);
+    const findChatUser = await this.chatUserRepository.findChatUser(
+      user,
+      chatRoom,
+    );
+    if (!findChatUser) {
+      throw new ConflictException([`채팅방에 없는 유저입니다.`]);
+    }
+    await this.chatUserRepository.leaveChatRoom(user, chatRoom);
+    const chatUsers = await this.chatUserRepository.findChatRoomById(chatRoom);
+    if (chatUsers.length === 0) {
+      // 채팅방에 유저가 없으면 삭제
+      await this.chatRoomRepository.deleteChatRoom(chatRoom.id);
+      return `${chatRoom.id} 채팅방이 삭제되었습니다.`;
+    }
+    // 나간 사람이 Owner여서 새로운 오너가 정해져야 하는 경우
+    if (findChatUser.role === ChatRole.OWNER) {
+      const newOwner = await this.chatUserRepository.findNewOwner(chatRoom);
+      await this.chatUserRepository.updateOwnerRole(newOwner);
+      return `${newOwner.id}님이 채팅방 오너로 설정되었습니다.`; // 지금은 db의 PK값 반환
+    }
+    return `${user.nickname}님이 채팅방에서 나가셨습니다.`;
+}
+  async sendChat(id: string, chatDto: ChatDto): Promise<void> {
     const user = await this.userService.findByNickname(chatDto.nickname);
     const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (chatUser === null) {
