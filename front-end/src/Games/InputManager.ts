@@ -6,7 +6,7 @@
 /*   By: smun <smun@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/01 09:26:57 by smun              #+#    #+#             */
-/*   Updated: 2022/07/29 15:16:16 by smun             ###   ########.fr       */
+/*   Updated: 2022/08/05 14:09:10 by smun             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,12 +97,8 @@ class InputManager {
 
   private onPointerLockChange(): void {
     if (document.pointerLockElement === this.mouseTracker) {
-      // eslint-disable-next-line no-console
-      console.log('The pointer lock status is now locked');
       document.addEventListener('mousemove', this.updatePosition, false);
     } else {
-      // eslint-disable-next-line no-console
-      console.log('The pointer lock status is now unlocked');
       document.removeEventListener('mousemove', this.updatePosition, false);
     }
   }

@@ -28,7 +28,6 @@ export default class LocalPlayer extends AbstractPlayer {
       keyboardDelta.y += delta * PLAYER_RACKET_MOVE_SPEED;
     }
 
-    // eslint-disable-next-line no-console
     if (this.socket.connected)
       this.onLocalMove(this.socket, mouseDelta, keyboardDelta);
   }

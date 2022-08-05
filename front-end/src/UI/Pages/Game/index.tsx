@@ -41,9 +41,8 @@ export default function Game() {
     () => {
       setLoadingState(false);
     },
-    (err) => {
-      // eslint-disable-next-line no-console
-      console.error(err);
+    () => {
+      // error
       setLoadingState(false);
     },
   );

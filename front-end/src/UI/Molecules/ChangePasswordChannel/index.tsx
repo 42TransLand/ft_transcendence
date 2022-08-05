@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-prop-types */
 import React from 'react';
 import { LockIcon } from '@chakra-ui/icons';
 import { Grid, GridItem, VStack, Input, Button, Text } from '@chakra-ui/react';
@@ -45,7 +44,7 @@ function ChangePasswordChannel() {
       onSubmit={onSubmitHandler}
       validationSchema={ChangePasswordChannelScheme}
     >
-      {(props) => (
+      {({ isSubmitting }) => (
         <>
           <Form>
             <Grid
@@ -83,8 +82,7 @@ function ChangePasswordChannel() {
                   type="submit"
                   colorScheme="gray"
                   width="100%"
-                  // eslint-disable-next-line react/prop-types
-                  isLoading={props.isSubmitting}
+                  isLoading={isSubmitting}
                 >
                   변경하기
                 </Button>
