@@ -33,7 +33,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private userContexts: Map<string, UserContext> = new Map(); // key: socketId
 
-  private usersSocket: Map<number, string> = new Map(); // key: userId(나중에 string으로 교체), value: socketId
+  private usersSocket: Map<string, string> = new Map(); // key: userId(나중에 string으로 교체), value: socketId
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(
@@ -52,6 +52,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!user) {
         throw new Error('User Not Found');
       }
+      client.join(user.id);
       this.userContexts.set(
         socketId,
         new UserContext(socketId, this.server, client, userToken, user, date),
@@ -71,6 +72,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const userContext = this.userContexts.get(client.id);
       if (userContext) {
+        client.leave(userContext.user.id);
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {

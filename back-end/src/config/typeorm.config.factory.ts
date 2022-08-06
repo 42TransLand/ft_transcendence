@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Alert } from 'src/alert/entities/alert.entity';
 import { ChatUser } from 'src/chat/entities/chat.user.entity';
+import { Dm } from 'src/dm/entities/dm.entity';
 import { Friend } from 'src/friend/entities/friend.entity';
 import { GameRecord } from 'src/game/entities/game.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -18,7 +19,7 @@ export async function TypeOrmConfigFactory(
     password: configService.get('DB_PASSWORD'),
     database: configService.get('DB_DATABASE'),
     autoLoadEntities: true,
-    entities: [User, GameRecord, Friend, Alert, ChatRoom, ChatUser],
+    entities: [User, GameRecord, Friend, Alert, ChatRoom, ChatUser, Dm],
     synchronize: true,
   };
 }

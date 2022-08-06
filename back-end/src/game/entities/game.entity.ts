@@ -25,13 +25,13 @@ export class GameRecord extends BaseEntity {
   })
   // @ManyToOne(() =>User, () => User)
   @ManyToOne(() => User, (user) => user.id) // id로 바꿔야함
-  leftUser: number;
+  leftUser: string;
 
   @ApiProperty({
     description: '오른쪽 유저 아이디',
   })
   @ManyToOne(() => User, (user) => user.id) // id로 바꿔야함
-  rightUser: number;
+  rightUser: string;
 
   @ApiProperty({
     description: '왼쪽 유저 스코어',

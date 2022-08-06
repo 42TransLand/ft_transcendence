@@ -12,6 +12,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmConfigFactory } from './config/typeorm.config.factory';
 import { ChatModule } from './chat/chat.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
+import { DmModule } from './dm/dm.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
     AlertModule,
     SocketModule,
     ChatModule,
+    DmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
