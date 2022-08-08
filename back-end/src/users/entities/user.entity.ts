@@ -7,7 +7,6 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -23,8 +22,8 @@ export class User extends BaseEntity {
   @Column()
   nickname: string;
 
-  //@Column()
-  //email: string;
+  @Column()
+  email: string;
 
   //@Column()
   //profileIcon: string;
@@ -41,11 +40,11 @@ export class User extends BaseEntity {
   //@Column()
   //twoFactorAuthUri: string;
 
-  //@CreateDateColumn()
-  //createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-  //@UpdateDateColumn()
-  //updatedAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ApiProperty({
     description: '사용자의 게임 기록',

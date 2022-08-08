@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: config.get('jwt.secret'),
-      signOptions: { expiresIn: 3600 },
+      signOptions: { expiresIn: 36000 },
     }),
     HttpModule,
     TypeOrmExModule.forCustomRepository([UserRepository]),

@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 declare const module: any;
 
@@ -9,6 +10,7 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
 
+  app.use(cookieParser());
   const config = new DocumentBuilder()
     .setTitle('NestJS API')
     .setDescription('The NestJS API description')
