@@ -9,6 +9,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
+  if (process.env.NODE_ENV === 'dev')
+    app.enableCors({
+      origin: 'http://localhost:3001',
+      credentials: true,
+    });
 
   app.use(cookieParser());
   const config = new DocumentBuilder()

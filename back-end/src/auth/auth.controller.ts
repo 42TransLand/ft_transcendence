@@ -35,8 +35,8 @@ export class AuthController {
     const accessToken = await this.jwtService.sign({ id: req.user.id });
     res.setHeader(
       'Set-Cookie',
-      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=36000`,
+      `Authentication=${accessToken}; Path=/; Max-Age=36000`,
     );
-    res.redirect('http://localhost:3000');
+    res.redirect('http://localhost:3001/');
   }
 }
