@@ -9,13 +9,13 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from 'src/users/users.service';
-import { AuthService } from './auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
     private readonly userService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Get('/42')
@@ -32,7 +32,11 @@ export class AuthController {
     if (!isUserExist) {
       await this.userService.createUser(req.user);
     }
-
-    res.redirect('http://localhost:3000/');
+    const accessToken = await this.jwtService.sign({ id: req.user.id });
+    res.setHeader(
+      'Set-Cookie',
+      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=36000`,
+    );
+    res.redirect('http://localhost:3000');
   }
 }

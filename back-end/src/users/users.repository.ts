@@ -7,7 +7,11 @@ import { User } from './entities/user.entity';
 @CustomRepository(User)
 export class UserRepository extends Repository<User> {
   async createUser(user: Auth42userDto): Promise<void> {
-    const newUser = this.create({ id: user.id, nickname: user.username });
+    const newUser = this.create({
+      id: user.id,
+      nickname: user.username,
+      email: user.email,
+    });
     await this.save(newUser);
   }
 
@@ -27,5 +31,10 @@ export class UserRepository extends Repository<User> {
   async findById(id: string): Promise<User> {
     const user: User = await this.findOneBy({ id });
     return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    const users: User[] = await this.find();
+    return users;
   }
 }
