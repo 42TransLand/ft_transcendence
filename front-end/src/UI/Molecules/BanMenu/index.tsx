@@ -8,20 +8,20 @@ import { useTargetUser } from '../../../Hooks/useTargetUser';
 
 function BanMenu({ icon, label }: { icon: IconType; label: string }) {
   const [, dispatch] = useChat();
-  const { name } = useTargetUser();
+  const { userName } = useTargetUser();
 
   const handleMenuClick = React.useCallback(() => {
     dispatch({
       action: 'enqueueEvent',
       event: {
         type: 'banned',
-        target: name,
+        target: userName,
         commandSuccessful: [true, false, undefined][
           Math.floor(Math.random() * 3)
         ],
       },
     });
-  }, [name, dispatch]);
+  }, [userName, dispatch]);
 
   return (
     <MenuItem onClick={handleMenuClick} icon={<Icon as={icon} />}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack } from '@chakra-ui/react';
-import UserProfileInfo from '../../Molecules/UserProfileInfo';
-import UserGameInfo from '../../Molecules/UserGameInfo';
+import UserProfileInfo from '../../Organisms/UserProfileInfo';
+import UserGameInfo from '../../Organisms/UserGameInfo';
 import UserMatchHistory from '../../Organisms/UserMatchHistory';
 
 function ProfileContent(props: { isMyself: boolean }) {

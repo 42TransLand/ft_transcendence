@@ -1,12 +1,12 @@
 import React from 'react';
-import { VStack } from '@chakra-ui/react';
+import ScrollableVStack from '../../Atoms/ScrollableVStack';
 
 function ElementList(props: { children: React.ReactNode }) {
   const { children } = props;
   return (
-    <VStack width="100%" maxH="100%" /* overflow="auto" */>
+    <ScrollableVStack width="100%" maxH="100%">
       {children}
-    </VStack>
+    </ScrollableVStack>
   );
 }
 

@@ -9,8 +9,8 @@ import {
 } from '@chakra-ui/react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
+import TwoFAInput from '../../Molecules/TwoFAInput';
 import RoutedModal from '../../Templates/RoutedModal';
-import TwoFAInput from '../../Atoms/TwoFAInput';
 
 const CreateChannelScheme = Yup.object().shape({
   code: Yup.string()

@@ -2,31 +2,44 @@ import React from 'react';
 import { HStack, VStack } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import SearchBar from '../../Atoms/SearchBar';
-import PopoverButton from '../PopoverButton';
-import ElementList from '../ElementList';
 import FriendElement from '../../Molecules/FriendElement';
+import FriendSearch from '../../Templates/FriendSearch';
 import UserContextMenu from '../../Templates/UserContextMenu';
-import FriendSearch from '../../Molecules/FriendSearch';
+import ElementList from '../ElementList';
+import PopoverButton from '../PopoverButton';
+
+const friends = [
+  { userId: 1, userName: 'Kanye West', conenctionStatus: 'online' },
+  { userId: 2, userName: 'Erling Haaland', conenctionStatus: 'offline' },
+  { userId: 3, userName: 'Benjamin Button', conenctionStatus: 'ingame' },
+];
 
 function FriendTab() {
+  const [pattern, setPattern] = React.useState('');
+
   return (
     <VStack w="100%">
       <HStack w="100%">
         <PopoverButton icon={<AddIcon />}>
           <FriendSearch />
         </PopoverButton>
-        <SearchBar />
+        <SearchBar setPattern={setPattern} />
       </HStack>
       <ElementList>
-        <UserContextMenu target="Kanye West" mode="friend">
-          <FriendElement userName="Kanye West" connectionStatus="online" />
-        </UserContextMenu>
-        <UserContextMenu target="Erling Haaland" mode="friend">
-          <FriendElement userName="Erling Haaland" connectionStatus="offline" />
-        </UserContextMenu>
-        <UserContextMenu target="Benjamin Button" mode="friend">
-          <FriendElement userName="Benjamin Button" connectionStatus="ingame" />
-        </UserContextMenu>
+        {friends
+          .filter((f) => f.userName.includes(pattern))
+          .map((f) => (
+            <UserContextMenu
+              target={f.userId}
+              targetName={f.userName}
+              mode="friend"
+            >
+              <FriendElement
+                userName={f.userName}
+                connectionStatus={f.conenctionStatus}
+              />
+            </UserContextMenu>
+          ))}
       </ElementList>
     </VStack>
   );
