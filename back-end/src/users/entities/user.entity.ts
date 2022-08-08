@@ -13,7 +13,7 @@ import {
 
 @Entity()
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @Column({ primary: true })
   id: string;
 
   @ApiProperty({
