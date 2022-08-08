@@ -12,7 +12,7 @@ import { IoIosChatbubbles } from 'react-icons/io';
 import { FiSend } from 'react-icons/fi';
 import { useChat } from '../../../Hooks/useChat';
 import PopoverButton from '../PopoverButton';
-import ChangePasswordChannel from '../../Molecules/ChangePasswordChannel';
+import ChangePasswordChannel from '../../Templates/ChangePasswordChannel';
 
 export default function ChatHeader() {
   const [chat] = useChat();

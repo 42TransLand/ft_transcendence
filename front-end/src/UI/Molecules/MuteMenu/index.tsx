@@ -16,20 +16,20 @@ function MuteMenu({
   cast: boolean;
 }) {
   const [, dispatch] = useChat();
-  const { name } = useTargetUser();
+  const { userName } = useTargetUser();
 
   const handleMenuClick = React.useCallback(() => {
     dispatch({
       action: 'enqueueEvent',
       event: {
         type: cast ? 'muted' : 'unmuted',
-        target: name,
+        target: userName,
         commandSuccessful: [true, false, undefined][
           Math.floor(Math.random() * 3)
         ],
       },
     });
-  }, [cast, name, dispatch]);
+  }, [cast, userName, dispatch]);
 
   return (
     <MenuItem onClick={handleMenuClick} icon={<Icon as={icon} />}>

@@ -13,8 +13,8 @@ export interface TwoFAProps {
   isSubmitting: boolean;
 }
 
-function TwoFAInput(TwoFAprops: TwoFAProps) {
-  const { isSubmitting } = TwoFAprops;
+function TwoFAInput(twofaProps: TwoFAProps) {
+  const { isSubmitting } = twofaProps;
 
   return (
     <>

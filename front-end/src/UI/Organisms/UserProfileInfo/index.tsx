@@ -8,7 +8,7 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { MdAddPhotoAlternate } from 'react-icons/md';
-import ModifiableUserName from '../../Atoms/ModifiableUserName';
+import ModifiableUserName from '../../Molecules/ModifiableUserName';
 
 function UserProfileInfo(props: {
   userName: string;

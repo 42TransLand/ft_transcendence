@@ -1,11 +1,13 @@
 import React from 'react';
-import LogInButton from '../../Atoms/LogInButton';
+import { Button } from '@chakra-ui/react';
 import LoginBody from '../../Templates/LoginBody';
 
 export default function Login() {
   return (
     <LoginBody>
-      <LogInButton />
+      <Button colorScheme="gray" size="lg">
+        LOGIN
+      </Button>
     </LoginBody>
   );
 }

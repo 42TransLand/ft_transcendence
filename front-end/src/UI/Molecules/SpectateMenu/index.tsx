@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { MenuItem, Text, useDisclosure } from '@chakra-ui/react';
 import { MdSmartDisplay } from 'react-icons/md';
-import WarningAlertDialog from '../../Atoms/WarningAlertDialog';
+import WarningAlertDialog from '../../Templates/WarningAlertDialog';
 
 function SpectateMenu() {
   const { isOpen, onOpen, onClose } = useDisclosure();

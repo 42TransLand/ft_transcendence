@@ -13,7 +13,7 @@ import { GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
 import { GoSignOut } from 'react-icons/go';
 import { TbCrown, TbCrownOff } from 'react-icons/tb';
 import styled from 'styled-components';
-import { ContextMenu } from '../../Atoms/ContextMenu';
+import { ContextMenu } from '../../Organisms/ContextMenu';
 import InviteGameMenu from '../../Molecules/InviteGameMenu';
 import SpectateMenu from '../../Molecules/SpectateMenu';
 import FriendMenu from '../../Molecules/FriendMenu';
@@ -31,17 +31,19 @@ const ChildView = styled.div`
 
 export default function UserContextMenu({
   target,
+  targetName,
   mode,
   children,
   eventType,
 }: {
-  target: string;
+  target: number;
+  targetName: string;
   mode: UserContextMenuType;
   children: React.ReactNode;
   eventType?: 'click' | 'contextmenu';
 }) {
   return (
-    <TargetUserProvider name={target}>
+    <TargetUserProvider userId={target} userName={targetName}>
       <ContextMenu
         eventType={eventType || 'contextmenu'}
         renderMenu={() => (

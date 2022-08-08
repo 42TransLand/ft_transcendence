@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, Grid, GridItem, Text } from '@chakra-ui/react';
-import AcceptanceButton from '../../Atoms/AcceptanceButton';
+import AcceptanceButton from '../AcceptanceButton';
 
 function NotificationElement(props: { userName: string }) {
   const { userName } = props;

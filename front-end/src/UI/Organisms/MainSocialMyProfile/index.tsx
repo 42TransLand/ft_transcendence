@@ -3,11 +3,20 @@ import { HStack, Text, Avatar } from '@chakra-ui/react';
 import { FaMedal } from 'react-icons/fa';
 import UserContextMenu from '../../Templates/UserContextMenu';
 
-function MyProfile(props: { userName: string; userImage: string }) {
-  const { userName, userImage } = props;
+function MyProfile(props: {
+  userId: number;
+  userName: string;
+  userImage: string;
+}) {
+  const { userId, userName, userImage } = props;
 
   return (
-    <UserContextMenu target={userName} mode="self" eventType="click">
+    <UserContextMenu
+      target={userId}
+      targetName={userName}
+      mode="self"
+      eventType="click"
+    >
       <HStack
         bgColor="#424556"
         w="100%"

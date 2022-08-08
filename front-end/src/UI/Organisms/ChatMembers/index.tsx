@@ -19,11 +19,13 @@ export default function ChatMembers() {
         {chat.chatMembers.map((member) => (
           <UserContextMenu
             key={member.name}
-            target={member.name}
+            target={member.userId}
+            targetName={member.name}
             mode={chat.chatInfo.roomType === 'private' ? 'friend' : 'chat'}
             eventType="contextmenu"
           >
             <ChatMemberElement
+              userId={member.userId}
               profileIcon={member.profileIcon}
               name={member.name}
               role={member.role}

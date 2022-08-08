@@ -3,7 +3,7 @@ import { Icon } from '@chakra-ui/icons';
 import { IconType } from 'react-icons';
 
 import { MenuItem, useDisclosure, Text } from '@chakra-ui/react';
-import WarningAlertDialog from '../../Atoms/WarningAlertDialog';
+import WarningAlertDialog from '../../Templates/WarningAlertDialog';
 
 function BlockMenu({ icon, label }: { icon: IconType; label: string }) {
   const { isOpen, onOpen, onClose } = useDisclosure();

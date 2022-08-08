@@ -22,6 +22,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: 1,
         name: '엄준식은살아있다',
         profileIcon: '/profileicons/umjunsik.jpeg',
         role: 'member',
@@ -32,6 +33,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: 2,
         name: 'YuriMyWife',
         profileIcon: '/profileicons/yuri.jpeg',
         role: 'member',
@@ -42,6 +44,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: 3,
         name: '박수고양이',
         profileIcon: '/profileicons/catclap.gif',
         role: 'member',
@@ -52,6 +55,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: 4,
         name: '새침소녀',
         profileIcon: '/profileicons/deregirl.jpeg',
         role: 'member',
@@ -62,6 +66,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: 5,
         name: '아그래요',
         profileIcon: '/profileicons/orly.jpeg',
         role: 'member',
@@ -73,6 +78,7 @@ function ChatExampleChannel() {
       dispatch({
         action: 'insertMember',
         chatMember: {
+          userId: 6 + i,
           name: `아그래요${i}`,
           profileIcon: '/profileicons/orly.jpeg',
           role: 'member',
@@ -203,6 +209,7 @@ function ChatExampleDM() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: 1,
         name: '엄준식은살아있다',
         profileIcon: '/profileicons/umjunsik.jpeg',
         role: 'member',
@@ -213,6 +220,7 @@ function ChatExampleDM() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: 2,
         name: 'YuriMyWife',
         profileIcon: '/profileicons/yuri.jpeg',
         role: 'member',
