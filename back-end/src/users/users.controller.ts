@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/userdto';
@@ -14,5 +14,11 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'))
   getAllUsers(): Promise<User[]> {
     return this.usersService.getAllUsers();
+  }
+
+  @Get('/me')
+  @UseGuards(AuthGuard('jwt'))
+  async test(@Res() res) {
+    res.json({ id: 1, name: 'smun' });
   }
 }
