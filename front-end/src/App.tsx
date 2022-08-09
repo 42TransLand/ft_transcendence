@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, ChakraProvider, theme } from '@chakra-ui/react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { getCookie, setCookie } from 'typescript-cookie';
@@ -13,7 +13,7 @@ import Loading from './UI/Templates/Loading';
 
 function App() {
   React.useEffect(() => {
-    axios.defaults.baseURL = process.env.REACT_APP_WEBSOCKET_HOST;
+    axios.defaults.baseURL = process.env.REACT_APP_API_HOST;
     axios.defaults.withCredentials = true;
   }, []);
   const [authCookie, setAuthCookie] = React.useState(
@@ -24,14 +24,18 @@ function App() {
   if (!authCookie) {
     return (
       <ChakraProvider theme={theme}>
-        <Login />
+        <Box backgroundColor="#000">
+          <Login />
+        </Box>
       </ChakraProvider>
     );
   }
   if (isLoading) {
     return (
       <ChakraProvider theme={theme}>
-        <Loading message="정보를 불러오는 중입니다." />
+        <Box backgroundColor="#000">
+          <Loading message="정보를 불러오는 중입니다." />
+        </Box>
       </ChakraProvider>
     );
   }
@@ -41,14 +45,16 @@ function App() {
   }
   return (
     <ChakraProvider theme={theme}>
-      <SocketProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/game" element={<Game />} />
-            <Route path="/*" element={<Main />} />
-          </Routes>
-        </BrowserRouter>
-      </SocketProvider>
+      <Box backgroundColor="#000">
+        <SocketProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/game" element={<Game />} />
+              <Route path="/*" element={<Main />} />
+            </Routes>
+          </BrowserRouter>
+        </SocketProvider>
+      </Box>
     </ChakraProvider>
   );
 }
