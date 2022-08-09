@@ -11,19 +11,21 @@ import { ErrorMessage, Field } from 'formik';
 
 export interface TwoFAProps {
   isSubmitting: boolean;
+  size: string;
+  textColor: string;
 }
 
 function TwoFAInput(twofaProps: TwoFAProps) {
-  const { isSubmitting } = twofaProps;
+  const { isSubmitting, size, textColor } = twofaProps;
 
   return (
     <>
-      <InputGroup w="50%" size="lg">
+      <InputGroup w={size} size="lg">
         <Field
           as={Input}
           pr="4.5rem"
           name="code"
-          textColor="black"
+          textColor={textColor}
           placeholder="6 digit code"
         />
         <InputRightElement width="3rem">
