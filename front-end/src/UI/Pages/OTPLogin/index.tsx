@@ -1,28 +1,44 @@
 import React from 'react';
-import {
-  InputGroup,
-  InputRightElement,
-  Button,
-  Input,
-  Text,
-} from '@chakra-ui/react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
+import { Text } from '@chakra-ui/react';
+import { Form, Formik, FormikHelpers } from 'formik';
 import LoginBody from '../../Templates/LoginBody';
+import { OTPInputScheme, CodeValueType } from '../OTPRevise';
+import TwoFAInput from '../../Molecules/TwoFAInput';
 
 function OTPLogin() {
+  const tempKey = '123456';
+  const onSubmitHandler = React.useCallback(
+    (values: CodeValueType, actions: FormikHelpers<CodeValueType>) => {
+      setTimeout(() => {
+        actions.setSubmitting(false);
+        if (values.code === tempKey) {
+          actions.resetForm();
+        }
+      }, 500);
+    },
+    [],
+  );
+
   return (
     <LoginBody>
-      <Text color="white" fontSize="4xl">
-        <b>Authentication Code를 입력하세요</b>
-      </Text>
-      <InputGroup size="lg">
-        <Input pr="4.5rem" textColor="white" placeholder="6 digit code" />
-        <InputRightElement width="3rem">
-          <Button colorScheme="gray" size="sm">
-            <ArrowBackIcon />
-          </Button>
-        </InputRightElement>
-      </InputGroup>
+      <Formik
+        initialValues={{ code: '' }}
+        onSubmit={onSubmitHandler}
+        validationSchema={OTPInputScheme}
+      >
+        {({ isSubmitting }) => (
+          <Form>
+            <Text color="white" fontSize="4xl">
+              <b>Authentication Code를 입력하세요</b>
+            </Text>
+            <TwoFAInput
+              textColor="white"
+              size="100%"
+              isSubmitting={isSubmitting}
+            />
+          </Form>
+        )}
+      </Formik>
     </LoginBody>
   );
 }

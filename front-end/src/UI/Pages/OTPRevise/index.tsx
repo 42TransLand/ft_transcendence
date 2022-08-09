@@ -12,14 +12,15 @@ import * as Yup from 'yup';
 import TwoFAInput from '../../Molecules/TwoFAInput';
 import RoutedModal from '../../Templates/RoutedModal';
 
-const CreateChannelScheme = Yup.object().shape({
+export const OTPInputScheme = Yup.object().shape({
   code: Yup.string()
+    .required('6자리 코드를 입력해주세요.')
     .typeError('6자리 코드를 입력해주세요.')
     .min(6, '6자리 코드를 입력해주세요.')
     .max(6, '6자리 코드를 입력해주세요.'),
 });
 
-type CodeValueType = {
+export type CodeValueType = {
   code: string;
 };
 
@@ -42,7 +43,11 @@ function OTPBody({
           <Box w="15vw" h="20vh" bgColor="blue.200">
             대충 QR 코드 나타날 곳
           </Box>
-          <TwoFAInput isSubmitting={isSubmitting} />
+          <TwoFAInput
+            size="30%"
+            textColor="black"
+            isSubmitting={isSubmitting}
+          />
         </>
       )}
       {isEnabled === true && (
@@ -51,7 +56,11 @@ function OTPBody({
             2차인증이 활성화 되었습니다. 해제하려면 OTP 인증을 한 번 더
             수행하십시오.
           </Text>
-          <TwoFAInput isSubmitting={isSubmitting} />
+          <TwoFAInput
+            size="30%"
+            textColor="black"
+            isSubmitting={isSubmitting}
+          />
         </>
       )}
     </VStack>
@@ -59,13 +68,13 @@ function OTPBody({
 }
 
 function OTPRevise() {
-  const value = '123456';
+  const tempKey = '123456';
   const [isEnabled, setIsEnabled] = useState(false);
   const onSubmitHandler = React.useCallback(
     (values: CodeValueType, actions: FormikHelpers<CodeValueType>) => {
       setTimeout(() => {
         actions.setSubmitting(false);
-        if (values.code === value) {
+        if (values.code === tempKey) {
           setIsEnabled(!isEnabled);
           actions.resetForm();
         }
@@ -79,7 +88,7 @@ function OTPRevise() {
       <Formik
         initialValues={{ code: '' }}
         onSubmit={onSubmitHandler}
-        validationSchema={CreateChannelScheme}
+        validationSchema={OTPInputScheme}
       >
         {({ isSubmitting }) => (
           <Form>
