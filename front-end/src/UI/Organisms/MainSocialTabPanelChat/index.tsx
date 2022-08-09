@@ -45,7 +45,7 @@ function ChatTab() {
         {channels
           .filter((c) => c.channelName.includes(pattern))
           .map((c) => (
-            <ChannelLink to={`/chat/${c.roomId}`}>
+            <ChannelLink key={c.roomId} to={`/chat/${c.roomId}`}>
               <ChannelElement
                 roomType={c.roomType}
                 channelName={c.channelName}
