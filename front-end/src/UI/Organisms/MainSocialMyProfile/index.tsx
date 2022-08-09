@@ -11,12 +11,7 @@ function MyProfile(props: {
   const { userId, userName, userImage } = props;
 
   return (
-    <UserContextMenu
-      target={userId}
-      targetName={userName}
-      mode="self"
-      eventType="click"
-    >
+    <UserContextMenu target={userId} targetName={userName} mode="self">
       <HStack
         bgColor="#424556"
         w="100%"
