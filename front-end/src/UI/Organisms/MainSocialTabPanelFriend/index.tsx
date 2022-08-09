@@ -30,6 +30,7 @@ function FriendTab() {
           .filter((f) => f.userName.includes(pattern))
           .map((f) => (
             <UserContextMenu
+              key={f.userId}
               target={f.userId}
               targetName={f.userName}
               mode="friend"
