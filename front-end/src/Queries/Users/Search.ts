@@ -38,6 +38,11 @@ const friends = [
     profileIcon:
       'http://t1.daumcdn.net/movie/759dde5f25480f3acc2d4b21375519ad1dc11ebf',
   },
+  {
+    id: 7,
+    nickname: 'YuriMyWife',
+    profileIcon: '/profileicons/yuri.jpeg',
+  },
 ];
 
 const USERS_SEARCH_GET = (nickname: string) => ({
