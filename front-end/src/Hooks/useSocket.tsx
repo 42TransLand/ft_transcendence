@@ -1,5 +1,7 @@
 import React from 'react';
 import { io, Socket } from 'socket.io-client';
+import { useQuery } from '@tanstack/react-query';
+import USERS_ME_GET from '../Queries/Users/Me';
 
 enum SocketState {
   CONNECTING,
@@ -61,15 +63,12 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
   }
 }
 
-function SocketProvider({
-  query,
-  children,
-}: {
-  query: { [key: string]: any };
-  children: React.ReactNode;
-}) {
+function SocketProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(SocketReducer, initialSocketState);
   const val = React.useMemo(() => ({ state, dispatch }), [state, dispatch]);
+  const { data } = useQuery(USERS_ME_GET);
+  const query = React.useMemo(() => ({ id: data?.id }), [data]);
+
   React.useEffect(() => {
     const socket = io(
       `${process.env.REACT_APP_WEBSOCKET_HOST}${process.env.REACT_APP_WEBSOCKET_URI}`,
