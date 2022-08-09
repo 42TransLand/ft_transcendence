@@ -10,8 +10,11 @@ import {
 } from '@chakra-ui/react';
 import { IoGameController } from 'react-icons/io5';
 import InviteGame from '../../Templates/InviteGame';
+import { useTargetUser } from '../../../Hooks/useTargetUser';
 
 function InviteGameMenu() {
+  const { userId, userName } = useTargetUser();
+
   return (
     <Popover placement="left" closeOnBlur={false}>
       <PopoverTrigger>
@@ -28,7 +31,7 @@ function InviteGameMenu() {
           h="280px"
         >
           <PopoverCloseButton />
-          <InviteGame />
+          <InviteGame id={userId} nickname={userName} />
         </PopoverContent>
       </Portal>
     </Popover>

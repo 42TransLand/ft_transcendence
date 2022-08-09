@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Grid,
   GridItem,
@@ -6,60 +6,74 @@ import {
   Text,
   Button,
   Input,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
+  Select,
 } from '@chakra-ui/react';
 import { Icon, ChevronDownIcon } from '@chakra-ui/icons';
 import { GrGamepad } from 'react-icons/gr';
+import { Formik, Form, Field } from 'formik';
+import WarningAlertDialog from '../WarningAlertDialog';
+import useInviteGame from '../../../Hooks/useInviteGame';
 
-function InviteGame() {
-  const [gameMode, setGameMode] = useState('기본모드');
-  const onCliclkBasic = () => {
-    setGameMode('기본모드');
-  };
-  const onClickHard = () => {
-    setGameMode('하드모드');
-  };
+function InviteGame({ id, nickname }: { id: number; nickname: string }) {
+  const { error, clearError, cancelRef, onSubmit } = useInviteGame(id);
 
   return (
-    <Grid
-      h="100%"
-      w="100%"
-      templateRows="reapeat(3, 1fr)"
-      templateColumns="repeat(6, 1fr)"
-    >
-      <GridItem rowSpan={1} colSpan={1}>
-        <Icon as={GrGamepad} fontSize={40} />
-      </GridItem>
-      <GridItem rowSpan={2} colSpan={5}>
-        <VStack align="baseline">
-          <Text fontSize={10} color="gray">
-            게임 모드
-          </Text>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              {gameMode}
-            </MenuButton>
-            <MenuList>
-              <MenuItem onClick={onCliclkBasic}>기본모드</MenuItem>
-              <MenuItem onClick={onClickHard}>하드모드</MenuItem>
-            </MenuList>
-          </Menu>
-          <Text fontSize={10} color="gray">
-            초대할 상대방
-          </Text>
-          <Input variant="flushed" />
-        </VStack>
-      </GridItem>
-      <GridItem rowSpan={1} colSpan={4} />
-      <GridItem rowSpan={1} colSpan={2}>
-        <Button colorScheme="gray" width="100%">
-          게임 초대
-        </Button>
-      </GridItem>
-    </Grid>
+    <Formik initialValues={{ mode: 'classic' }} onSubmit={onSubmit}>
+      {({ isSubmitting }) => (
+        <>
+          <Form>
+            <Grid
+              h="100%"
+              w="100%"
+              templateRows="reapeat(3, 1fr)"
+              templateColumns="repeat(6, 1fr)"
+            >
+              <GridItem rowSpan={1} colSpan={1}>
+                <Icon as={GrGamepad} fontSize={40} />
+              </GridItem>
+              <GridItem rowSpan={2} colSpan={5}>
+                <VStack align="baseline">
+                  <Text fontSize={10} color="gray">
+                    게임 모드
+                  </Text>
+                  <Field as={Select} name="mode" icon={<ChevronDownIcon />}>
+                    <option value="classic">기본모드</option>
+                    <option value="hardcore">하드모드</option>
+                  </Field>
+                  <Text fontSize={10} color="gray">
+                    초대할 상대방
+                  </Text>
+                  <Input
+                    variant="flushed"
+                    value={nickname}
+                    textColor="gray.500"
+                    isDisabled
+                  />
+                </VStack>
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={4} />
+              <GridItem rowSpan={1} colSpan={2}>
+                <Button
+                  type="submit"
+                  colorScheme="gray"
+                  width="100%"
+                  isLoading={isSubmitting}
+                >
+                  게임 초대
+                </Button>
+              </GridItem>
+            </Grid>
+          </Form>
+          <WarningAlertDialog
+            isOpen={error.bodyMessage.length > 0}
+            onClose={() => clearError()}
+            cancelRef={cancelRef}
+            headerMessage={error.headerMessage}
+            bodyMessage={error.bodyMessage}
+          />
+        </>
+      )}
+    </Formik>
   );
 }
 
