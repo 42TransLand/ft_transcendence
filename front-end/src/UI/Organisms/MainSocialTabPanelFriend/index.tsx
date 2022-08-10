@@ -12,6 +12,7 @@ const friends = [
   { userId: 1, userName: 'Kanye West', conenctionStatus: 'online' },
   { userId: 2, userName: 'Erling Haaland', conenctionStatus: 'offline' },
   { userId: 3, userName: 'Benjamin Button', conenctionStatus: 'ingame' },
+  { userId: 4, userName: 'Kanye East', conenctionStatus: 'online' },
 ];
 
 function FriendTab() {
