@@ -48,7 +48,7 @@ export class AlertRepository extends Repository<Alert> {
     return alertId;
   }
 
-  async findAll(user: User): Promise<Alert[]> {
+  async findAll(user: User): Promise<AlertDto[]> {
     const result = await this.find({
       relations: {
         requestor: true,
@@ -58,7 +58,21 @@ export class AlertRepository extends Repository<Alert> {
         receiver: { id: Equal(user.id) },
         read: false,
       },
+      order: {
+        createdAt: 'DESC',
+      },
     });
-    return result;
+
+    const alerts = result.map((friend) => {
+      if (friend.receiver.id === user.id) {
+        const alert: AlertDto = {
+          alertId: friend.id,
+          createdAt: friend.createdAt,
+          requestor: friend.requestor,
+        };
+        return alert;
+      }
+    });
+    return alerts;
   }
 }

@@ -20,8 +20,7 @@ export class AlertService {
     await this.alertRepository.createAlert(user, opponentUser);
   }
 
-  async findAll(nickName: string): Promise<Alert[]> {
-    const user = await this.userRepository.findByNickname(nickName);
+  async findAll(user: User): Promise<AlertDto[]> {
     return this.alertRepository.findAll(user);
   }
 
