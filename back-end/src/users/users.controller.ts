@@ -56,4 +56,13 @@ export class UsersController {
   //@ApiResponse({ status: 200, description: '내 정보 수정 성공' })
   //@Patch('/me')
   //updateMe(@GetUser() user: User, @Body() userToUpdate: UserDto) {}
+
+  @ApiOperation({ summary: '유저 검색' })
+  @ApiResponse({ status: 200, description: '유저 검색 성공' })
+  @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
+  @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
+  @Get('/search/:nickname')
+  searchUsers(@Param('nickname') nickname: string): Promise<User[]> {
+    return this.usersService.searchUsers(nickname);
+  }
 }
