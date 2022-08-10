@@ -25,8 +25,8 @@ export class User extends BaseEntity {
   @Column()
   email: string;
 
-  //@Column()
-  //profileIcon: string;
+  @Column({ default: 'files/profileImg/default.png' })
+  profileImg: string;
 
   //@Column()
   //status: string;

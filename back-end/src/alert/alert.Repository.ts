@@ -11,6 +11,7 @@ export class AlertRepository extends Repository<Alert> {
       receiver,
       read: false,
     });
+    console.log(alert);
     await this.save(alert);
   }
 

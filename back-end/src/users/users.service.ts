@@ -19,8 +19,8 @@ export class UsersService {
     return this.userRepository.findByNickname(nickname);
   }
 
-  async verifyUser(user: User): Promise<User> {
-    return this.userRepository.verifyUser(user);
+  async findByUser(user: User): Promise<User> {
+    return this.userRepository.findByUser(user);
   }
 
   async findById(id: string): Promise<User> {

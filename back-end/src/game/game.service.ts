@@ -17,9 +17,9 @@ export class GameService {
 
   // 유저 2명 모두 들어올 때, return gameId
   async createGame(leftUser: User, rightUser: User): Promise<string> {
-    const findLeftUser = await this.userService.verifyUser(leftUser);
+    const findLeftUser = await this.userService.findByUser(leftUser);
     // 유저가 존재하지 않으면, null 반환하게 해야 하는데 그냥 임의로 찾아버림. friend에서는 되는데 여기서는 안됨.
-    const findRightUser = await this.userService.verifyUser(rightUser);
+    const findRightUser = await this.userService.findByUser(rightUser);
     return this.gameRepository.createGame(findLeftUser, findRightUser);
   }
 
