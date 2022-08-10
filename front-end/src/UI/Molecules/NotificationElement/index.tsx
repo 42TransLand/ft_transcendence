@@ -1,10 +1,16 @@
 import React from 'react';
 import { Avatar, Grid, GridItem, Text } from '@chakra-ui/react';
 import AcceptanceButton from '../AcceptanceButton';
+import NotificationProps from '../../../Props/NotificationProps';
+import useTime from '../../../Hooks/useTime';
 
-function NotificationElement(props: { userName: string }) {
-  const { userName } = props;
-
+function NotificationElement({
+  id,
+  nickname,
+  profileImg,
+  createAt,
+}: NotificationProps) {
+  const time = useTime(createAt);
   return (
     <Grid
       h="100px"
@@ -17,12 +23,12 @@ function NotificationElement(props: { userName: string }) {
       paddingY={2}
     >
       <GridItem rowSpan={3} colSpan={1} margin="auto">
-        <Avatar name={userName} size="md" />
+        <Avatar name={nickname} src={profileImg} size="md" />
       </GridItem>
       <GridItem rowSpan={1} colSpan={1} />
       <GridItem rowSpan={2} colSpan={8}>
         <Text fontSize="lg" lineHeight={1.25}>
-          {userName}님께서
+          {nickname}님께서
           <br />
           친구신청을 보냈습니다
         </Text>
@@ -30,12 +36,12 @@ function NotificationElement(props: { userName: string }) {
       <GridItem rowSpan={2} colSpan={1} />
       <GridItem rowSpan={1} colSpan={4} flex="">
         <Text fontSize="sm" paddingY={1.5}>
-          방금전
+          {time}
         </Text>
       </GridItem>
       <GridItem rowSpan={1} colSpan={2} />
       <GridItem rowSpan={1} colSpan={2}>
-        <AcceptanceButton />
+        <AcceptanceButton id={id} />
       </GridItem>
     </Grid>
   );

@@ -1,13 +1,18 @@
 import React from 'react';
 import { Text, HStack, Spacer, Avatar, AvatarBadge } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import { FriendOnlineState } from '../../../Hooks/useSocket';
 
-function FriendElement(props: { userName: string; connectionStatus: string }) {
+function FriendElement(props: {
+  userName: string;
+  connectionStatus: FriendOnlineState;
+}) {
   const { userName, connectionStatus } = props;
-  const StatusColors: { [key: string]: string } = {
-    online: 'green.500',
-    offline: 'red.500',
-    ingame: 'yellow.500',
+  const StatusColors = {
+    ONLINE: 'green.500',
+    OFFLINE: 'red.500',
+    PLAYING: 'yellow.500',
+    SPECTATING: 'pink.500',
   };
   const statusColor = StatusColors[connectionStatus];
 

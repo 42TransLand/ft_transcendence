@@ -1,7 +1,9 @@
 import React from 'react';
 import axios from 'axios';
+import { useToast } from '@chakra-ui/react';
 
-export default function useAddFriend(id: number) {
+export default function useAddFriend(id: number, nickname: string) {
+  const toast = useToast();
   const [isSubmitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState({
     headerMessage: '',
@@ -15,12 +17,15 @@ export default function useAddFriend(id: number) {
   const onAddFriend = React.useCallback(() => {
     setSubmitting(true);
     axios
-      .post('/friends/add', {
-        id, // TODO: 실제 친구 추가 요청을 보내야 할 대상 유저ID로 수정
-      })
+      .put(`/friend/request/${nickname}`)
       .then(() => {
         setSubmitting(false);
-        // TODO: 친구 리스트 갱신 요청 (useQuery)
+        toast({
+          title: `${nickname}님에게 친구 요청을 보냈습니다.`,
+          status: 'success',
+          isClosable: true,
+          position: 'top',
+        });
       })
       .catch((err) => {
         if (err.response) {
@@ -36,6 +41,6 @@ export default function useAddFriend(id: number) {
         }
         setSubmitting(false);
       });
-  }, [id]);
+  }, [nickname, toast]);
   return { isSubmitting, error, clearError, cancelRef, onAddFriend };
 }
