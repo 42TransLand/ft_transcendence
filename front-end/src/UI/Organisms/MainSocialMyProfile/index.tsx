@@ -1,28 +1,41 @@
 import React from 'react';
 import { HStack, Text, Avatar } from '@chakra-ui/react';
-import { FaMedal } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
 import UserContextMenu from '../../Templates/UserContextMenu';
+import USERS_ME_GET from '../../../Queries/Users/Me';
 
-function MyProfile(props: {
-  userId: number;
-  userName: string;
-  userImage: string;
-}) {
-  const { userId, userName, userImage } = props;
+function ProfileContent({ nickname }: { nickname: string | undefined }) {
+  return (
+    <HStack
+      bgColor="#424556"
+      w="100%"
+      h="175px"
+      fontSize="3xl"
+      justify="center"
+    >
+      {nickname ? (
+        <>
+          <Avatar name={nickname} size="xl" />
+          <Text textColor="white">{nickname}</Text>
+        </>
+      ) : (
+        <Text textColor="white">Loading</Text>
+      )}
+    </HStack>
+  );
+}
+
+function MyProfile() {
+  const { data, isLoading, error } = useQuery(USERS_ME_GET);
+
+  if (isLoading) return <ProfileContent nickname={undefined} />;
+  if (error) return <ProfileContent nickname="Error" />;
+
+  const { id, nickname } = data;
 
   return (
-    <UserContextMenu target={userId} targetName={userName} mode="self">
-      <HStack
-        bgColor="#424556"
-        w="100%"
-        h="175px"
-        fontSize="3xl"
-        justify="center"
-      >
-        <Avatar name={userName} src={userImage} size="xl" />
-        <FaMedal />
-        <Text textColor="white">{userName}</Text>
-      </HStack>
+    <UserContextMenu target={id} targetName={nickname} mode="self">
+      <ProfileContent nickname={nickname} />
     </UserContextMenu>
   );
 }
