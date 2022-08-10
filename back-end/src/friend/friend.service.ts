@@ -9,6 +9,7 @@ import { FriendRepository } from './friend.repository';
 import { AlertService } from 'src/alert/alert.service';
 import { User } from 'src/users/entities/user.entity';
 import { Friend } from './entities/friend.entity';
+import { FriendStatus } from './constants/friend.enum';
 
 @Injectable()
 export class FriendService {
@@ -62,7 +63,7 @@ export class FriendService {
   // 받는 사람이 차단했는지 확일 할 때
   async getFriend(sender: User, receiver: User): Promise<Friend> {
     const friendShip = await this.friendRepository.findRow(receiver, sender);
-    if (!friendShip) {
+    if (!friendShip || friendShip.status === FriendStatus.PENDDING) {
       throw new NotFoundException('아무 관계가 아니다.');
     }
     return friendShip;

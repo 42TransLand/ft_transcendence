@@ -8,23 +8,11 @@ export class AlertDto {
   })
   alertId: string;
 
-  //@ApiProperty({
-  //  example: 'plee',
-  //  description: '알림 보낸 사람의 유저 아이디',
-  //})
-  //requestorId: string;
-
   @ApiProperty({
     example: 'dcho',
     description: '알람 보낸 사람의 닉네임',
   })
   requestor: User;
-
-  //@ApiProperty({
-  //  example: 'false',
-  //  description: '알림의 읽음 여부',
-  //})
-  //read: boolean;
 
   @ApiProperty({
     example: '2020-08-01T00:00:00.000Z',
