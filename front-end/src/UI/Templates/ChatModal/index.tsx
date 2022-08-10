@@ -17,10 +17,12 @@ import ChatBody from '../../Organisms/ChatBody';
 import RoutedModalExample from '../../Pages/RoutedModalExample';
 import { useChat } from '../../../Hooks/useChat';
 import useToastedChat from '../../../Hooks/useToastedChat';
+import useMe from '../../../Hooks/useMe';
 
 export default function ChatModal() {
   const [, dispatch] = useChat();
-  useToastedChat('엄준식은살아있다');
+  const { nickname } = useMe();
+  useToastedChat(nickname);
 
   return (
     <RoutedModal closeOnOverlayClick={false}>
@@ -38,7 +40,7 @@ export default function ChatModal() {
             if (message.length === 0) return;
             dispatch({
               action: 'chat',
-              name: '엄준식은살아있다',
+              name: nickname,
               message,
             });
             resetForm();
