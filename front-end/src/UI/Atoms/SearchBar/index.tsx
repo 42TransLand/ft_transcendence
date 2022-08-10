@@ -16,7 +16,7 @@ function SearchBar({
 }) {
   const onSubmitHandler = React.useCallback(
     (values: FormikValues) => {
-      setPattern(values.keyword);
+      setPattern(values.target.value);
     },
     [setPattern],
   );
@@ -26,7 +26,7 @@ function SearchBar({
       <Box w="100%">
         <Form>
           <InputGroup w="100%" size="2xl">
-            <Input size="2xl" />
+            <Input size="2xl" onChange={onSubmitHandler} />
             <InputRightElement>
               <Button type="submit" size="xs">
                 <SearchIcon />
