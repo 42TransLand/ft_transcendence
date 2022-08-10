@@ -6,20 +6,18 @@ import {
   Patch,
   Post,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiCookieAuth,
-  ApiExtraModels,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserDto } from './dto/userdto';
 import { User } from './entities/user.entity';
 import { GetUser } from './get.user.decorator';
 import { UsersService } from './users.service';
+import { loaclOptions } from './constants/multer.options';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard('jwt'))
@@ -64,5 +62,20 @@ export class UsersController {
   @Get('/search/:nickname')
   searchUsers(@Param('nickname') nickname: string): Promise<User[]> {
     return this.usersService.searchUsers(nickname);
+  }
+
+  @ApiOperation({ summary: '나의 정보 수정' })
+  @ApiResponse({ status: 200, description: '유저 정보 수정' })
+  @ApiResponse({ status: 400, description: '지원하지 않는 이미지 형식' })
+  @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
+  @ApiResponse({ status: 409, description: '중복된 닉네임' })
+  @Patch('/me')
+  @UseInterceptors(FileInterceptor('file', loaclOptions))
+  updateUser(
+    @GetUser() user: User,
+    @Body() { nickname }: UserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<User> {
+    return this.usersService.updateUser(user, nickname, file?.path);
   }
 }
