@@ -1,21 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from 'src/users/entities/user.entity';
 
 export class AlertDto {
+  @ApiProperty({
+    example: '8faaf513-1153-4b75-8055-6e3f2e162a80',
+    description: '알람 아이디',
+  })
+  alertId: string;
+
+  //@ApiProperty({
+  //  example: 'plee',
+  //  description: '알림 보낸 사람의 유저 아이디',
+  //})
+  //requestorId: string;
+
   @ApiProperty({
     example: 'dcho',
     description: '알람 보낸 사람의 닉네임',
   })
-  requestor: string;
+  requestor: User;
+
+  //@ApiProperty({
+  //  example: 'false',
+  //  description: '알림의 읽음 여부',
+  //})
+  //read: boolean;
 
   @ApiProperty({
-    example: 'plee',
-    description: '알림 받은 사람의 닉네임',
+    example: '2020-08-01T00:00:00.000Z',
+    description: '알림의 생성 시간',
   })
-  receiver: string;
-
-  @ApiProperty({
-    example: 'false',
-    description: '알림의 읽음 여부',
-  })
-  read: boolean;
+  createdAt: Date;
 }

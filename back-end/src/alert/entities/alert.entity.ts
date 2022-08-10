@@ -39,5 +39,5 @@ export class Alert {
     description: '알림의 생성 시간',
   })
   @CreateDateColumn()
-  createAt: Date;
+  createdAt: Date;
 }
