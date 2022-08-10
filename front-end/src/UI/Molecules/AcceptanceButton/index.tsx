@@ -47,13 +47,14 @@ function AcceptanceResult(props: { isAccepted: boolean }) {
   );
 }
 
-function AcceptanceButton() {
+function AcceptanceButton({ id }: { id: number }) {
   const [AcceptanceState, setAcceptanceState] = useState({
     isChecked: false,
     isAccepted: false,
   });
 
   const handleClick = (AcceptanceVal: boolean) => {
+    console.log(`response to ${id}`);
     setAcceptanceState({ isChecked: true, isAccepted: AcceptanceVal });
   };
 

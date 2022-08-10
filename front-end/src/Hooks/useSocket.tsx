@@ -10,20 +10,30 @@ enum SocketState {
   DISCONNECTED,
 }
 
+enum FriendOnlineState {
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+  PLAYING = 'PLAYING',
+  SPECTATING = 'SPECTATING',
+}
+
 type SocketStateType = {
   socket: Socket | null;
   socketState: SocketState;
+  friendState: { [key: number]: FriendOnlineState };
 };
 const initialSocketState: SocketStateType = {
   socket: null,
   socketState: SocketState.DISCONNECTED,
+  friendState: [],
 };
 
 type SocketActionType =
   | { action: 'connect'; socket: Socket }
   | { action: 'connect_failed' }
   | { action: 'connected' }
-  | { action: 'disconnect' };
+  | { action: 'disconnect' }
+  | { action: 'updateFriendState'; friendId: number; state: FriendOnlineState };
 
 type SocketContextType = {
   state: SocketStateType;
@@ -57,6 +67,14 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
         ...beforeState,
         socket: null,
         socketState: SocketState.DISCONNECTED,
+      };
+    case 'updateFriendState':
+      return {
+        ...beforeState,
+        friendState: {
+          ...beforeState.friendState,
+          [action.friendId]: action.state,
+        },
       };
     default:
       return beforeState;
@@ -98,4 +116,4 @@ function SocketProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export { SocketProvider, useSocket, SocketState };
+export { SocketProvider, useSocket, SocketState, FriendOnlineState };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { HStack, VStack } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import SearchBar from '../../Atoms/SearchBar';
@@ -7,16 +8,19 @@ import FriendSearch from '../../Templates/FriendSearch';
 import UserContextMenu from '../../Templates/UserContextMenu';
 import ElementList from '../ElementList';
 import PopoverButton from '../PopoverButton';
-
-const friends = [
-  { userId: 1, userName: 'Kanye West', conenctionStatus: 'online' },
-  { userId: 2, userName: 'Erling Haaland', conenctionStatus: 'offline' },
-  { userId: 3, userName: 'Benjamin Button', conenctionStatus: 'ingame' },
-  { userId: 4, userName: 'Kanye East', conenctionStatus: 'online' },
-];
+import FRIEND_GET from '../../../Queries/Friends/All';
+import { useSocket } from '../../../Hooks/useSocket';
 
 function FriendTab() {
   const [pattern, setPattern] = React.useState('');
+  const { data, isLoading, error } = useQuery(FRIEND_GET);
+  const friends = React.useMemo(() => {
+    if (isLoading || error) {
+      return [];
+    }
+    return data;
+  }, [data, isLoading, error]);
+  const socket = useSocket();
 
   return (
     <VStack w="100%">
@@ -28,17 +32,17 @@ function FriendTab() {
       </HStack>
       <ElementList>
         {friends
-          .filter((f) => f.userName.includes(pattern))
+          .filter((f) => f.receiver.nickname.includes(pattern))
           .map((f) => (
             <UserContextMenu
-              key={f.userId}
-              target={f.userId}
-              targetName={f.userName}
+              key={f.receiver.id}
+              target={f.receiver.id}
+              targetName={f.receiver.nickname}
               mode="friend"
             >
               <FriendElement
-                userName={f.userName}
-                connectionStatus={f.conenctionStatus}
+                userName={f.receiver.nickname}
+                connectionStatus={socket.state.friendState[f.receiver.id]}
               />
             </UserContextMenu>
           ))}

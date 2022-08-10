@@ -11,7 +11,7 @@ function SearchFriendResultElement({
   profileIcon,
 }: UserSearchResultProps) {
   const { isSubmitting, error, clearError, cancelRef, onAddFriend } =
-    useAddFriend(id);
+    useAddFriend(id, nickname);
 
   return (
     <>
