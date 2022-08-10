@@ -6,14 +6,12 @@ import {
   Patch,
   Param,
   Delete,
-  ConsoleLogger,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { ChatRoom } from './entities/chat.room.entity';
 import { CreateChatRoomDto } from './dto/create.chat.room.dto';
 import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
-import { ChatRole } from './constants/chat.role.enum';
 import { UpdateRoleDto } from './dto/update.role.dto';
 import { ChatRoomDto } from './dto/chat.room.dto';
 import { ChatDto } from 'src/chat/dto/chat.dto';

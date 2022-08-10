@@ -1,3 +1,4 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { CustomRepository } from 'src/custom/typeorm.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Equal, Repository } from 'typeorm';
@@ -11,7 +12,11 @@ export class DMRepository extends Repository<Dm> {
       receiver,
       content,
     });
-    await this.save(DM);
+    try {
+      await this.save(DM);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
     return DM;
   }
 

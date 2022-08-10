@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatRoomRepository } from './chat.room.repository';
 import { ChatRoom } from './entities/chat.room.entity';
@@ -206,7 +210,11 @@ export class ChatService {
     muteTime.setMinutes(muteTime.getMinutes() + muteMinutes);
 
     chatUser.unmutedAt = muteTime;
-    await this.chatUserRepository.save(chatUser);
+    try {
+      await this.chatUserRepository.save(chatUser);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
 
     setTimeout(async () => {
       chatUser.unmutedAt = null;
@@ -254,6 +262,10 @@ export class ChatService {
     }
 
     chatUser.unmutedAt = null;
-    await this.chatUserRepository.save(chatUser);
+    try {
+      await this.chatUserRepository.save(chatUser);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

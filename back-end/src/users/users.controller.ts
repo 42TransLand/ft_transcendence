@@ -4,8 +4,6 @@ import {
   Get,
   Param,
   Patch,
-  Post,
-  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -49,11 +47,6 @@ export class UsersController {
   getProfile(@Param('nickname') nickname: string): Promise<User> {
     return this.usersService.findByNickname(nickname);
   }
-
-  //@ApiOperation({ summary: '내 정보 수정' })
-  //@ApiResponse({ status: 200, description: '내 정보 수정 성공' })
-  //@Patch('/me')
-  //updateMe(@GetUser() user: User, @Body() userToUpdate: UserDto) {}
 
   @ApiOperation({ summary: '유저 검색' })
   @ApiResponse({ status: 200, description: '유저 검색 성공' })

@@ -1,4 +1,7 @@
-import { ConflictException } from '@nestjs/common';
+import {
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CustomRepository } from 'src/custom/typeorm.decorator';
 import { Equal, Repository } from 'typeorm';
 import { CreateChatRoomDto } from './dto/create.chat.room.dto';
@@ -22,7 +25,11 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
       type,
       password: encryptPassword,
     });
-    await this.save(chatRoom);
+    try {
+      await this.save(chatRoom);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
     return chatRoom;
   }
 
@@ -42,7 +49,11 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
       chatRoom.password = null;
       chatRoom.type = ChatType.PUBLIC;
     }
-    await this.save(chatRoom);
+    try {
+      await this.save(chatRoom);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
     return chatRoom;
   }
 
