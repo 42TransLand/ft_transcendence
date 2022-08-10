@@ -1,10 +1,15 @@
 import React from 'react';
 import { HStack, Text, Avatar } from '@chakra-ui/react';
-import { useQuery } from '@tanstack/react-query';
 import UserContextMenu from '../../Templates/UserContextMenu';
-import USERS_ME_GET from '../../../Queries/Users/Me';
+import useMe from '../../../Hooks/useMe';
 
-function ProfileContent({ nickname }: { nickname: string | undefined }) {
+function ProfileContent({
+  nickname,
+  profileImg,
+}: {
+  nickname: string;
+  profileImg: string;
+}) {
   return (
     <HStack
       bgColor="#424556"
@@ -15,7 +20,7 @@ function ProfileContent({ nickname }: { nickname: string | undefined }) {
     >
       {nickname ? (
         <>
-          <Avatar name={nickname} size="xl" />
+          <Avatar name={nickname} src={profileImg} size="xl" />
           <Text textColor="white">{nickname}</Text>
         </>
       ) : (
@@ -26,16 +31,11 @@ function ProfileContent({ nickname }: { nickname: string | undefined }) {
 }
 
 function MyProfile() {
-  const { data, isLoading, error } = useQuery(USERS_ME_GET);
-
-  if (isLoading) return <ProfileContent nickname={undefined} />;
-  if (error) return <ProfileContent nickname="Error" />;
-
-  const { id, nickname } = data;
+  const { id, nickname, profileImg } = useMe();
 
   return (
     <UserContextMenu target={id} targetName={nickname} mode="self">
-      <ProfileContent nickname={nickname} />
+      <ProfileContent nickname={nickname} profileImg={profileImg} />
     </UserContextMenu>
   );
 }

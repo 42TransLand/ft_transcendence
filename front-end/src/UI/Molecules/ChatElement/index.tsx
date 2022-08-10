@@ -3,11 +3,14 @@ import { Image, Box, HStack, VStack, Text } from '@chakra-ui/react';
 import ChatElementProps from '../../../Props/ChatElementProps';
 import ChatBalloon from '../../Atoms/ChatBalloon';
 import { useChat } from '../../../Hooks/useChat';
+import useMe from '../../../Hooks/useMe';
 
 export default function ChatElement({ message, name }: ChatElementProps) {
   const [chat] = useChat();
+  const { id: myId } = useMe();
+
   const speaker = chat.chatMembers.find((m) => m.name === name);
-  const self = speaker?.name === '엄준식은살아있다';
+  const self = speaker?.userId === myId;
 
   return (
     <HStack
