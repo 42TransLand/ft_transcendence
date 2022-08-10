@@ -5,7 +5,10 @@ import { ChatRole } from './constants/chat.role.enum';
 import { ChatRoom } from './entities/chat.room.entity';
 import { ChatUser } from './entities/chat.user.entity';
 import * as bcrypt from 'bcrypt';
-import { NotFoundException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 @CustomRepository(ChatUser)
 export class ChatUserRepository extends Repository<ChatUser> {
@@ -15,7 +18,11 @@ export class ChatUserRepository extends Repository<ChatUser> {
       chatRoom,
       role: ChatRole.OWNER,
     });
-    await this.save(chatUser);
+    try {
+      await this.save(chatUser);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async findChatUser(user: User, chatRoom: ChatRoom): Promise<ChatUser> {
@@ -43,14 +50,26 @@ export class ChatUserRepository extends Repository<ChatUser> {
     newAdmin.role = ChatRole.ADMIN;
     if (oldAdmin !== null) {
       oldAdmin.role = ChatRole.PARTICIPANT;
-      await this.save(oldAdmin);
+      try {
+        await this.save(oldAdmin);
+      } catch (error) {
+        throw new InternalServerErrorException();
+      }
     }
-    await this.save(newAdmin);
+    try {
+      await this.save(newAdmin);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async updateOwnerRole(user: ChatUser): Promise<void> {
     user.role = ChatRole.OWNER;
-    await this.save(user);
+    try {
+      await this.save(user);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async findNewOwner(chatRoom: ChatRoom): Promise<ChatUser> {
@@ -100,7 +119,11 @@ export class ChatUserRepository extends Repository<ChatUser> {
       chatRoom,
       role: ChatRole.PARTICIPANT,
     });
-    await this.save(chatUser);
+    try {
+      await this.save(chatUser);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 
   async leaveChatRoom(user: User, chatRoom: ChatRoom): Promise<void> {

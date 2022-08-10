@@ -5,6 +5,7 @@ import { AlertRepository } from './alert.Repository';
 import { UserRepository } from 'src/users/users.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiOperation } from '@nestjs/swagger';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AlertService {
@@ -15,14 +16,8 @@ export class AlertService {
     private userRepository: UserRepository,
   ) {}
 
-  async createAlert(alertDto: AlertDto): Promise<void> {
-    const requestor = await this.userRepository.findByNickname(
-      alertDto.requestor,
-    );
-    const receiver = await this.userRepository.findByNickname(
-      alertDto.receiver,
-    );
-    return this.alertRepository.createAlert(requestor, receiver);
+  async createAlert(user: User, opponentUser: User): Promise<void> {
+    await this.alertRepository.createAlert(user, opponentUser);
   }
 
   async findAll(nickName: string): Promise<Alert[]> {

@@ -1,15 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
-import { FriendDto } from './dto/friend.dto';
 import { FriendRepository } from './friend.repository';
 import { AlertService } from 'src/alert/alert.service';
-import { AlertDto } from 'src/alert/dto/alert.dto';
-import { FriendAlertDto } from './dto/friendAlert.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Friend } from './entities/friend.entity';
-import { DeleteResult, Not } from 'typeorm';
-import { FriendStatus } from './constants/friend.enum';
 
 @Injectable()
 export class FriendService {
@@ -20,40 +19,44 @@ export class FriendService {
     private alertService: AlertService,
   ) {}
 
-  async findAllFriends(user: User): Promise<Friend[]> {
+  async findAllFriends(user: User): Promise<User[]> {
     return this.friendRepository.findAllFriends(user);
   }
 
-  async searchFriend(user: User, nickname: string): Promise<Friend[]> {
+  async requestFriend(user: User, nickname: string): Promise<void> {
+    if (user.nickname === nickname) {
+      throw new BadRequestException(
+        '자기 자신에게 친구 요청을 보낼 수 없습니다.',
+      );
+    }
     const opponentUser = await this.userService.findByNickname(nickname);
-    return this.friendRepository.searchFriend(user, opponentUser);
+    await this.friendRepository.requestFriend(user, opponentUser);
+    await this.alertService.createAlert(user, opponentUser);
   }
 
-  async requestFriend(user: User, nickname: string): Promise<Friend> {
-    // [Todo] re
-    const opponentUser = await this.userService.findByNickname(nickname);
-
-    return this.friendRepository.requestFriend(user, opponentUser);
-    // const alertDto: AlertDto = { user, opponentUser, read: false };
-    // return this.alertService.createAlert(alertDto);
+  async acceptFriend(
+    user: User,
+    alertId: string,
+    userId: string,
+  ): Promise<void> {
+    const opponentUser = await this.userService.findById(userId);
+    await this.alertService.updateAlert(alertId);
+    await this.friendRepository.acceptFriend(opponentUser, user);
   }
 
-  async acceptFriend(user: User, nickname: string): Promise<Friend> {
-    const opponentUser = await this.userService.findByNickname(nickname);
-    //await this.alertService.updateAlert(alertId); // [추가된 항목]
-    return this.friendRepository.acceptFriend(opponentUser, user);
+  async rejectFriend(
+    user: User,
+    alertId: string,
+    userId: string,
+  ): Promise<void> {
+    const opponentUser = await this.userService.findById(userId);
+    await this.alertService.updateAlert(alertId); // [추가된 항목]
+    await this.friendRepository.rejectFriend(opponentUser, user);
   }
 
-  async rejectFriend(user: User, nickname: string): Promise<DeleteResult> {
+  async blockFriend(user: User, nickname: string): Promise<void> {
     const opponentUser = await this.userService.findByNickname(nickname);
-    //const { requestor, receiver, alertId } = friendAlertDto;
-    //await this.alertService.updateAlert(alertId); // [추가된 항목]
-    return this.friendRepository.rejectFriend(opponentUser, user);
-  }
-
-  async blockFriend(user: User, nickname: string): Promise<Friend> {
-    const opponentUser = await this.userService.findByNickname(nickname);
-    return this.friendRepository.blockFriend(user, opponentUser);
+    await this.friendRepository.blockFriend(user, opponentUser);
   }
 
   // 받는 사람이 차단했는지 확일 할 때
