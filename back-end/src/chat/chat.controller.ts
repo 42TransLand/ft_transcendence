@@ -24,7 +24,7 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @ApiOperation({ summary: '채팅방 생성' })
-  @Post('create')
+  @Post('/create')
   createChatRoom(@Body() chatRoomDto: CreateChatRoomDto) {
     return this.chatService.createChatRoom(chatRoomDto);
   }
@@ -35,7 +35,7 @@ export class ChatController {
     return this.chatService.findChatRoomById(id);
   }
 
-  @ApiOperation({ summary: '모든 방 조회' })
+  @ApiOperation({ summary: '모든 채팅방 조회' })
   @Get()
   findAllChatRoom(): Promise<ChatRoom[]> {
     return this.chatService.findAllChatRoom();
@@ -43,7 +43,7 @@ export class ChatController {
 
   // User 구현되면, geUser로 user 받아와서 방장인지 확인하고, 방장이면 비밀번호를 변경하는 기능을 구현해야 함.
   @ApiOperation({ summary: '비밀번호 수정/삭제' })
-  @Patch('/:id/password')
+  @Patch('/:id')
   updatePassword(
     @Param('id') id: string,
     @Body() updatePassword: UpdateChatPasswordDto,
@@ -55,13 +55,13 @@ export class ChatController {
     );
   }
 
+  @ApiOperation({ summary: '채팅방 유저 조회' })
+  @Get('/:id')
   @ApiOperation({ summary: '채팅방 유저 역할 변경' })
   @Patch('/:id/role')
   updateRole(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.chatService.updateRole(id, updateRoleDto);
   }
-
-  // owner + admin인 사람이 방을 나갔을 때 가장 오래된 유저가 owner로 자동 변경될 때
 
   // 게임 유저 나감
 

@@ -34,4 +34,12 @@ export class UsersService {
   async searchUsers(search: string): Promise<User[]> {
     return this.userRepository.searchUsers(search);
   }
+
+  async updateUser(
+    user: User,
+    nickName?: string,
+    profileImg?: string,
+  ): Promise<User> {
+    return this.userRepository.updateUser(user, nickName, profileImg);
+  }
 }

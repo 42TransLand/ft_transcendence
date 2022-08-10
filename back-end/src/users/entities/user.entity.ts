@@ -19,13 +19,13 @@ export class User extends BaseEntity {
     example: 'dcho',
     description: '사용자의 닉네임',
   })
-  @Column()
+  @Column({ unique: true })
   nickname: string;
 
   @Column()
   email: string;
 
-  @Column({ default: 'files/profileImg/default.png' })
+  @Column({ default: 'files/profileImg/default.jpg' })
   profileImg: string;
 
   //@Column()

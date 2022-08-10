@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { User } from 'src/users/entities/user.entity';
-import { Equal, Repository } from 'typeorm';
+import { DeleteResult, Equal, Repository } from 'typeorm';
 import { CustomRepository } from '../custom/typeorm.decorator';
 import { FriendDto } from './dto/friend.dto';
 import { Friend } from './entities/friend.entity';
@@ -8,7 +8,7 @@ import { FriendStatus } from './constants/friend.enum';
 
 @CustomRepository(Friend)
 export class FriendRepository extends Repository<Friend> {
-  async requestFriend(requestor: User, receiver: User): Promise<void> {
+  async requestFriend(requestor: User, receiver: User): Promise<Friend> {
     // 친구 요청을 했는데, 상대방이 이 친구를 차단했다면 요청 자체가 안가도록.
     const resultOp = await this.findRow(receiver, requestor);
     if (resultOp !== null && resultOp.block === true) {
@@ -24,9 +24,9 @@ export class FriendRepository extends Repository<Friend> {
         ]);
       }
       if (result.status === FriendStatus.FRIEND) {
-        throw new NotFoundException([`이미 친구다.`]);
+        throw new NotFoundException([`이미 친구입니다.`]);
       } else if (result.status === FriendStatus.PENDDING) {
-        throw new NotFoundException([`이미 친구 요청 보냈다.`]);
+        throw new NotFoundException([`이미 친구 요청 보냈습니다.`]);
       }
     }
     const friend = this.create({
@@ -35,13 +35,18 @@ export class FriendRepository extends Repository<Friend> {
       status: FriendStatus.PENDDING,
     });
     await this.save(friend);
+    return friend;
+    // 자기자신에게 친구요청하는 경우도 예외처리 할것인지 생각필요.
   }
 
-  async acceptFriend(requestor: User, receiver: User): Promise<void> {
+  async acceptFriend(requestor: User, receiver: User): Promise<Friend> {
     // friend DB에 관계가 있는지 확인
     // PENDDING -> FRIEND (Update)
     // accept 무조건 1번만 들어온다고 가정. (재요청 불가)
     // 친구 요청자가 requestor
+    // console.log(requestor.id);
+    // console.log(4);
+    // console.log(receiver.id);
     const foundUpdate: Friend = await this.findRow(requestor, receiver);
     const foundCreate: Friend = await this.findRow(receiver, requestor);
 
@@ -52,10 +57,8 @@ export class FriendRepository extends Repository<Friend> {
     if (foundCreate !== null && foundCreate.block === true) {
       throw new ConflictException([`차단한 유저의 친구요청을 수락하셨습니다.`]);
     }
-
     foundUpdate.status = FriendStatus.FRIEND;
     await this.save(foundUpdate);
-
     const friend = this.create({
       requestor: receiver,
       receiver: requestor,
@@ -63,9 +66,10 @@ export class FriendRepository extends Repository<Friend> {
       block: false,
     });
     await this.save(friend);
+    return friend;
   }
 
-  async rejectFriend(requestor: User, receiver: User): Promise<void> {
+  async rejectFriend(requestor: User, receiver: User): Promise<DeleteResult> {
     const result = await this.delete({
       requestor: { id: Equal(requestor.id) },
       receiver: { id: Equal(receiver.id) },
@@ -76,10 +80,11 @@ export class FriendRepository extends Repository<Friend> {
         `Friend with ${requestor.nickname} which status is ${FriendStatus.PENDDING} not found.`,
       ]);
     }
+    return result;
   }
 
   // 모든 유저를 차단할 수 있다.
-  async blockFriend(requestor: User, receiver: User): Promise<void> {
+  async blockFriend(requestor: User, receiver: User): Promise<Friend> {
     const result: Friend = await this.findRow(requestor, receiver);
 
     // 이미 차단된 상태가 아니면 block true로 차단시킨다.
@@ -89,7 +94,7 @@ export class FriendRepository extends Repository<Friend> {
       }
       result.block = true;
       await this.save(result);
-      return;
+      return result;
     }
 
     // 관계가 없던 상태라 block으로 만들어서 저장
@@ -100,6 +105,7 @@ export class FriendRepository extends Repository<Friend> {
       block: true,
     });
     await this.save(friend);
+    return friend;
   }
 
   async findRow(requestor: User, receiver: User): Promise<Friend> {
@@ -113,6 +119,45 @@ export class FriendRepository extends Repository<Friend> {
         receiver: { id: Equal(receiver.id) },
       },
     });
+    return result;
+  }
+
+  async findAllFriends(user: User): Promise<Friend[]> {
+    /* 친구인 경우, 자기 자신이 requestor 혹은 receiver 둘 중 하나에는 무조건 있기 때문에
+       requestor가 자기 자신인 경우를 찾아 반환한다.*/
+    const result = await this.find({
+      relations: {
+        requestor: true,
+        receiver: true,
+      },
+      where: {
+        requestor: { id: Equal(user.id) },
+        status: FriendStatus.FRIEND,
+      },
+    });
+    if (Object.keys(result).length === 0) {
+      throw new NotFoundException([`친구가 없습니다.`]);
+    }
+    return result;
+  }
+
+  async searchFriend(user: User, toFindUser: User): Promise<Friend[]> {
+    /* 친구인 경우, 자기 자신과 찾으려는 친구 각각이 requestor 혹은 receiver 둘 중 하나에는 무조건 있기 때문에
+        requestor가 자기 자신인 경우를 찾아 반환한다.*/
+    const result = await this.find({
+      relations: {
+        requestor: true,
+        receiver: true,
+      },
+      where: {
+        requestor: { id: Equal(user.id) },
+        receiver: { id: Equal(toFindUser.id) },
+        status: FriendStatus.FRIEND,
+      },
+    });
+    if (Object.keys(result).length === 0) {
+      throw new NotFoundException([`친구가 아닙니다.`]);
+    }
     return result;
   }
 }

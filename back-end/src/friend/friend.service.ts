@@ -8,7 +8,7 @@ import { AlertDto } from 'src/alert/dto/alert.dto';
 import { FriendAlertDto } from './dto/friendAlert.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Friend } from './entities/friend.entity';
-import { Not } from 'typeorm';
+import { DeleteResult, Not } from 'typeorm';
 import { FriendStatus } from './constants/friend.enum';
 
 @Injectable()
@@ -20,42 +20,40 @@ export class FriendService {
     private alertService: AlertService,
   ) {}
 
-  async requestFriend(friendDto: FriendDto): Promise<void> {
-    const { requestor, receiver } = friendDto;
+  async findAllFriends(user: User): Promise<Friend[]> {
+    return this.friendRepository.findAllFriends(user);
+  }
 
+  async searchFriend(user: User, nickname: string): Promise<Friend[]> {
+    const opponentUser = await this.userService.findByNickname(nickname);
+    return this.friendRepository.searchFriend(user, opponentUser);
+  }
+
+  async requestFriend(user: User, nickname: string): Promise<Friend> {
     // [Todo] re
-    const reqUser = await this.userService.findByNickname(requestor);
-    const resUser = await this.userService.findByNickname(receiver);
-    await this.friendRepository.requestFriend(reqUser, resUser);
-    const alertDto: AlertDto = { requestor, receiver, read: false };
-    return this.alertService.createAlert(alertDto);
+    const opponentUser = await this.userService.findByNickname(nickname);
+
+    return this.friendRepository.requestFriend(user, opponentUser);
+    // const alertDto: AlertDto = { user, opponentUser, read: false };
+    // return this.alertService.createAlert(alertDto);
   }
 
-  async acceptFriend(friendAlertDto: FriendAlertDto): Promise<void> {
-    const { requestor, receiver, alertId } = friendAlertDto;
-
-    const reqUser = await this.userService.findByNickname(receiver);
-    const resUser = await this.userService.findByNickname(requestor);
-    await this.alertService.updateAlert(alertId); // [추가된 항목]
-
-    return this.friendRepository.acceptFriend(reqUser, resUser);
+  async acceptFriend(user: User, nickname: string): Promise<Friend> {
+    const opponentUser = await this.userService.findByNickname(nickname);
+    //await this.alertService.updateAlert(alertId); // [추가된 항목]
+    return this.friendRepository.acceptFriend(opponentUser, user);
   }
 
-  async rejectFriend(friendAlertDto: FriendAlertDto): Promise<void> {
-    const { requestor, receiver, alertId } = friendAlertDto;
-
-    const reqUser = await this.userService.findByNickname(receiver);
-    const resUser = await this.userService.findByNickname(requestor);
-    await this.alertService.updateAlert(alertId); // [추가된 항목]
-    return this.friendRepository.rejectFriend(reqUser, resUser);
+  async rejectFriend(user: User, nickname: string): Promise<DeleteResult> {
+    const opponentUser = await this.userService.findByNickname(nickname);
+    //const { requestor, receiver, alertId } = friendAlertDto;
+    //await this.alertService.updateAlert(alertId); // [추가된 항목]
+    return this.friendRepository.rejectFriend(opponentUser, user);
   }
 
-  async blockFriend(friendDto: FriendDto): Promise<void> {
-    const { requestor, receiver } = friendDto;
-
-    const reqUser = await this.userService.findByNickname(requestor);
-    const resUser = await this.userService.findByNickname(receiver);
-    return this.friendRepository.blockFriend(reqUser, resUser);
+  async blockFriend(user: User, nickname: string): Promise<Friend> {
+    const opponentUser = await this.userService.findByNickname(nickname);
+    return this.friendRepository.blockFriend(user, opponentUser);
   }
 
   // 받는 사람이 차단했는지 확일 할 때
