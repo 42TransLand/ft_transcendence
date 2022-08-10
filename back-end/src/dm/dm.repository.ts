@@ -2,6 +2,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { CustomRepository } from 'src/custom/typeorm.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Equal, Repository } from 'typeorm';
+import { DmDto } from './dto/dm.dto';
 import { Dm } from './entities/dm.entity';
 
 @CustomRepository(Dm)
@@ -20,7 +21,7 @@ export class DMRepository extends Repository<Dm> {
     return DM;
   }
 
-  async getDMsByOpposite(myUser: User, oppositeUser: User): Promise<Dm[]> {
+  async getDMsByOpposite(myUser: User, oppositeUser: User): Promise<DmDto[]> {
     const result = await this.find({
       relations: {
         sender: true,
@@ -40,6 +41,19 @@ export class DMRepository extends Repository<Dm> {
         createdAt: 'DESC',
       },
     });
-    return result;
+
+    const dms = result.map((findDM) => {
+      const dm: DmDto = {
+        dmId: findDM.id,
+        content: findDM.content,
+        senderId: findDM.sender.id,
+        senderNickName: findDM.sender.nickname,
+        receiverId: findDM.receiver.id,
+        receiverNickName: findDM.receiver.nickname,
+        createdAt: findDM.createdAt,
+      };
+      return dm;
+    });
+    return dms;
   }
 }

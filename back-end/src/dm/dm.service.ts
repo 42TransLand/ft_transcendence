@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendService } from 'src/friend/friend.service';
 import { SocketGateway } from 'src/socket/socket.gateway';
+import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { DMRepository } from './dm.repository';
 import { DmDto } from './dto/dm.dto';
@@ -18,10 +19,9 @@ export class DmService {
   ) {}
 
   // 아직 미완성
-  async getDMsByUser(user: string, nickname: string): Promise<Dm[]> {
-    const myUser = await this.userService.findByNickname(user);
+  async getDMsByUser(user: User, nickname: string): Promise<DmDto[]> {
     const oppositeUser = await this.userService.findByNickname(nickname);
-    return this.dmRepository.getDMsByOpposite(myUser, oppositeUser);
+    return this.dmRepository.getDMsByOpposite(user, oppositeUser);
   }
 
   async createDM(
