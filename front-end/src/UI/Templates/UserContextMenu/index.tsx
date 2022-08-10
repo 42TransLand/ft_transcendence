@@ -10,7 +10,6 @@ import {
   FaUserTimes,
 } from 'react-icons/fa';
 import { GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
-import { GoSignOut } from 'react-icons/go';
 import { TbCrown, TbCrownOff } from 'react-icons/tb';
 import styled from 'styled-components';
 import { ContextMenu } from '../../Organisms/ContextMenu';
@@ -22,6 +21,7 @@ import BanMenu from '../../Molecules/BanMenu';
 import { TargetUserProvider } from '../../../Hooks/useTargetUser';
 import MuteMenu from '../../Molecules/MuteMenu';
 import AdminApproveMenu from '../../Molecules/AdminApproveMenu';
+import LogoutMenu from '../../Molecules/LogoutMenu';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -89,7 +89,7 @@ export default function UserContextMenu({
             {mode === 'self' && (
               <>
                 <MenuDivider />
-                <MenuItem icon={<GoSignOut />}>로그아웃</MenuItem>
+                <LogoutMenu />
               </>
             )}
           </MenuList>

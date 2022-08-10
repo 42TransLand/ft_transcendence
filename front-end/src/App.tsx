@@ -10,6 +10,7 @@ import Login from './UI/Pages/Login';
 import { SocketProvider } from './Hooks/useSocket';
 import USERS_ME_GET from './Queries/Users/Me';
 import Loading from './UI/Templates/Loading';
+import { LogoutProvider } from './Hooks/useLogout';
 
 function App() {
   React.useEffect(() => {
@@ -20,6 +21,10 @@ function App() {
     getCookie('Authentication'),
   );
   const { error, isLoading } = useQuery(USERS_ME_GET);
+  const logout = React.useCallback(() => {
+    setCookie('Authentication', '', { path: '/' });
+    setAuthCookie('');
+  }, [setAuthCookie]);
 
   if (!authCookie) {
     return (
@@ -40,22 +45,23 @@ function App() {
     );
   }
   if (error) {
-    setCookie('Authentication', '', { path: '/' });
-    setAuthCookie('');
+    logout();
   }
   return (
-    <ChakraProvider theme={theme}>
-      <Box backgroundColor="#000">
-        <SocketProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/game" element={<Game />} />
-              <Route path="/*" element={<Main />} />
-            </Routes>
-          </BrowserRouter>
-        </SocketProvider>
-      </Box>
-    </ChakraProvider>
+    <LogoutProvider callback={logout}>
+      <ChakraProvider theme={theme}>
+        <Box backgroundColor="#000">
+          <SocketProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/game" element={<Game />} />
+                <Route path="/*" element={<Main />} />
+              </Routes>
+            </BrowserRouter>
+          </SocketProvider>
+        </Box>
+      </ChakraProvider>
+    </LogoutProvider>
   );
 }
 
