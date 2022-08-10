@@ -30,4 +30,8 @@ export class UsersService {
   async getAllUsers(): Promise<User[]> {
     return this.userRepository.getAllUsers();
   }
+
+  async searchUsers(search: string): Promise<User[]> {
+    return this.userRepository.searchUsers(search);
+  }
 }

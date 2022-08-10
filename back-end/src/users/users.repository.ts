@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Auth42userDto } from 'src/auth/dto/auth.42user.dto';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CustomRepository } from '../custom/typeorm.decorator';
 import { User } from './entities/user.entity';
 
@@ -50,6 +50,18 @@ export class UserRepository extends Repository<User> {
 
   async getAllUsers(): Promise<User[]> {
     const users: User[] = await this.find();
+    return users;
+  }
+
+  async searchUsers(search: string): Promise<User[]> {
+    const users: User[] = await this.find({
+      where: {
+        nickname: Like(`%${search}%`),
+      },
+    });
+    if (users.length === 0) {
+      throw new NotFoundException(`User not found`);
+    }
     return users;
   }
 }
