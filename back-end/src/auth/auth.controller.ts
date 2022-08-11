@@ -3,6 +3,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Req,
   Res,
   UseGuards,
@@ -28,9 +29,12 @@ export class AuthController {
   @Get('/42/redirect')
   @UseGuards(AuthGuard('42'))
   async getRedirect42(@Req() req, @Res() res) {
-    const isUserExist = await this.userService.findById(req.user.id);
-    if (!isUserExist) {
-      await this.userService.createUser(req.user);
+    try {
+      await this.userService.findById(req.user.id);
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        await this.userService.createUser(req.user);
+      }
     }
     const accessToken = await this.jwtService.sign({ id: req.user.id });
     res.setHeader(
