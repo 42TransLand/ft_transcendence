@@ -126,10 +126,15 @@ export class SocketGameService {
       room.update();
       if (room.state === GameState.ENDED || room.isEmpty()) {
         // TODO 게임이 종료되어, 게임 결과를 저장해야 함
-        const { winner } = room;
-        if (winner != null) {
-          console.log(winner);
-        }
+        this.gameService.updateGame(
+          room.id,
+          room.winner.user.user,
+          room.loser.user.user,
+          room.winner.score,
+          room.loser.score,
+          room.ladder,
+          room.gameMode,
+        );
         rooms.delete(index);
       }
     });

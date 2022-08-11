@@ -24,33 +24,33 @@ export class GameRecord extends BaseEntity {
     description: '왼쪽 유저 아이디',
   })
   // @ManyToOne(() =>User, () => User)
-  @ManyToOne(() => User, (user) => user.id) // id로 바꿔야함
-  leftUser: string;
+  @ManyToOne(() => User, (user) => user.id)
+  winUser: User;
 
   @ApiProperty({
     description: '오른쪽 유저 아이디',
   })
-  @ManyToOne(() => User, (user) => user.id) // id로 바꿔야함
-  rightUser: string;
+  @ManyToOne(() => User, (user) => user.id)
+  loseUser: User;
 
   @ApiProperty({
     description: '왼쪽 유저 스코어',
   })
   @Column({ default: 0 })
-  leftUserScore: number;
+  winUserScore: number;
 
   @ApiProperty({
     description: '오른쪽 유저 스코어',
   })
   @Column({ default: 0 })
-  rightUserScore: number;
+  loseUserScore: number;
 
-  @ApiProperty({
-    example: 1,
-    description: '왼쪽 유저의 승패 여부 (0: 패배, 1: 승리)',
-  })
-  @Column({ default: 0 })
-  result: number;
+  // @ApiProperty({
+  //   example: 1,
+  //   description: '왼쪽 유저의 승패 여부 (0: 패배, 1: 승리)',
+  // })
+  // @Column({ default: 0 })
+  // result: number;
 
   @ApiProperty({
     example: false,

@@ -45,4 +45,24 @@ export class GameService {
     const boards = await query.getMany();
     return boards;
   }
+
+  async updateGame(
+    gameId: string,
+    winUser: User,
+    loseUser: User,
+    winScore: number,
+    loseScore: number,
+    isLadder: boolean,
+    type: GameMode,
+  ): Promise<void> {
+    await this.gameRepository.updateGame(
+      gameId,
+      winUser,
+      loseUser,
+      winScore,
+      loseScore,
+      isLadder,
+      type,
+    );
+  }
 }
