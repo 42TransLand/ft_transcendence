@@ -4,7 +4,6 @@ import { MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
 import {
   FaUserCircle,
   FaUserEdit,
-  FaUserMinus,
   FaUserPlus,
   FaUserSlash,
   FaUserTimes,
@@ -22,6 +21,7 @@ import { TargetUserProvider } from '../../../Hooks/useTargetUser';
 import MuteMenu from '../../Molecules/MuteMenu';
 import AdminApproveMenu from '../../Molecules/AdminApproveMenu';
 import LogoutMenu from '../../Molecules/LogoutMenu';
+import useFriends from '../../../Hooks/useFriends';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -42,6 +42,8 @@ export default function UserContextMenu({
   children: React.ReactNode;
   eventType?: 'click' | 'contextmenu';
 }) {
+  const friends = useFriends();
+
   return (
     <TargetUserProvider userId={target} userName={targetName}>
       <ContextMenu
@@ -59,8 +61,9 @@ export default function UserContextMenu({
             {mode !== 'self' && (
               <>
                 <MenuDivider />
-                <FriendMenu icon={FaUserPlus} label="친구추가" />
-                <FriendMenu icon={FaUserMinus} label="친구삭제" />
+                {friends.filter((f) => f.id === target).length === 0 && (
+                  <FriendMenu icon={FaUserPlus} label="친구추가" />
+                )}
                 <BlockMenu icon={FaUserSlash} label="차단하기" />
                 <BlockMenu icon={FaUserSlash} label="차단해제" />
               </>
