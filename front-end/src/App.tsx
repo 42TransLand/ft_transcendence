@@ -11,6 +11,7 @@ import { SocketProvider } from './Hooks/useSocket';
 import USERS_ME_GET from './Queries/Users/Me';
 import Loading from './UI/Templates/Loading';
 import { LogoutProvider } from './Hooks/useLogout';
+import useMe from './Hooks/useMe';
 
 function App() {
   React.useEffect(() => {
@@ -25,6 +26,7 @@ function App() {
     setCookie('Authentication', '', { path: '/' });
     setAuthCookie('');
   }, [setAuthCookie]);
+  const { nickname } = useMe();
 
   if (!authCookie) {
     return (
@@ -51,7 +53,7 @@ function App() {
     <LogoutProvider callback={logout}>
       <ChakraProvider theme={theme}>
         <Box backgroundColor="#000">
-          <SocketProvider>
+          <SocketProvider nickname={nickname}>
             <BrowserRouter>
               <Routes>
                 <Route path="/game" element={<Game />} />
