@@ -16,8 +16,8 @@ function ProfileContent(props: {
     props;
 
   return (
-    <Box w="100%" h="500px">
-      <VStack h="100%">
+    <Box w="100%" h="500px" paddingY={2}>
+      <VStack h="100%" spacing={7}>
         <UserProfileInfo
           userName={nickname}
           userImage={userImage}
