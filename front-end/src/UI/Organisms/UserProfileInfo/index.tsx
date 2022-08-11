@@ -28,8 +28,8 @@ function UserProfileInfo(props: {
   };
 
   return (
-    <HStack>
-      <Avatar name={userName} src={userImage} size="xl">
+    <HStack spacing={5} fontSize="5xl">
+      <Avatar name={userName} src={userImage} size="lg">
         {isMyself && (
           <AvatarBadge borderWidth={0}>
             <AspectRatio width="30px" ratio={1}>

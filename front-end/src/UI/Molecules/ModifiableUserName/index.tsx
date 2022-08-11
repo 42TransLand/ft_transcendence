@@ -83,7 +83,7 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
         setIsEditing(true);
       }}
       cursor="pointer"
-      fontSize="3xl"
+      fontSize="5xl"
     >
       {modUserName}
     </Text>
