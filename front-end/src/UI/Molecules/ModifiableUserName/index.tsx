@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import { IoMdSave } from 'react-icons/io';
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import axios from 'axios';
-import WarningAlertDialog from '../../Templates/WarningAlertDialog';
+import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 type ChangeNameProps = {
   nickname: string;
@@ -25,11 +25,7 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
   const { userName, isMyself } = props;
   const [isEditing, setIsEditing] = useState(false);
   const [modUserName, setModUserName] = useState(userName);
-  const [error, setError] = React.useState({
-    headerMessage: '',
-    bodyMessage: '',
-  });
-  const cancelRef = React.useRef(null);
+  const { setError, WarningDialogComponent } = useWarningDialog();
 
   const onSubmitHandler = React.useCallback(
     ({ nickname }: ChangeNameProps, helper: FormikHelpers<ChangeNameProps>) => {
@@ -50,7 +46,7 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
           helper.setSubmitting(false);
         });
     },
-    [setModUserName, setIsEditing],
+    [setModUserName, setIsEditing, setError],
   );
 
   if (!isMyself) {
@@ -77,13 +73,7 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
               <ErrorMessage name="nickname" />
             </Text>
           </Form>
-          <WarningAlertDialog
-            isOpen={error.bodyMessage.length > 0}
-            onClose={() => setError({ headerMessage: '', bodyMessage: '' })}
-            cancelRef={cancelRef}
-            headerMessage={error.headerMessage}
-            bodyMessage={error.bodyMessage}
-          />
+          {WarningDialogComponent}
         </>
       )}
     </Formik>
