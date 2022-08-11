@@ -14,7 +14,6 @@ function ProfileContent(props: {
 }) {
   const { nickname, userImage, userRating, userWins, userLosses, isMyself } =
     props;
-  const userTier = 'Challenger';
 
   return (
     <Box w="100%" h="500px">
@@ -26,7 +25,6 @@ function ProfileContent(props: {
         />
         <UserGameInfo
           userRating={userRating}
-          userTier={userTier}
           userWins={userWins}
           userLosses={userLosses}
         />
