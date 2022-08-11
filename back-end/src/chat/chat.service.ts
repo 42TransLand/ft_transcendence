@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatRoomRepository } from './chat.room.repository';
@@ -17,6 +19,7 @@ import { ChatRoomDto } from './dto/chat.room.dto';
 import { ChatUser } from './entities/chat.user.entity';
 import { ChatDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ChatService {
@@ -29,50 +32,51 @@ export class ChatService {
     private readonly socketGateway: SocketGateway,
   ) {}
 
-  async createChatRoom(chatRoomDto: CreateChatRoomDto): Promise<string> {
-    const user = await this.userService.findByNickname(chatRoomDto.nickname);
+  async createChatRoom(
+    user: User,
+    chatRoomDto: CreateChatRoomDto,
+  ): Promise<void> {
     const room = await this.chatRoomRepository.createChatRoom(chatRoomDto);
     await this.chatUserRepository.createRoomOwner(user, room);
 
-    return room.id;
+    console.log(room.id);
   }
 
-  findAll() {
-    return `This action returns all chat`;
-  }
-
-  findOne(id: string) {
-    return `This action returns a #${id} chat`;
-  }
-
-  async updatePassword(id: string, type: ChatType, password?: string) {
+  async updatePassword(
+    id: string,
+    user: User,
+    password?: string,
+  ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-    if (!chatRoom) {
-      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
+    const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
+    if (chatUser === null) {
+      throw new BadRequestException([`채팅방에 없는 유저 입니다.`]);
     }
-    // 비밀번호 변경요청한 user가 해당 채팅방에 들어와있는지, 권한은 있는지 추가해야함
-
-    return this.chatRoomRepository.updatePassword(chatRoom, password, type);
+    if (chatUser.role !== ChatRole.OWNER) {
+      throw new BadRequestException(`권한이 없습니다.`);
+    }
+    await this.chatRoomRepository.updatePassword(
+      chatRoom,
+      password,
+      chatRoom.type,
+    );
   }
-
-  //update(id: number, updateChatDto: UpdateChatDto) {
-  //  return `This action updates a #${id} chat`;
-  //}
 
   findAllChatRoom(): Promise<ChatRoom[]> {
     return this.chatRoomRepository.findAllChatRoom();
   }
 
-  findChatRoomById(id: string): Promise<ChatRoom> {
-    return this.chatRoomRepository.findChatRoomById(id);
+  async findChatRoomById(id: string): Promise<ChatRoom> {
+    const chatRoom = await this.chatRoomRepository.findChatRoomById(id);
+    if (!chatRoom) {
+      throw new NotFoundException([`존재하지 않는 채팅방입니다.`]);
+    }
+    return chatRoom;
   }
 
   async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
     let oldAdmin = null;
-    if (!chatRoom) {
-      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
-    }
     let user = await this.userService.findByNickname(updateRoleDto.owner);
     const owner = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (owner.role !== ChatRole.OWNER) {
@@ -95,9 +99,6 @@ export class ChatService {
 
   async joinChatRoom(id: string, chatRoomDto: ChatRoomDto): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-    if (!chatRoom) {
-      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
-    }
     const user = await this.userService.findByNickname(chatRoomDto.nickname);
     if (
       chatRoom.type === ChatType.PROTECT &&
@@ -114,9 +115,6 @@ export class ChatService {
 
   async leaveChatRoom(id: string, nickname: string): Promise<string> {
     const chatRoom = await this.findChatRoomById(id);
-    if (!chatRoom) {
-      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
-    }
     const user = await this.userService.findByNickname(nickname);
     const findChatUser = await this.chatUserRepository.findChatUser(
       user,
@@ -143,9 +141,6 @@ export class ChatService {
 
   async sendChat(id: string, chatDto: ChatDto): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-    if (!chatRoom) {
-      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
-    }
 
     const user = await this.userService.findByNickname(chatDto.nickname);
     const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
@@ -172,9 +167,6 @@ export class ChatService {
     myNickName: string,
   ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-    if (!chatRoom) {
-      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
-    }
 
     const myUser = await this.userService.findByNickname(myNickName);
     const myChatUser = await this.chatUserRepository.findChatUser(

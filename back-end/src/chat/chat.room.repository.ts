@@ -41,7 +41,7 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
     chatRoom: ChatRoom,
     password: string,
     type: ChatType,
-  ): Promise<ChatRoom> {
+  ): Promise<void> {
     if (password && type === 'PROTECT') {
       const salt: string = await bcrypt.genSalt();
       chatRoom.password = await bcrypt.hash(password, salt);
@@ -54,7 +54,6 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
     } catch (error) {
       throw new InternalServerErrorException();
     }
-    return chatRoom;
   }
 
   async findChatRoomById(id: string): Promise<ChatRoom> {
