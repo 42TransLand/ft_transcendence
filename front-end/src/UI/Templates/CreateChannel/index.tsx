@@ -37,7 +37,6 @@ function CreateChannel() {
           password: values.password,
         })
         .then((response) => {
-          console.log(response);
           actions.setSubmitting(false);
           navigate(`/chat/${response.data}`);
         })
