@@ -1,5 +1,7 @@
 import React from 'react';
 import { io, Socket } from 'socket.io-client';
+import WarningDialogProps from '../Props/WarningDialogProps';
+import GameMode from '../Games/dto/constants/game.mode.enum';
 
 enum SocketState {
   CONNECTING,
@@ -15,15 +17,27 @@ enum FriendOnlineState {
   SPECTATING = 'SPECTATING',
 }
 
+export type GameStateType = {
+  mode: 'create' | 'join' | 'spectate';
+  opponentNickname: string;
+  gameMode?: GameMode;
+  scoreForWin?: number;
+};
+
 type SocketStateType = {
   socket: Socket | null;
   socketState: SocketState;
   friendState: { [key: number]: FriendOnlineState };
+  gameState: GameStateType | null;
+  socketError: WarningDialogProps;
 };
+
 const initialSocketState: SocketStateType = {
   socket: null,
   socketState: SocketState.DISCONNECTED,
   friendState: [],
+  gameState: null,
+  socketError: { headerMessage: '', bodyMessage: '' },
 };
 
 type SocketActionType =
@@ -31,7 +45,15 @@ type SocketActionType =
   | { action: 'connect_failed' }
   | { action: 'connected' }
   | { action: 'disconnect' }
-  | { action: 'updateFriendState'; friendId: number; state: FriendOnlineState };
+  | { action: 'updateFriendState'; friendId: number; state: FriendOnlineState }
+  | {
+      action: 'setCustomGame';
+      gameState: GameStateType | null;
+    }
+  | {
+      action: 'setSocketError';
+      error: WarningDialogProps;
+    };
 
 type SocketContextType = {
   state: SocketStateType;
@@ -73,6 +95,16 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
           ...beforeState.friendState,
           [action.friendId]: action.state,
         },
+      };
+    case 'setCustomGame':
+      return {
+        ...beforeState,
+        gameState: action.gameState,
+      };
+    case 'setSocketError':
+      return {
+        ...beforeState,
+        socketError: action.error,
       };
     default:
       return beforeState;

@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { Socket } from 'socket.io-client';
+import { GameStateType } from '../Hooks/useSocket';
 import AbstractPlayer from './AbstractPlayer';
 import Ball from './Ball';
 import Decoration from './Decoration';
@@ -50,6 +51,7 @@ export default class GameContext {
 
   constructor(
     public readonly socket: Socket,
+    public readonly gameState: GameStateType | null,
     public readonly searchParams: URLSearchParams,
   ) {
     this.app = new PIXI.Application({
@@ -82,7 +84,32 @@ export default class GameContext {
     this.hudMessage.anchor.y = 0.5;
     this.app.stage.addChild(this.hudMessage);
 
-    if (!searchParams.has('mode')) this.hudMessage.text = 'INVALID ACCESS :(';
+    const mode = searchParams.get('mode');
+
+    if (!mode) this.hudMessage.text = 'INVALID ACCESS :(';
+    switch (mode) {
+      case 'match-making':
+        socket.emit(SocketEventName.GAME_ENQUEUE_MATCH_REQ);
+        break;
+      case 'custom':
+        if (!gameState) {
+          this.displayHud('INVALID CUSTOM GAME');
+        } else if (gameState.mode === 'create') {
+          this.send(SocketEventName.GAME_INVITE_REQ, {
+            gameMode: gameState.gameMode,
+            opponentNickname: gameState.opponentNickname,
+            scoreForWin: gameState.scoreForWin,
+          });
+        } else if (gameState.mode === 'join') {
+          this.send(SocketEventName.GAME_ACCEPT_REQ, {
+            opponentNickname: gameState.opponentNickname,
+          });
+        }
+        break;
+      default:
+        this.displayHud('INVALID MODE');
+        break;
+    }
   }
 
   public get view() {
@@ -102,7 +129,7 @@ export default class GameContext {
     this.socket.emit(SocketEventName.GAME_LEAVE_REQ);
   }
 
-  private displayHud(reason: string) {
+  public displayHud(reason: string) {
     this.hudMessage.text = reason;
   }
 

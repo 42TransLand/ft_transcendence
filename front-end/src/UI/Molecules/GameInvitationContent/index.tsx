@@ -11,16 +11,15 @@ import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 
 function GameInvitationContent(props: {
   userName: string;
-  gameId: number;
   gameMode: string;
   isRanked: boolean;
   handleInvitation: (
-    toastId: number,
+    toastId: string,
     response: boolean,
-    AcceptanceCallback: () => void,
+    userName: string,
   ) => void;
 }) {
-  const { userName, gameId, gameMode, isRanked, handleInvitation } = props;
+  const { userName, gameMode, isRanked, handleInvitation } = props;
 
   return (
     <Grid
@@ -59,14 +58,14 @@ function GameInvitationContent(props: {
             aria-label="accept"
             icon={<CheckIcon />}
             size="sm"
-            onClick={() => handleInvitation(gameId, true, () => {})}
+            onClick={() => handleInvitation(userName, true, userName)}
           />
           <IconButton
             colorScheme="red"
             aria-label="decline"
             icon={<CloseIcon />}
             size="sm"
-            onClick={() => handleInvitation(gameId, false, () => {})}
+            onClick={() => handleInvitation(userName, false, userName)}
           />
         </HStack>
       </GridItem>

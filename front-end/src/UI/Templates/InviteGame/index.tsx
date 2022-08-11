@@ -11,13 +11,27 @@ import {
 import { Icon, ChevronDownIcon } from '@chakra-ui/icons';
 import { GrGamepad } from 'react-icons/gr';
 import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 import useInviteGame from '../../../Hooks/useInviteGame';
+import GameMode from '../../../Games/dto/constants/game.mode.enum';
 
-function InviteGame({ id, nickname }: { id: number; nickname: string }) {
-  const { onSubmit, WarningDialogComponent } = useInviteGame(id);
+const InviteGameScheme = Yup.object().shape({
+  mode: Yup.mixed<GameMode>().required('올바른 게임모드를 선택해주세요.'),
+  scoreForWin: Yup.number()
+    .required('승리 목표 점수를 입력해주세요.')
+    .min(1, '승리 목표 점수는 1 이상이어야 합니다.')
+    .max(100, '승리 목표 점수는 100 이하이어야 합니다.'),
+});
+
+function InviteGame({ nickname }: { nickname: string }) {
+  const { onSubmit, WarningDialogComponent } = useInviteGame(nickname);
 
   return (
-    <Formik initialValues={{ mode: 'classic' }} onSubmit={onSubmit}>
+    <Formik
+      initialValues={{ mode: GameMode.CLASSIC, scoreForWin: 5 }}
+      validationSchema={InviteGameScheme}
+      onSubmit={onSubmit}
+    >
       {({ isSubmitting }) => (
         <>
           <Form>
@@ -36,9 +50,13 @@ function InviteGame({ id, nickname }: { id: number; nickname: string }) {
                     게임 모드
                   </Text>
                   <Field as={Select} name="mode" icon={<ChevronDownIcon />}>
-                    <option value="classic">기본모드</option>
-                    <option value="hardcore">하드모드</option>
+                    <option value={GameMode.CLASSIC}>기본모드</option>
+                    <option value={GameMode.SPEED}>스피드모드</option>
                   </Field>
+                  <Text fontSize={10} color="gray">
+                    승리 목표 점수
+                  </Text>
+                  <Field as={Input} name="scoreForWin" />
                   <Text fontSize={10} color="gray">
                     초대할 상대방
                   </Text>

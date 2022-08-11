@@ -21,12 +21,12 @@ function App() {
   const [authCookie, setAuthCookie] = React.useState(
     getCookie('Authentication'),
   );
+  const { nickname } = useMe();
   const { error, isLoading } = useQuery(USERS_ME_GET);
   const logout = React.useCallback(() => {
     setCookie('Authentication', '', { path: '/' });
     setAuthCookie('');
   }, [setAuthCookie]);
-  const { nickname } = useMe();
 
   if (!authCookie) {
     return (

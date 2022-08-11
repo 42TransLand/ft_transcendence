@@ -55,6 +55,10 @@ enum SocketEventName {
   GAME_LEAVE_REQ = 'game-leave-req',
   PLAYER_MOVE_REQ = 'player-move-req',
 
+  GAME_INVITE_REQ = 'game-invite-req',
+  GAME_ACCEPT_REQ = 'game-accept-req',
+  GAME_REFUSE_REQ = 'game-refuse-req',
+
   BALL_MOVE_NOTIFY = 'ball-move-notify',
   GAME_CREATE_RES = 'game-create-res',
   GAME_END_NOTIFY = 'game-end-notify',
@@ -64,6 +68,11 @@ enum SocketEventName {
   GAME_SCORE_NOTIFY = 'game-score-notify',
   GAME_STATE_NOTIFY = 'game-state-notify',
   PLAYER_MOVE_NOTIFY = 'player-move-notify',
+
+  GAME_INVITE_RES = 'game-invite-res',
+  GAME_ACCEPT_RES = 'game-accept-res',
+  GAME_REFUSE_RES = 'game-refuse-res',
+  GAME_INVITE_NOTIFY = 'game-invite-notify',
 }
 
 export {
