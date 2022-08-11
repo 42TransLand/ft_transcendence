@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import axios from 'axios';
 import { ChatIcon } from '@chakra-ui/icons';
@@ -14,6 +15,11 @@ import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
+type CreateChannelProps = {
+  name: string;
+  password: string;
+};
+
 const CreateChannelScheme = Yup.object().shape({
   name: Yup.string()
     .required('채널명이 필요합니다.')
@@ -29,14 +35,19 @@ function CreateChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
   const navigate = useNavigate();
   const onSubmitHandler = React.useCallback(
-    (values: FormikValues, actions: FormikHelpers<FormikValues>) => {
+    (
+      { name, password }: CreateChannelProps,
+      actions: FormikHelpers<CreateChannelProps>,
+    ) => {
       axios
         .post('/chat/create', {
-          name: values.name,
-          type: values.password.length ? 'PROTECT' : 'PUBLIC', // TODO
-          password: values.password,
+          name: name,
+          type: password.length ? 'PROTECT' : 'PUBLIC', // TODO
+          password: password ?? '',
         })
         .then((response) => {
+          console.log('here then');
+          actions.resetForm();
           actions.setSubmitting(false);
           navigate(`/chat/${response.data}`);
         })
@@ -55,7 +66,7 @@ function CreateChannel() {
 
   return (
     <Formik
-      initialValues={{}}
+      initialValues={{ name: '', password: '' }}
       onSubmit={onSubmitHandler}
       validationSchema={CreateChannelScheme}
     >
