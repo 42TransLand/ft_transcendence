@@ -8,6 +8,7 @@ export default function useMe() {
       id: 0,
       nickname: '불러오는중',
       profileImg: 'https://cdn.intra.42.fr/users/3b3.jpg',
+      rankScore: 0,
     };
   }
   if (error) {
@@ -15,6 +16,7 @@ export default function useMe() {
       id: 0,
       nickname: '알수없음',
       profileImg: 'https://cdn.intra.42.fr/users/3b3.jpg',
+      rankScore: 0,
     };
   }
   return data;

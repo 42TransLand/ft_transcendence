@@ -187,9 +187,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       if (opponent) {
         const opponentSocket = this.usersSocket.get(opponent.id);
-        this.server.to(opponentSocket).emit(SocketEventName.GAME_INVITE_RES, {
-          mode: gameMatchDto.gameMode,
-          opponentSocket: client.id,
+        this.server
+          .to(opponentSocket)
+          .emit(SocketEventName.GAME_INVITE_NOTIFY, {
+            mode: gameMatchDto.gameMode,
+            opponentNickname: this.userContexts.get(client.id).user.nickname,
+          });
+        client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
+          success: true,
         });
       } else throw new Error('No user');
     } catch (e) {

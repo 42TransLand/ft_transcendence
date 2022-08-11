@@ -72,6 +72,7 @@ enum SocketEventName {
   GAME_INVITE_RES = 'game-invite-res',
   GAME_ACCEPT_RES = 'game-accept-res',
   GAME_REFUSE_RES = 'game-refuse-res',
+  GAME_INVITE_NOTIFY = 'game-invite-notify',
 }
 
 export {

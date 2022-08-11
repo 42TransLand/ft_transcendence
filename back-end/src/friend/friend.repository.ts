@@ -56,7 +56,7 @@ export class FriendRepository extends Repository<Friend> {
     const foundCreate: Friend = await this.findRow(receiver, requestor);
 
     if (foundUpdate.status !== FriendStatus.PENDDING) {
-      throw new BadRequestException([`요청이 오지 않았다.`]);
+      throw new BadRequestException([`요청이 오지 않았습니다.`]);
     }
     if (foundCreate !== null && foundCreate.block === true) {
       throw new BadRequestException([
@@ -108,19 +108,57 @@ export class FriendRepository extends Repository<Friend> {
       } catch (error) {
         throw new InternalServerErrorException();
       }
+    } else {
+      // 관계가 없던 상태라 block으로 만들어서 저장
+      const friend = this.create({
+        requestor,
+        receiver,
+        status: FriendStatus.NONE,
+        block: true,
+      });
+      try {
+        await this.save(friend);
+      } catch (error) {
+        throw new InternalServerErrorException();
+      }
     }
+  }
 
-    // 관계가 없던 상태라 block으로 만들어서 저장
-    const friend = this.create({
-      requestor,
-      receiver,
-      status: FriendStatus.NONE,
-      block: true,
-    });
-    try {
-      await this.save(friend);
-    } catch (error) {
-      throw new InternalServerErrorException();
+  async unblockFriend(requestor: User, receiver: User): Promise<void> {
+    const result: Friend = await this.findRow(requestor, receiver);
+
+    // 이미 차단된 상태가 아니면 block true로 차단시킨다.
+    if (result !== null) {
+      if (result.block === false) {
+        throw new BadRequestException([`차단하지 않은 유저 입니다.`]);
+      } else {
+        if (
+          // 과거에 친구 요청 혹은 친구였던 기록 있다면 차단만 false로 바꿔서 저장
+          result.status === FriendStatus.FRIEND ||
+          result.status === FriendStatus.PENDDING
+        ) {
+          result.block = false;
+          try {
+            await this.save(result);
+          } catch (error) {
+            throw new InternalServerErrorException();
+          }
+        } else {
+          // 과거에 친구 요청 혹은 친구였던 기록 없다면 행 삭제
+          try {
+            await this.delete({
+              requestor: { id: Equal(requestor.id) },
+              receiver: { id: Equal(receiver.id) },
+              status: FriendStatus.NONE,
+              block: true,
+            });
+          } catch (error) {
+            throw new InternalServerErrorException();
+          }
+        }
+      }
+    } else {
+      throw new BadRequestException([`차단하지 않은 유저 입니다.`]);
     }
   }
 
@@ -139,8 +177,8 @@ export class FriendRepository extends Repository<Friend> {
   }
 
   async findAllFriends(user: User): Promise<User[]> {
-    /* 친구인 경우, 자기 자신이 requestor 혹은 receiver 둘 중 하나에는 무조건 있기 때문에
-       requestor가 자기 자신인 경우를 찾아 반환한다.*/
+    // 친구인 경우, 자기 자신이 requestor 혹은 receiver 둘 중 하나에는 무조건 있기 때문에
+    // requestor가 자기 자신인 경우를 찾아 반환한다.
     const result = await this.find({
       relations: {
         requestor: true,
