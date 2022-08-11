@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { HStack, VStack } from '@chakra-ui/react';
+import { Flex, HStack, VStack } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import SearchBar from '../../Atoms/SearchBar';
 import FriendElement from '../../Molecules/FriendElement';
@@ -23,11 +23,13 @@ function FriendTab() {
   const socket = useSocket();
 
   return (
-    <VStack w="100%">
-      <HStack w="100%">
-        <PopoverButton icon={<AddIcon />}>
-          <FriendSearch />
-        </PopoverButton>
+    <VStack>
+      <HStack w="full">
+        <Flex>
+          <PopoverButton icon={<AddIcon />}>
+            <FriendSearch />
+          </PopoverButton>
+        </Flex>
         <SearchBar setPattern={setPattern} />
       </HStack>
       <ElementList>

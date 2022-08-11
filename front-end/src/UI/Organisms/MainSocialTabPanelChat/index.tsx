@@ -1,7 +1,7 @@
 /*eslint-disable*/
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { HStack, VStack } from '@chakra-ui/react';
+import { Flex, HStack, VStack } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
@@ -47,11 +47,13 @@ function ChatTab() {
   }
 
   return (
-    <VStack w="100%">
-      <HStack w="100%">
-        <PopoverButton h={200} icon={<AddIcon />}>
-          <CreateChannel />
-        </PopoverButton>
+    <VStack>
+      <HStack w="full">
+        <Flex>
+          <PopoverButton h={200} icon={<AddIcon />} placement="right-start">
+            <CreateChannel />
+          </PopoverButton>
+        </Flex>
         <SearchBar setPattern={setPattern} />
       </HStack>
       {channelContent}
