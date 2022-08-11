@@ -2,7 +2,7 @@ name: Automatic pull from github
 on:
   push:
     branches:
-      - master
+      - release
 jobs:
   build:
     name: Build
