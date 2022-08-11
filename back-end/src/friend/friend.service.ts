@@ -60,6 +60,11 @@ export class FriendService {
     await this.friendRepository.blockFriend(user, opponentUser);
   }
 
+  async unblockFriend(user: User, nickname: string): Promise<void> {
+    const opponentUser = await this.userService.findByNickname(nickname);
+    await this.friendRepository.unblockFriend(user, opponentUser);
+  }
+
   // 받는 사람이 차단했는지 확일 할 때
   async getFriend(sender: User, receiver: User): Promise<Friend> {
     const friendShip = await this.friendRepository.findRow(receiver, sender);
