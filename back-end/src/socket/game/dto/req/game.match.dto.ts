@@ -1,4 +1,6 @@
+import { GameMode } from 'src/game/constants/game.mode.enum';
+
 export default interface GameMatchDto {
-  gameMode: string;
+  gameMode: GameMode;
   opponentNickname: string;
 }
