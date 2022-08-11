@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FriendService } from './friend.service';
-import { Friend } from './entities/friend.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/users/get.user.decorator';
 import { User } from 'src/users/entities/user.entity';
