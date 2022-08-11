@@ -28,13 +28,12 @@ export class ChatController {
 
   @ApiOperation({ summary: '채팅방 생성' })
   @ApiResponse({ status: 201, description: '성공' })
-  @ApiResponse({ status: 404, description: '없는 채팅방일 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Post('/create')
   createChatRoom(
     @GetUser() user: User,
     @Body() chatRoomDto: CreateChatRoomDto,
-  ): Promise<void> {
+  ): Promise<string> {
     return this.chatService.createChatRoom(user, chatRoomDto);
   }
 
@@ -70,50 +69,95 @@ export class ChatController {
 
   @ApiOperation({ summary: '채팅방 유저 조회' })
   @ApiResponse({ status: 200, description: '성공' })
-  @Get('users/:id')
+  @Get('/users/:id')
+  findChatRoomUsers(@Param('id') id: string) {
+    return this.chatService.findChatRoomUsers(id);
+  }
+
   @ApiOperation({ summary: '채팅방 유저 역할 변경' })
-  @Patch('/:id/role')
-  updateRole(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.chatService.updateRole(id, updateRoleDto);
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 401, description: '유저 권한이 잘못된 경우' })
+  @ApiResponse({ status: 404, description: '없는 채팅방일 경우' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @ApiResponse({
+    status: 409,
+    description: 'admin으로 줄 유저가 이미 admin일 경우',
+  })
+  @Patch('/role/:id/:nickname')
+  updateRole(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+  ): Promise<void> {
+    return this.chatService.updateRole(id, user, updateRoleDto);
   }
 
   // 게임 유저 나감
 
   @ApiOperation({ summary: '채팅방 참석' })
-  @Post('/join/:id/:nickname')
-  joinChatRoom(@Param('id') id: string, @Body() chatRoomDto: ChatRoomDto) {
-    return this.chatService.joinChatRoom(id, chatRoomDto);
+  @ApiResponse({ status: 201, description: '성공' })
+  @ApiResponse({ status: 401, description: '유저 권한이 잘못된 경우' })
+  @ApiResponse({ status: 404, description: '패스워드가 잘못된 경우' })
+  @ApiResponse({ status: 409, description: '이미 채팅방에 접속한 경우' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Post('/join/:id')
+  joinChatRoom(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() { password }: ChatRoomDto,
+  ): Promise<void> {
+    return this.chatService.joinChatRoom(id, user, password);
   }
 
   @ApiOperation({ summary: '채팅방 나가기' })
-  @Delete('/:id/leave')
-  leaveChatRoom(@Param('id') id: string, @Body() chatRoomDto: ChatRoomDto) {
-    return this.chatService.leaveChatRoom(id, chatRoomDto.nickname);
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
+  @Delete('/leave/:id')
+  leaveChatRoom(
+    @GetUser() user: User,
+    @Param('id') id: string,
+  ): Promise<string> {
+    return this.chatService.leaveChatRoom(id, user);
   }
 
   @ApiOperation({ summary: '채팅 보내기' })
-  @Post('/:id/sendChat')
-  sendChat(@Param('id') id: string, @Body() chatDto: ChatDto) {
-    return this.chatService.sendChat(id, chatDto);
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '음소거된 유저인 경우' })
+  @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
+  @Post('/send/:id/')
+  sendChat(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() { content }: ChatDto,
+  ): Promise<void> {
+    return this.chatService.sendChat(id, user, content);
   }
 
   @ApiOperation({ summary: '해당 유저 음소거' })
-  @Patch('/:id/users/:userName/mute')
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '권힌이 없는 경우' })
+  @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Patch('/mute/:id/:nickname')
   updateChatMute(
-    @Body() { nickname }: ChatDto, // [TODO] GetUser() 로 대체될 부분
+    @GetUser() user: User,
     @Param('id') id: string,
-    @Param('userName') userName: string,
-  ) {
-    return this.chatService.updateChatMute(id, userName, nickname);
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.chatService.updateChatMute(id, user, nickname);
   }
 
   @ApiOperation({ summary: '해당 유저 음소거 해제' })
-  @Patch('/:id/users/:userName/unMute')
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '권힌이 없는 경우' })
+  @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Patch('/unmute/:id/:nickname/')
   updateChatUnMute(
-    @Body() { nickname }: ChatDto, // [TODO] GetUser() 로 대체될 부분
+    @GetUser() user: User,
     @Param('id') id: string,
-    @Param('userName') userName: string,
-  ) {
-    return this.chatService.updateChatUnMute(id, userName, nickname);
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.chatService.updateChatUnMute(id, user, nickname);
   }
 }
