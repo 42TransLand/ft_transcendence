@@ -44,7 +44,7 @@ function Main() {
       </Box>
       <Routes>
         <Route path="/otp/:name" element={<OTPRevise />} />
-        <Route path="/example/:name" element={<Profile />} />
+        <Route path="/user/:name" element={<Profile />} />
         <Route path="/chat/:id/*" element={<Chat dm={false} />} />
         <Route path="/dm/:userName/*" element={<Chat dm />} />
       </Routes>

@@ -3,7 +3,7 @@ import { HStack, Avatar, Spacer, Text } from '@chakra-ui/react';
 
 function UserMatch(props: {
   opponentUserName: string;
-  opponentUserIamge: string | undefined;
+  opponentUserImage: string;
   userScore: number;
   opponentScore: number;
   isRankedGame: boolean;
@@ -11,7 +11,7 @@ function UserMatch(props: {
 }) {
   const {
     opponentUserName,
-    opponentUserIamge,
+    opponentUserImage,
     userScore,
     opponentScore,
     isRankedGame,
@@ -21,7 +21,7 @@ function UserMatch(props: {
 
   return (
     <HStack w="100%" padding={3}>
-      <Avatar name={opponentUserName} src={opponentUserIamge} size="md" />
+      <Avatar name={opponentUserName} src={opponentUserImage} size="md" />
       <Spacer />
       <Text>vs</Text>
       <Text fontSize="3xl">{opponentUserName}</Text>
