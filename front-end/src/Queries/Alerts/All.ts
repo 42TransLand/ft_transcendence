@@ -1,15 +1,8 @@
 import axios from 'axios';
-import UserInfoProps from '../../Props/UserInfoProps';
+import NotificationProps from '../../Props/NotificationProps';
 import BuildQuery from '../QueryBuilder';
 
-interface AlertType {
-  id: string;
-  receiver: UserInfoProps;
-  requestor: UserInfoProps;
-  createAt: Date;
-}
-
-const ALERT_GET = BuildQuery<AlertType[]>(['alerts'], () =>
+const ALERT_GET = BuildQuery<NotificationProps[]>(['alerts'], () =>
   axios.get('/alert'),
 );
 

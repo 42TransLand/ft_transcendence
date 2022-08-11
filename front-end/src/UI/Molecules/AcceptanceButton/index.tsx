@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
+import { AxiosError } from 'axios';
 import { Box, Center, Text, IconButton, HStack } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useWarningDialog from '../../../Hooks/useWarningDialog';
+import FRIEND_ACCEPT_PATCH from '../../../Queries/Friends/Accept';
+import FRIEND_REJECT_DELETE from '../../../Queries/Friends/Reject';
 
 function AcceptDeclineButtons(props: {
   handleClick: (AcceptanceVal: boolean) => void;
+  isLoading: boolean;
 }) {
-  const { handleClick } = props;
+  const { handleClick, isLoading } = props;
 
   return (
     <div>
@@ -16,6 +22,7 @@ function AcceptDeclineButtons(props: {
           icon={<CheckIcon />}
           size="sm"
           onClick={() => handleClick(true)}
+          isLoading={isLoading}
         />
         <IconButton
           colorScheme="red"
@@ -23,6 +30,7 @@ function AcceptDeclineButtons(props: {
           icon={<CloseIcon />}
           size="sm"
           onClick={() => handleClick(false)}
+          isLoading={isLoading}
         />
       </HStack>
     </div>
@@ -47,24 +55,68 @@ function AcceptanceResult(props: { isAccepted: boolean }) {
   );
 }
 
-function AcceptanceButton({ id }: { id: number }) {
-  const [AcceptanceState, setAcceptanceState] = useState({
+function AcceptanceButton({
+  alertId,
+  senderId,
+}: {
+  alertId: string;
+  senderId: number;
+}) {
+  const [acceptanceState, setAcceptanceState] = useState({
     isChecked: false,
     isAccepted: false,
   });
-
-  const handleClick = (AcceptanceVal: boolean) => {
-    console.log(`response to ${id}`);
-    setAcceptanceState({ isChecked: true, isAccepted: AcceptanceVal });
-  };
+  const queryClient = useQueryClient();
+  const [isLoading, setLoading] = useState(false);
+  const { setError, WarningDialogComponent } = useWarningDialog();
+  const onError = React.useCallback(
+    (err: AxiosError<any, any>, mode: string) => {
+      setError({
+        headerMessage: `${mode} 실패`,
+        bodyMessage: err.response?.data.message ?? err.message,
+      });
+      setAcceptanceState({ ...acceptanceState, isChecked: false });
+      setLoading(false);
+    },
+    [setError, setLoading, acceptanceState],
+  );
+  const onSuccess = React.useCallback(
+    (acceptance: boolean) => {
+      setAcceptanceState({ isChecked: true, isAccepted: acceptance });
+      setLoading(false);
+      queryClient.invalidateQueries(['friend']);
+    },
+    [setAcceptanceState, setLoading, queryClient],
+  );
+  const mutationAccept = useMutation(
+    FRIEND_ACCEPT_PATCH(alertId, senderId, {
+      onSuccess: () => onSuccess(true),
+      onError: (err) => onError(err, '수락'),
+    }),
+  );
+  const mutationReject = useMutation(
+    FRIEND_REJECT_DELETE(alertId, senderId, {
+      onSuccess: () => onSuccess(false),
+      onError: (err) => onError(err, '거절'),
+    }),
+  );
+  const handleClick = React.useCallback(
+    (acceptanceVal: boolean) => {
+      setLoading(true);
+      if (acceptanceVal) mutationAccept.mutate();
+      else mutationReject.mutate();
+    },
+    [mutationAccept, mutationReject, setLoading],
+  );
 
   return (
     <Box w="65px" h="32px">
-      {AcceptanceState.isChecked ? (
-        <AcceptanceResult isAccepted={AcceptanceState.isAccepted} />
+      {acceptanceState.isChecked ? (
+        <AcceptanceResult isAccepted={acceptanceState.isAccepted} />
       ) : (
-        <AcceptDeclineButtons handleClick={handleClick} />
+        <AcceptDeclineButtons isLoading={isLoading} handleClick={handleClick} />
       )}
+      {WarningDialogComponent}
     </Box>
   );
 }
