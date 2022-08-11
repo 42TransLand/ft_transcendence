@@ -38,6 +38,7 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
         .then(() => {
           setModUserName(nickname);
           setIsEditing(false);
+          helper.setSubmitting(false);
         })
         .catch((err) => {
           if (err.response.status === 409) {
@@ -46,8 +47,8 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
               bodyMessage: '중복된 닉네임입니다.',
             });
           }
+          helper.setSubmitting(false);
         });
-      helper.setSubmitting(false);
     },
     [setModUserName, setIsEditing],
   );

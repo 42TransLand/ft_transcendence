@@ -8,7 +8,7 @@ import {
   Input,
 } from '@chakra-ui/react';
 import { MdAddPhotoAlternate } from 'react-icons/md';
-import { Field, Form, Formik } from 'formik';
+import axios from 'axios';
 import ModifiableUserName from '../../Molecules/ModifiableUserName';
 
 function UserProfileInfo(props: {
@@ -18,7 +18,14 @@ function UserProfileInfo(props: {
 }) {
   const { userName, userImage, isMyself } = props;
 
-  const onSubmitHandler = () => {};
+  const onChangeHandler = (event: { target: HTMLInputElement }): void => {
+    const { target } = event;
+    const formData = new FormData();
+    if (target.files?.length) {
+      formData.append('file', target.files[0]);
+      axios.patch('/users/me', formData);
+    }
+  };
 
   return (
     <HStack>
@@ -36,21 +43,16 @@ function UserProfileInfo(props: {
                 >
                   <MdAddPhotoAlternate />
                 </Box>
-                <Formik initialValues={{}} onSubmit={onSubmitHandler}>
-                  <Form>
-                    <Field
-                      name="image"
-                      as={Input}
-                      type="file"
-                      accept="image/*"
-                      position="absolute"
-                      top="0"
-                      left="0"
-                      opacity="0"
-                      cursor="pointer"
-                    />
-                  </Form>
-                </Formik>
+                <Input
+                  type="file"
+                  accept="image/jpeg"
+                  position="absolute"
+                  top="0"
+                  left="0"
+                  opacity="0"
+                  cursor="pointer"
+                  onChange={(event) => onChangeHandler(event)}
+                />
               </Box>
             </AspectRatio>
           </AvatarBadge>

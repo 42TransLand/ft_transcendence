@@ -56,6 +56,9 @@ function OTPBody({
             2차인증이 활성화 되었습니다. 해제하려면 OTP 인증을 한 번 더
             수행하십시오.
           </Text>
+          <Box w="15vw" h="20vh" bgColor="blue.200">
+            대충 QR 코드 나타날 곳
+          </Box>
           <TwoFAInput
             size="30%"
             textColor="black"
