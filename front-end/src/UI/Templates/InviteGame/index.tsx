@@ -11,11 +11,10 @@ import {
 import { Icon, ChevronDownIcon } from '@chakra-ui/icons';
 import { GrGamepad } from 'react-icons/gr';
 import { Formik, Form, Field } from 'formik';
-import WarningAlertDialog from '../WarningAlertDialog';
 import useInviteGame from '../../../Hooks/useInviteGame';
 
 function InviteGame({ id, nickname }: { id: number; nickname: string }) {
-  const { error, clearError, cancelRef, onSubmit } = useInviteGame(id);
+  const { onSubmit, WarningDialogComponent } = useInviteGame(id);
 
   return (
     <Formik initialValues={{ mode: 'classic' }} onSubmit={onSubmit}>
@@ -64,13 +63,7 @@ function InviteGame({ id, nickname }: { id: number; nickname: string }) {
               </GridItem>
             </Grid>
           </Form>
-          <WarningAlertDialog
-            isOpen={error.bodyMessage.length > 0}
-            onClose={() => clearError()}
-            cancelRef={cancelRef}
-            headerMessage={error.headerMessage}
-            bodyMessage={error.bodyMessage}
-          />
+          {WarningDialogComponent}
         </>
       )}
     </Formik>

@@ -1,19 +1,12 @@
 import React from 'react';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
+import useWarningDialog from './useWarningDialog';
 
 export default function useAddFriend(id: number, nickname: string) {
   const toast = useToast();
   const [isSubmitting, setSubmitting] = React.useState(false);
-  const [error, setError] = React.useState({
-    headerMessage: '',
-    bodyMessage: '',
-  });
-  const clearError = React.useCallback(
-    () => setError({ headerMessage: '', bodyMessage: '' }),
-    [setError],
-  );
-  const cancelRef = React.useRef(null); // TODO: 삭제하기
+  const { setError, WarningDialogComponent } = useWarningDialog();
   const onAddFriend = React.useCallback(() => {
     setSubmitting(true);
     axios
@@ -41,6 +34,6 @@ export default function useAddFriend(id: number, nickname: string) {
         }
         setSubmitting(false);
       });
-  }, [nickname, toast]);
-  return { isSubmitting, error, clearError, cancelRef, onAddFriend };
+  }, [nickname, toast, setError]);
+  return { isSubmitting, onAddFriend, WarningDialogComponent };
 }

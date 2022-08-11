@@ -10,7 +10,7 @@ import {
   FormikValues,
 } from 'formik';
 import * as Yup from 'yup';
-import WarningAlertDialog from '../WarningAlertDialog';
+import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 const ChangePasswordChannelScheme = Yup.object().shape({
   password: Yup.string().max(
@@ -20,10 +20,7 @@ const ChangePasswordChannelScheme = Yup.object().shape({
 });
 
 function ChangePasswordChannel() {
-  const [error, setError] = React.useState({
-    headerMessage: '',
-    bodyMessage: '',
-  });
+  const { setError, WarningDialogComponent } = useWarningDialog();
   const onSubmitHandler = React.useCallback(
     (values: FormikValues, actions: FormikHelpers<FormikValues>) => {
       setTimeout(() => {
@@ -34,9 +31,8 @@ function ChangePasswordChannel() {
         actions.setSubmitting(false);
       }, 1000);
     },
-    [],
+    [setError],
   );
-  const cancelRef = React.useRef(null); // TODO: 삭제하기
 
   return (
     <Formik
@@ -89,13 +85,7 @@ function ChangePasswordChannel() {
               </GridItem>
             </Grid>
           </Form>
-          <WarningAlertDialog
-            isOpen={error.bodyMessage.length > 0}
-            onClose={() => setError({ headerMessage: '', bodyMessage: '' })}
-            cancelRef={cancelRef}
-            headerMessage={error.headerMessage}
-            bodyMessage={error.bodyMessage}
-          />
+          {WarningDialogComponent}
         </>
       )}
     </Formik>

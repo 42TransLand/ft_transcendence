@@ -2,7 +2,6 @@ import React from 'react';
 import { Text, HStack, Avatar, Button, Icon } from '@chakra-ui/react';
 import { FaUserPlus } from 'react-icons/fa';
 import UserSearchResultProps from '../../../Props/UserSearchResultProps';
-import WarningAlertDialog from '../../Templates/WarningAlertDialog';
 import useAddFriend from '../../../Hooks/useAddFriend';
 
 function SearchFriendResultElement({
@@ -10,8 +9,10 @@ function SearchFriendResultElement({
   nickname,
   profileIcon,
 }: UserSearchResultProps) {
-  const { isSubmitting, error, clearError, cancelRef, onAddFriend } =
-    useAddFriend(id, nickname);
+  const { isSubmitting, onAddFriend, WarningDialogComponent } = useAddFriend(
+    id,
+    nickname,
+  );
 
   return (
     <>
@@ -44,13 +45,7 @@ function SearchFriendResultElement({
           </Button>
         </HStack>
       </HStack>
-      <WarningAlertDialog
-        isOpen={error.bodyMessage.length > 0}
-        onClose={() => clearError()}
-        cancelRef={cancelRef}
-        headerMessage={error.headerMessage}
-        bodyMessage={error.bodyMessage}
-      />
+      {WarningDialogComponent}
     </>
   );
 }
