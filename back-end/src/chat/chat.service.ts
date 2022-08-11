@@ -90,8 +90,8 @@ export class ChatService {
       throw new UnauthorizedException(`권한이 없습니다.`);
     }
     // oldAdmin 확실하게 들어온다고 가정하고 진행, 없으면 null, 있으면 객체
-    user = await this.userService.findByNickname(updateRoleDto.oldAdmin);
-    if (user !== null) {
+    if (updateRoleDto.oldAdmin) {
+      user = await this.userService.findByNickname(updateRoleDto.oldAdmin);
       oldAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
     }
 
