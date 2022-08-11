@@ -11,5 +11,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build ./back-end
+    - name: Using Node 16
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'npm'
+    - name: npm ci
+      working-directory: ./back-end
+      run: npm ci
+    - name: npm run build
+      working-directory: ./back-end
+      run: npm run build
