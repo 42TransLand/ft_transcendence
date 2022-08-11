@@ -8,11 +8,17 @@ import { InternalServerErrorException } from '@nestjs/common';
 @CustomRepository(GameRecord)
 export class GameRepository extends Repository<GameRecord> {
   // 게임 create, 유저 2명 일때
-  async createGame(leftUser: User, rightUser: User): Promise<string> {
+  async createGame(
+    leftUser: User,
+    rightUser: User,
+    gameMode: GameMode,
+    ladder: boolean,
+  ): Promise<string> {
     const game = await this.create({
       leftUser: leftUser.id,
       rightUser: rightUser.id,
-      type: GameMode.LADDER_GAME, // : gameMode.LADDER_GAME
+      type: gameMode, // : gameMode.LADDER_GAME
+      isLadder: ladder,
     });
     try {
       await this.save(game);

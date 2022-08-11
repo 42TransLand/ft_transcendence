@@ -15,7 +15,7 @@ export class GameCreateDto {
   rightUser: string;
 
   @ApiProperty({
-    example: GameMode.LADDER_GAME,
+    example: GameMode.CLASSIC,
     description: '게임 모드',
   })
   type: GameMode;

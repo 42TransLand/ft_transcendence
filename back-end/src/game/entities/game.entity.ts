@@ -53,10 +53,17 @@ export class GameRecord extends BaseEntity {
   result: number;
 
   @ApiProperty({
-    example: GameMode.LADDER_GAME,
+    example: false,
+    description: '래더 게임 여부',
+  })
+  @Column({ default: false })
+  isLadder: boolean;
+
+  @ApiProperty({
+    example: GameMode.CLASSIC,
     description: '게임 모드',
   })
-  @Column({ default: GameMode.LADDER_GAME })
+  @Column({ default: GameMode.CLASSIC })
   type: GameMode;
 
   @ApiProperty({

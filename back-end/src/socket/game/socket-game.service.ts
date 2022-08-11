@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
+import { GameMode } from 'src/game/constants/game.mode.enum';
 import { GameService } from 'src/game/game.service';
 import { User } from 'src/users/entities/user.entity';
 import { UserContext } from '../class/user.class';
@@ -82,13 +83,15 @@ export class SocketGameService {
   async createGame(
     user1: UserContext,
     user2: UserContext,
-    gameMode: string,
+    gameMode: GameMode,
     ladder: boolean,
     scoreForWin: number,
   ) {
     const dbRecordRoom = await this.gameService.createGame(
       user1.user,
       user2.user,
+      gameMode,
+      ladder,
     ); // TODO 실제 DB에서 생성된 방의 ID를 반환받아야 함.
     // console.log(dbRecordRoom); // 테스트 필요
     const room = new Room(dbRecordRoom, gameMode, ladder, scoreForWin);
@@ -123,6 +126,10 @@ export class SocketGameService {
       room.update();
       if (room.state === GameState.ENDED || room.isEmpty()) {
         // TODO 게임이 종료되어, 게임 결과를 저장해야 함
+        const { winner } = room;
+        if (winner != null) {
+          console.log(winner);
+        }
         rooms.delete(index);
       }
     });
@@ -138,7 +145,7 @@ export class SocketGameService {
     const room = await this.createGame(
       user1,
       user2,
-      'classic',
+      GameMode.CLASSIC,
       true,
       GAME_SCORE_FOR_WIN_LADDER,
     );

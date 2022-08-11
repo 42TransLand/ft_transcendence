@@ -12,6 +12,7 @@ import GameScoreDto from '../dto/res/game.score.notify.dto';
 import GameReadyNotifyDto from '../dto/res/game.ready.notify.dto';
 import GameStateNotifyDto from '../dto/res/game.state.notify.dto';
 import GameState from '../constants/game.state.enum';
+import { GameMode } from 'src/game/constants/game.mode.enum';
 
 export class Room {
   private players: Map<string, Player>;
@@ -30,7 +31,7 @@ export class Room {
 
   constructor(
     public readonly id: string,
-    public readonly gameMode: string,
+    public readonly gameMode: GameMode,
     public readonly ladder: boolean,
     public readonly scoreForWin: number,
   ) {
@@ -64,6 +65,32 @@ export class Room {
         winnerIndex: this.winnerIndex,
       });
     }
+  }
+
+  private getWinnerOrLoser(findWinner: boolean) {
+    const players = this.players.values();
+
+    for (;;) {
+      const { value, done } = players.next();
+      if (done) break;
+      if (findWinner) {
+        if (value.index === this.winnerIndex) {
+          return value;
+        }
+      }
+      if (value.index !== this.winnerIndex) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  public get winner(): Player | null {
+    return this.getWinnerOrLoser(true);
+  }
+
+  public get loser(): Player | null {
+    return this.getWinnerOrLoser(false);
   }
 
   public isEmpty() {
