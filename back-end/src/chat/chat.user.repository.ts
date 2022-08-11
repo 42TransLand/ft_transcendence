@@ -6,6 +6,7 @@ import { ChatRoom } from './entities/chat.room.entity';
 import { ChatUser } from './entities/chat.user.entity';
 import * as bcrypt from 'bcrypt';
 import {
+  ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -38,6 +39,15 @@ export class ChatUserRepository extends Repository<ChatUser> {
     const chatUser = await this.find({
       where: {
         chatRoom: { id: Equal(chatRoom.id) },
+      },
+    });
+    return chatUser;
+  }
+
+  async findChatRoomUsers(id: string): Promise<ChatUser[]> {
+    const chatUser = await this.find({
+      where: {
+        chatRoom: { id: Equal(id) },
       },
     });
     return chatUser;
@@ -100,7 +110,7 @@ export class ChatUserRepository extends Repository<ChatUser> {
         validation = await bcrypt.compare(password, chatRoom.password);
       }
       if (!validation) {
-        throw new NotFoundException('Password is incorrect');
+        throw new NotFoundException('패스워드가 올바르지 않습니다.');
       }
     }
     // 이미 채팅방에 있는 사용자인지 검사
@@ -111,7 +121,7 @@ export class ChatUserRepository extends Repository<ChatUser> {
     });
 
     if (alreadyUser !== null) {
-      throw new NotFoundException('Already in chat room');
+      throw new ConflictException('이미 채팅방에 접속한 유저 입니다.');
     }
     // 채팅방에 사용자 추가
     const chatUser = this.create({
@@ -127,14 +137,9 @@ export class ChatUserRepository extends Repository<ChatUser> {
   }
 
   async leaveChatRoom(user: User, chatRoom: ChatRoom): Promise<void> {
-    const result = await this.delete({
+    await this.delete({
       user: { id: Equal(user.id) },
       chatRoom: { id: Equal(chatRoom.id) },
     });
-    if (result.affected === 0) {
-      throw new NotFoundException([
-        '유저가 채팅방 유저 테이블에서 삭제되지 않았습니다',
-      ]);
-    }
   }
 }

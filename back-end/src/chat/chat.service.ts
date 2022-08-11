@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatRoomRepository } from './chat.room.repository';
@@ -35,11 +36,10 @@ export class ChatService {
   async createChatRoom(
     user: User,
     chatRoomDto: CreateChatRoomDto,
-  ): Promise<void> {
+  ): Promise<string> {
     const room = await this.chatRoomRepository.createChatRoom(chatRoomDto);
     await this.chatUserRepository.createRoomOwner(user, room);
-
-    console.log(room.id);
+    return room.id;
   }
 
   async updatePassword(
@@ -74,17 +74,24 @@ export class ChatService {
     return chatRoom;
   }
 
-  async updateRole(id: string, updateRoleDto: UpdateRoleDto): Promise<void> {
+  async findChatRoomUsers(id: string): Promise<ChatUser[]> {
+    return this.chatUserRepository.findChatRoomUsers(id);
+  }
+
+  async updateRole(
+    id: string,
+    user: User,
+    updateRoleDto: UpdateRoleDto,
+  ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
     let oldAdmin = null;
-    let user = await this.userService.findByNickname(updateRoleDto.owner);
     const owner = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (owner.role !== ChatRole.OWNER) {
-      throw new ConflictException(`권한이 없습니다.`);
+      throw new UnauthorizedException(`권한이 없습니다.`);
     }
     // oldAdmin 확실하게 들어온다고 가정하고 진행, 없으면 null, 있으면 객체
-    user = await this.userService.findByNickname(updateRoleDto.oldAdmin);
-    if (user !== null) {
+    if (updateRoleDto.oldAdmin) {
+      user = await this.userService.findByNickname(updateRoleDto.oldAdmin);
       oldAdmin = await this.chatUserRepository.findChatUser(user, chatRoom);
     }
 
@@ -97,31 +104,22 @@ export class ChatService {
     this.chatUserRepository.updateAdminRole(newAdmin, oldAdmin);
   }
 
-  async joinChatRoom(id: string, chatRoomDto: ChatRoomDto): Promise<void> {
+  async joinChatRoom(id: string, user: User, password: string): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-    const user = await this.userService.findByNickname(chatRoomDto.nickname);
-    if (
-      chatRoom.type === ChatType.PROTECT &&
-      chatRoomDto.password !== undefined
-    ) {
-      return this.chatUserRepository.joinChatRoom(
-        user,
-        chatRoom,
-        chatRoomDto.password,
-      );
+    if (chatRoom.type === ChatType.PROTECT && password !== undefined) {
+      return this.chatUserRepository.joinChatRoom(user, chatRoom, password);
     }
     return this.chatUserRepository.joinChatRoom(user, chatRoom);
   }
 
-  async leaveChatRoom(id: string, nickname: string): Promise<string> {
+  async leaveChatRoom(id: string, user: User): Promise<string> {
     const chatRoom = await this.findChatRoomById(id);
-    const user = await this.userService.findByNickname(nickname);
     const findChatUser = await this.chatUserRepository.findChatUser(
       user,
       chatRoom,
     );
     if (!findChatUser) {
-      throw new ConflictException([`채팅방에 없는 유저입니다.`]);
+      throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
     }
     await this.chatUserRepository.leaveChatRoom(user, chatRoom);
     const chatUsers = await this.chatUserRepository.findChatRoomById(chatRoom);
@@ -139,49 +137,56 @@ export class ChatService {
     return `${user.nickname}님이 채팅방에서 나가셨습니다.`;
   }
 
-  async sendChat(id: string, chatDto: ChatDto): Promise<void> {
+  async sendChat(id: string, user: User, content: string): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
 
-    const user = await this.userService.findByNickname(chatDto.nickname);
     const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (chatUser === null) {
-      throw new ConflictException([`채팅방에 접속하지 않은 유저입니다.`]);
+      throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
     }
 
     if (chatUser.unmutedAt) {
       const now: Date = new Date();
       const diff = chatUser.unmutedAt.getTime() - now.getTime();
       if (diff > 0) {
-        throw new ConflictException([
+        throw new BadRequestException([
           `${Math.floor(diff / 1000)}초 후에 채팅을 사용할 수 있습니다.`,
         ]);
       }
     }
 
-    this.socketGateway.server.to(id).emit('chat', chatDto);
+    this.socketGateway.server.to(id).emit(
+      'chat',
+      JSON.stringify({
+        nickname: user.nickname,
+        content,
+      }),
+    );
   }
 
   async updateChatMute(
     id: string,
-    userName: string,
-    myNickName: string,
+    user: User,
+    nickname: string,
   ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
 
-    const myUser = await this.userService.findByNickname(myNickName);
     const myChatUser = await this.chatUserRepository.findChatUser(
-      myUser,
+      user,
       chatRoom,
     );
     if (myChatUser === null) {
-      throw new ConflictException([
+      throw new NotFoundException([
         `본인은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
-    const user = await this.userService.findByNickname(userName);
-    const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
+    const opponent = await this.userService.findByNickname(nickname);
+    const chatUser = await this.chatUserRepository.findChatUser(
+      opponent,
+      chatRoom,
+    );
     if (chatUser === null) {
-      throw new ConflictException([
+      throw new NotFoundException([
         `상대방은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
@@ -194,7 +199,7 @@ export class ChatService {
         chatUser.role !== ChatRole.ADMIN
       )
     ) {
-      throw new ConflictException(`해당 유저에게 mute를 할 수 없습니다.`);
+      throw new BadRequestException(`해당 유저에게 mute를 할 수 없습니다.`);
     }
 
     const muteMinutes = 1;
@@ -216,28 +221,27 @@ export class ChatService {
 
   async updateChatUnMute(
     id: string,
-    userName: string,
-    myNickName: string,
+    user: User,
+    nickname: string,
   ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-    if (!chatRoom) {
-      throw new ConflictException([`존재하지 않는 채팅방입니다.`]);
-    }
 
-    const myUser = await this.userService.findByNickname(myNickName);
     const myChatUser = await this.chatUserRepository.findChatUser(
-      myUser,
+      user,
       chatRoom,
     );
     if (myChatUser === null) {
-      throw new ConflictException([
+      throw new NotFoundException([
         `본인은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
-    const user = await this.userService.findByNickname(userName);
-    const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
+    const opponent = await this.userService.findByNickname(nickname);
+    const chatUser = await this.chatUserRepository.findChatUser(
+      opponent,
+      chatRoom,
+    );
     if (chatUser === null) {
-      throw new ConflictException([
+      throw new NotFoundException([
         `상대방은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
@@ -250,7 +254,7 @@ export class ChatService {
         chatUser.role !== ChatRole.ADMIN
       )
     ) {
-      throw new ConflictException(`해당 유저에게 unMute를 할 수 없습니다.`);
+      throw new BadRequestException(`해당 유저에게 unMute를 할 수 없습니다.`);
     }
 
     chatUser.unmutedAt = null;
