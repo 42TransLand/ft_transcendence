@@ -17,7 +17,7 @@ function calc(rating: number) {
   if (rating >= 1500)
     return {
       userTierText: 'platinum',
-      userTierColor: '#e2fefe',
+      userTierColor: '#157d7d',
       userRankIcon: '/rank_icons/platinum.png',
     };
   if (rating >= 1000)

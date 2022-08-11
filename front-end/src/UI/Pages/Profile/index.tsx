@@ -9,7 +9,7 @@ import useMe from '../../../Hooks/useMe';
 
 function Profile() {
   const { name } = useParams();
-  const { nickname: myNickname } = useMe();
+  const { nickname: myNickname, rankScore } = useMe();
   const { data, isLoading, error } = useQuery(
     USERS_PROFILE_GET(name ?? myNickname),
   );
@@ -26,7 +26,7 @@ function Profile() {
         nickname={nickname}
         userImage={profileImg}
         isMyself={myNickname === nickname}
-        userRating={2800}
+        userRating={rankScore}
         userWins={7500}
         userLosses={2500}
       />
