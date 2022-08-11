@@ -32,17 +32,17 @@ function FriendTab() {
       </HStack>
       <ElementList>
         {friends
-          .filter((f) => f.receiver.nickname.includes(pattern))
+          .filter((f) => f.nickname.includes(pattern))
           .map((f) => (
             <UserContextMenu
-              key={f.receiver.id}
-              target={f.receiver.id}
-              targetName={f.receiver.nickname}
+              key={f.id}
+              target={f.id}
+              targetName={f.nickname}
               mode="friend"
             >
               <FriendElement
-                userName={f.receiver.nickname}
-                connectionStatus={socket.state.friendState[f.receiver.id]}
+                userName={f.nickname}
+                connectionStatus={socket.state.friendState[f.id]}
               />
             </UserContextMenu>
           ))}

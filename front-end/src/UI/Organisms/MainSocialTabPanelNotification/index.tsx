@@ -15,11 +15,10 @@ function NotificationTab() {
     <VStack>
       {notifications.map((notification) => (
         <NotificationElement
-          key={notification.id}
-          id={notification.requestor.id}
-          nickname={notification.requestor.nickname}
-          profileImg={notification.requestor.profileImg}
-          createAt={notification.createAt}
+          key={notification.alertId}
+          alertId={notification.alertId}
+          requestor={notification.requestor}
+          createdAt={notification.createdAt}
         />
       ))}
     </VStack>

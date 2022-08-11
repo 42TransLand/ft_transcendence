@@ -5,12 +5,11 @@ import NotificationProps from '../../../Props/NotificationProps';
 import useTime from '../../../Hooks/useTime';
 
 function NotificationElement({
-  id,
-  nickname,
-  profileImg,
-  createAt,
+  alertId,
+  requestor,
+  createdAt,
 }: NotificationProps) {
-  const time = useTime(createAt);
+  const time = useTime(createdAt);
   return (
     <Grid
       h="100px"
@@ -23,12 +22,16 @@ function NotificationElement({
       paddingY={2}
     >
       <GridItem rowSpan={3} colSpan={1} margin="auto">
-        <Avatar name={nickname} src={profileImg} size="md" />
+        <Avatar
+          name={requestor.nickname}
+          src={requestor.profileImg}
+          size="md"
+        />
       </GridItem>
       <GridItem rowSpan={1} colSpan={1} />
       <GridItem rowSpan={2} colSpan={8}>
         <Text fontSize="lg" lineHeight={1.25}>
-          {nickname}님께서
+          {requestor.nickname}님께서
           <br />
           친구신청을 보냈습니다
         </Text>
@@ -41,7 +44,7 @@ function NotificationElement({
       </GridItem>
       <GridItem rowSpan={1} colSpan={2} />
       <GridItem rowSpan={1} colSpan={2}>
-        <AcceptanceButton id={id} />
+        <AcceptanceButton alertId={alertId} senderId={requestor.id} />
       </GridItem>
     </Grid>
   );

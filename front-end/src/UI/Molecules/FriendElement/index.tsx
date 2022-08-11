@@ -14,7 +14,7 @@ function FriendElement(props: {
     PLAYING: 'yellow.500',
     SPECTATING: 'pink.500',
   };
-  const statusColor = StatusColors[connectionStatus];
+  const statusColor = StatusColors[connectionStatus] ?? 'blackAlpha.900';
 
   return (
     <HStack
