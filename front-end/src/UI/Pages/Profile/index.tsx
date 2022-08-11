@@ -26,7 +26,7 @@ function Profile() {
         nickname={nickname}
         userImage={profileImg}
         isMyself={myNickname === nickname}
-        userRating={2400}
+        userRating={2800}
         userWins={7500}
         userLosses={2500}
       />
