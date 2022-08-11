@@ -56,4 +56,10 @@ export class User extends BaseEntity {
     eager: true,
   })
   records: GameRecord[];
+
+  @ApiProperty({
+    description: '사용자 랭크용 게임 점수',
+  })
+  @Column({ default: 1500 })
+  rankScore: number;
 }
