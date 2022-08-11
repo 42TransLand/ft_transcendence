@@ -13,7 +13,7 @@ import InviteGame from '../../Templates/InviteGame';
 import { useTargetUser } from '../../../Hooks/useTargetUser';
 
 function InviteGameMenu() {
-  const { userId, userName } = useTargetUser();
+  const { userName } = useTargetUser();
 
   return (
     <Popover placement="left" closeOnBlur={false}>
@@ -31,7 +31,7 @@ function InviteGameMenu() {
           h="280px"
         >
           <PopoverCloseButton />
-          <InviteGame id={userId} nickname={userName} />
+          <InviteGame nickname={userName} />
         </PopoverContent>
       </Portal>
     </Popover>

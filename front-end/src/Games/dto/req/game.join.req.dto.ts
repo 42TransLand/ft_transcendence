@@ -1,3 +1,3 @@
-export default interface GameJoinDto {
+export default interface GameJoinReqDto {
   roomId: number;
 }

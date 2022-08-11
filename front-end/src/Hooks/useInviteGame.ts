@@ -1,39 +1,27 @@
 import React from 'react';
-import axios from 'axios';
-import { FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import InviteGameProps from '../Props/InviteGameProps';
 import useWarningDialog from './useWarningDialog';
+import { useSocket } from './useSocket';
+import InviteGameProps from '../Props/InviteGameProps';
 
-export default function useInviteGame(id: number) {
+export default function useInviteGame(inviteeNickname: string) {
   const { setError, WarningDialogComponent } = useWarningDialog();
   const navigate = useNavigate();
+  const socket = useSocket();
   const onSubmit = React.useCallback(
-    (values: InviteGameProps, helper: FormikHelpers<InviteGameProps>) => {
-      axios
-        .post('/game/invite', {
-          id, // TODO: 실제 보내야 할 대상 유저ID로 수정
-          mode: values.mode,
-        })
-        .then(() => {
-          navigate(`/game?mode=custom`); // TODO: 실제 게임 경로?
-        })
-        .catch((err) => {
-          if (err.response) {
-            setError({
-              headerMessage: '초대 실패',
-              bodyMessage: err.response.data.message,
-            });
-          } else {
-            setError({
-              headerMessage: '초대 실패',
-              bodyMessage: err.message,
-            });
-          }
-          helper.setSubmitting(false);
-        });
+    (values: InviteGameProps) => {
+      socket.dispatch({
+        action: 'setCustomGame',
+        gameState: {
+          mode: 'create',
+          gameMode: values.mode,
+          scoreForWin: values.scoreForWin,
+          opponentNickname: inviteeNickname,
+        },
+      });
+      navigate(`/game?mode=custom`);
     },
-    [id, navigate, setError],
+    [socket, inviteeNickname, navigate],
   );
-  return { onSubmit, WarningDialogComponent };
+  return { onSubmit, setError, WarningDialogComponent };
 }

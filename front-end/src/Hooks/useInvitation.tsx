@@ -1,27 +1,39 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast, ToastId } from '@chakra-ui/react';
 import GameInvitationContent from '../UI/Molecules/GameInvitationContent';
+import { SocketEventName } from '../Games/dto/constants/game.constants';
+import { useSocket } from './useSocket';
 
 export default function useInvitation() {
   const [invitations, setInvitations] = useState<ToastId[]>([]);
+  const navigate = useNavigate();
+  const { state, dispatch } = useSocket();
   const toast = useToast();
 
   const handleInvitation = React.useCallback(
-    (toastId: number, response: boolean, AcceptanceCallback: () => void) => {
+    (toastId: string, response: boolean, userName: string) => {
       if (response) {
         toast.closeAll();
         setInvitations([]);
-        AcceptanceCallback();
+        dispatch({
+          action: 'setCustomGame',
+          gameState: { mode: 'join', opponentNickname: userName },
+        });
+        navigate('/game?mode=custom');
       } else {
         toast.close(toastId);
         setInvitations(invitations.filter((id) => id !== toastId));
+        state.socket?.emit(SocketEventName.GAME_REFUSE_REQ, {
+          opponentNickname: userName,
+        });
       }
     },
-    [invitations, toast],
+    [invitations, toast, dispatch, navigate, state.socket],
   );
+
   const newInvitation = (
     userName: string,
-    gameId: number,
     gameMode: string,
     isRanked: boolean,
   ) => {
@@ -30,11 +42,10 @@ export default function useInvitation() {
       toast({
         position: 'bottom-left',
         duration: null,
-        id: gameId,
+        id: userName,
         render: () => (
           <GameInvitationContent
             userName={userName}
-            gameId={gameId}
             gameMode={gameMode}
             isRanked={isRanked}
             handleInvitation={handleInvitation}
