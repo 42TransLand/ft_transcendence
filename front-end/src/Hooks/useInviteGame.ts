@@ -2,20 +2,12 @@ import React from 'react';
 import axios from 'axios';
 import { FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import WarningDialogProps from '../Props/WarningDialogProps';
 import InviteGameProps from '../Props/InviteGameProps';
+import useWarningDialog from './useWarningDialog';
 
 export default function useInviteGame(id: number) {
-  const [error, setError] = React.useState<WarningDialogProps>({
-    headerMessage: '',
-    bodyMessage: '',
-  });
-  const clearError = React.useCallback(
-    () => setError({ headerMessage: '', bodyMessage: '' }),
-    [setError],
-  );
+  const { setError, WarningDialogComponent } = useWarningDialog();
   const navigate = useNavigate();
-  const cancelRef = React.useRef(null); // TODO: 삭제하기
   const onSubmit = React.useCallback(
     (values: InviteGameProps, helper: FormikHelpers<InviteGameProps>) => {
       axios
@@ -41,7 +33,7 @@ export default function useInviteGame(id: number) {
           helper.setSubmitting(false);
         });
     },
-    [id, navigate],
+    [id, navigate, setError],
   );
-  return { error, clearError, cancelRef, onSubmit };
+  return { onSubmit, WarningDialogComponent };
 }
