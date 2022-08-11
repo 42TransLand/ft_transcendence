@@ -46,6 +46,9 @@ export class ChatUserRepository extends Repository<ChatUser> {
 
   async findChatRoomUsers(id: string): Promise<ChatUser[]> {
     const chatUser = await this.find({
+      relations: {
+        user: true,
+      },
       where: {
         chatRoom: { id: Equal(id) },
       },
