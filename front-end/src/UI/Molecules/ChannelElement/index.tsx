@@ -10,12 +10,13 @@ const FullSquare = styled(Square)`
 `;
 
 function ChannelElement(props: {
-  roomType: 'public' | 'private' | 'protected';
+  roomType: 'PUBLIC' | 'PROTECT';
   channelName: string;
-  currentHeadCount: number;
-  maxHeadCount: number;
+  /*   currentHeadCount: number;
+  maxHeadCount: number; */
 }) {
-  const { roomType, channelName, currentHeadCount, maxHeadCount } = props;
+  const { roomType, channelName /*  currentHeadCount, maxHeadCount  */ } =
+    props;
 
   return (
     <HStack
@@ -28,7 +29,7 @@ function ChannelElement(props: {
       <HStack h="full">
         <FullSquare centerContent minHeight="100%">
           <Icon
-            as={roomType === 'protected' ? LockIcon : IoIosChatbubbles}
+            as={roomType === 'PROTECT' ? LockIcon : IoIosChatbubbles}
             boxSize="1.75em"
           />
         </FullSquare>
@@ -36,9 +37,9 @@ function ChannelElement(props: {
           {channelName}
         </Text>
       </HStack>
-      <Text fontSize="xl" paddingX="0.5em">
+      {/*       <Text fontSize="xl" paddingX="0.5em">
         {currentHeadCount}/{maxHeadCount}
-      </Text>
+      </Text> */}
     </HStack>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import { ChatIcon } from '@chakra-ui/icons';
 import { Grid, GridItem, VStack, Input, Button, Text } from '@chakra-ui/react';
 import {
@@ -10,6 +11,7 @@ import {
   FormikValues,
 } from 'formik';
 import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 const CreateChannelScheme = Yup.object().shape({
@@ -17,12 +19,6 @@ const CreateChannelScheme = Yup.object().shape({
     .required('채널명이 필요합니다.')
     .min(4, '채녈명은 4글자 이상이어야 합니다.')
     .max(20, '채널명은 20글자 이하이어야 합니다.'),
-  max: Yup.number()
-    .typeError('최대 인원을 정수로 입력해주세요.')
-    .integer('최대 인원을 정수로 입력해주세요.')
-    .required('최대 인원을 입력해 주세요.')
-    .min(2, '방의 최대 인원은 적어도 2명이어야 합니다.')
-    .max(100, '방의 최대 인원은 100을 초과할 수 없습니다.'),
   password: Yup.string().max(
     100,
     '입장 비밀번호는 100자를 초과할 수 없습니다.',
@@ -31,17 +27,31 @@ const CreateChannelScheme = Yup.object().shape({
 
 function CreateChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
+  const navigate = useNavigate();
   const onSubmitHandler = React.useCallback(
     (values: FormikValues, actions: FormikHelpers<FormikValues>) => {
-      setTimeout(() => {
-        setError({
-          headerMessage: '채널 생성 실패',
-          bodyMessage: '이미 존재하는 채널명입니다.',
+      axios
+        .post('/chat/create', {
+          name: values.name,
+          type: values.password.length ? 'PROTECT' : 'PUBLIC', // TODO
+          password: values.password,
+        })
+        .then((response) => {
+          console.log(response);
+          actions.setSubmitting(false);
+          navigate(`/chat/${response.data}`);
+        })
+        .catch((err) => {
+          if (err.response.status === 500) {
+            setError({
+              headerMessage: '채널 생성 실패',
+              bodyMessage: '채널 생성에 실패했습니다.',
+            });
+            actions.setSubmitting(false);
+          }
         });
-        actions.setSubmitting(false);
-      }, 1000);
     },
-    [setError],
+    [setError, navigate],
   );
 
   return (
@@ -72,15 +82,6 @@ function CreateChannel() {
                   />
                   <Text fontSize="xs" textColor="red.500">
                     <ErrorMessage name="name" />
-                  </Text>
-                  <Field
-                    as={Input}
-                    variant="flushed"
-                    name="max"
-                    placeholder="최대 인원"
-                  />
-                  <Text fontSize="xs" textColor="red.500">
-                    <ErrorMessage name="max" />
                   </Text>
                   <Field
                     as={Input}
