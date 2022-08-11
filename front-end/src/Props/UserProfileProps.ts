@@ -1,5 +1,3 @@
-export default interface UserProfileProps {
-  id: number;
-  nickname: string;
-  profileImg: string;
-}
+import UserInfoProps from './UserInfoProps';
+
+export default interface UserProfileProps extends UserInfoProps {}
