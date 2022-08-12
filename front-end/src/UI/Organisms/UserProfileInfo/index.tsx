@@ -45,7 +45,7 @@ function UserProfileInfo(props: {
                 </Box>
                 <Input
                   type="file"
-                  accept="image/jpeg"
+                  accept="image/*"
                   position="absolute"
                   top="0"
                   left="0"

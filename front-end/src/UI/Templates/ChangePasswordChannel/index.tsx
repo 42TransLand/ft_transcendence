@@ -1,16 +1,15 @@
 import React from 'react';
 import { LockIcon } from '@chakra-ui/icons';
 import { Grid, GridItem, VStack, Input, Button, Text } from '@chakra-ui/react';
-import {
-  ErrorMessage,
-  Field,
-  Form,
-  Formik,
-  FormikHelpers,
-  FormikValues,
-} from 'formik';
+import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
+
+type ChangePasswordProps = {
+  password: string;
+};
 
 const ChangePasswordChannelScheme = Yup.object().shape({
   password: Yup.string().max(
@@ -21,22 +20,39 @@ const ChangePasswordChannelScheme = Yup.object().shape({
 
 function ChangePasswordChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
+  const { id } = useParams();
   const onSubmitHandler = React.useCallback(
-    (values: FormikValues, actions: FormikHelpers<FormikValues>) => {
-      setTimeout(() => {
-        setError({
-          headerMessage: '비밀번호 변경 실패',
-          bodyMessage: '입장 비밀번호를 변경하는데에 실패했습니다.',
+    (
+      { password }: ChangePasswordProps,
+      actions: FormikHelpers<ChangePasswordProps>,
+    ) => {
+      axios
+        .patch(`chat/${id}`, {
+          password,
+          type: password.length ? 'PROTECT' : 'PUBLIC',
+        })
+        .then(() => {
+          actions.resetForm();
+          actions.setSubmitting(false);
+        })
+        .catch((err) => {
+          if (err) {
+            setTimeout(() => {
+              setError({
+                headerMessage: '비밀번호 변경 실패',
+                bodyMessage: '입장 비밀번호를 변경하는데에 실패했습니다.',
+              });
+              actions.setSubmitting(false);
+            }, 1000);
+          }
         });
-        actions.setSubmitting(false);
-      }, 1000);
     },
-    [setError],
+    [setError, id],
   );
 
   return (
     <Formik
-      initialValues={{}}
+      initialValues={{ password: '' }}
       onSubmit={onSubmitHandler}
       validationSchema={ChangePasswordChannelScheme}
     >
