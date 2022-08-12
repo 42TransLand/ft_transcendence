@@ -25,7 +25,7 @@ function FriendSearch() {
             key={friend.id}
             id={friend.id}
             nickname={friend.nickname}
-            profileIcon={friend.profileIcon}
+            profileImg={friend.profileImg}
           />
         ))}
       </VStack>

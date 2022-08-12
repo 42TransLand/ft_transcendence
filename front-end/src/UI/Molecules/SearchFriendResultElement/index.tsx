@@ -7,7 +7,7 @@ import useAddFriend from '../../../Hooks/useAddFriend';
 function SearchFriendResultElement({
   id,
   nickname,
-  profileIcon,
+  profileImg,
 }: UserSearchResultProps) {
   const { isSubmitting, onAddFriend, WarningDialogComponent } = useAddFriend(
     id,
@@ -25,7 +25,7 @@ function SearchFriendResultElement({
         p={3}
         justifyContent="space-between"
       >
-        <Avatar name={nickname} size="sm" src={profileIcon} />
+        <Avatar name={nickname} size="sm" src={profileImg} />
         <HStack>
           <Text>{nickname}</Text>
           <Button
