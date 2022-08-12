@@ -45,6 +45,7 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
     if (password && type === 'PROTECT') {
       const salt: string = await bcrypt.genSalt();
       chatRoom.password = await bcrypt.hash(password, salt);
+      chatRoom.type = ChatType.PROTECT;
     } else {
       chatRoom.password = null;
       chatRoom.type = ChatType.PUBLIC;
