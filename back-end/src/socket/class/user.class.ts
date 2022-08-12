@@ -1,11 +1,14 @@
 import { Server, Socket } from 'socket.io';
 import { Room } from '../game/class/room.class';
 import { User } from 'src/users/entities/user.entity';
+import GameReservation from './game.reservation.class';
 
 export class UserContext {
   public readonly gameRooms: Set<Room>;
 
   public readonly gamesOnView: Set<Room>;
+
+  public gameReservation: GameReservation | null = null;
 
   // DM
   // 채팅방

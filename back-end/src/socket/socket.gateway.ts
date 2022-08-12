@@ -24,6 +24,11 @@ import { GameService } from 'src/game/game.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ChatDto } from '../chat/dto/chat.dto';
 import { Injectable } from '@nestjs/common';
+import GameReservation from './class/game.reservation.class';
+import GameCreateResDto from './game/dto/res/game.create.res.dto';
+import GameJoinResDto from './game/dto/res/game.join.res.dto';
+
+type GameInviteReqDtoType = { scoreForWin: number } & GameMatchDto;
 
 @Injectable()
 @WebSocketGateway({ transports: ['websocket'], namespace: 'socket' })
@@ -61,7 +66,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(
         `Client connected with id: ${user.id} | token: ${userToken} | socketId: ${socketId} | User: ${this.userContexts.size}`,
       );
-      console.log(this.usersSocket[user.id]);
     } catch (error) {
       // ignore
     }
@@ -72,12 +76,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const userContext = this.userContexts.get(client.id);
       if (userContext) {
+        console.log(`user disconnected: ${userContext.user.nickname}`);
         client.leave(userContext.user.id);
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
           this.socketService.handleLeaveChatRoom(userContext);
         }
+        this.usersSocket.delete(userContext.user.id);
         this.userContexts.delete(client.id);
       }
       console.log(`Client ${client.id} disconnected`);
@@ -179,23 +185,30 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage(SocketEventName.GAME_INVITE_REQ)
   async handleGameInvite(
     @ConnectedSocket() client: Socket,
-    @MessageBody() gameMatchDto: GameMatchDto,
+    @MessageBody()
+    { gameMode, scoreForWin, opponentNickname }: GameInviteReqDtoType,
   ) {
     try {
+      const user = this.userContexts.get(client.id);
+      user.gameReservation = new GameReservation(gameMode, scoreForWin);
+
       const opponent: User = await this.userService.findByNickname(
-        gameMatchDto.opponentNickname,
+        opponentNickname,
       );
       if (opponent) {
         const opponentSocket = this.usersSocket.get(opponent.id);
-        this.server
-          .to(opponentSocket)
-          .emit(SocketEventName.GAME_INVITE_NOTIFY, {
-            gameMode: gameMatchDto.gameMode,
-            opponentNickname: this.userContexts.get(client.id).user.nickname,
+        if (opponentSocket) {
+          this.server
+            .to(opponentSocket)
+            .emit(SocketEventName.GAME_INVITE_NOTIFY, {
+              gameMode,
+              opponentNickname: user.user.nickname,
+              scoreForWin,
+            });
+          client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
+            success: true,
           });
-        client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
-          success: true,
-        });
+        } else throw new Error('상대가 접속중이 아닙니다.');
       } else throw new Error('No user');
     } catch (e) {
       client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
@@ -217,18 +230,36 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (opponent) {
         // find socket
         const opponentSocket = this.usersSocket.get(opponent.id);
-
-        // find Context
-        const userContext = this.userContexts.get(client.id);
         const opponentContext = this.userContexts.get(opponentSocket);
+        if (opponentContext) {
+          // find Context
+          const userContext = this.userContexts.get(client.id);
+          const { gameMode, scoreForWin } = opponentContext.gameReservation;
 
-        this.socketGameService.createGame(
-          userContext,
-          opponentContext,
-          gameMatchDto.gameMode,
-          false,
-          10,
-        );
+          // TODO: 초대한 시점과 시간을 비교해서 초대가 만료되었는지 검사?
+
+          this.socketGameService.createGame(
+            opponentContext,
+            userContext,
+            gameMode,
+            false,
+            scoreForWin,
+          );
+          opponentContext.socket.emit(SocketEventName.GAME_CREATE_RES, <
+            GameCreateResDto
+          >{
+            gameMode,
+            ladder: false,
+            scoreForWin,
+            myIndex: 0,
+          });
+          client.emit(SocketEventName.GAME_JOIN_RES, <GameJoinResDto>{
+            gameMode,
+            ladder: false,
+            scoreForWin,
+            myIndex: 1,
+          });
+        } else throw new Error('초대한 사용자를 찾을 수 없습니다.');
       } else throw new Error('No user');
     } catch (e) {
       client.emit(SocketEventName.GAME_ACCEPT_RES, <BaseResultDto>{
@@ -252,11 +283,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const opponentSocket = this.usersSocket.get(opponent.id);
 
         this.server.to(opponentSocket).emit(SocketEventName.GAME_REFUSE_RES, {
-          message: `Your invitation has been refused`,
+          message: '상대가 게임 초대를 거절했습니다.',
         });
       } else throw new Error('No user');
     } catch (e) {
-      client.emit(SocketEventName.GAME_ACCEPT_RES, <BaseResultDto>{
+      client.emit(SocketEventName.GAME_REFUSE_RES, <BaseResultDto>{
         success: false,
         error: e.message,
       });
