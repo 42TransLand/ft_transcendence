@@ -36,11 +36,22 @@ export class UserRepository extends Repository<User> {
   }
 
   async findByUser(user: User): Promise<User> {
-    const findUser: User = await this.findOneBy({ id: user.id });
+    // const findUser: User = await this.findOneBy({ id: user.id });
+
+    const findUser: User = await this.findOne({
+      where: { id: user.id },
+      relations: ['records.winUser', 'records.loseUser'],
+    });
     if (findUser === null) {
       throw new NotFoundException(`User not found`);
     }
-    return user;
+    // console.log(findUser);
+    // findUser.records.forEach((record) => {
+    //   console.log(
+    //     `winUser: ${record.winUser.id} loseUser: ${record.loseUser.id}`,
+    //   );
+    // });
+    return findUser;
   }
 
   async findById(id: string): Promise<User> {

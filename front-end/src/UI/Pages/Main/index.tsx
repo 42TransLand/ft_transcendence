@@ -27,10 +27,10 @@ function Main() {
   });
   const invite = useInvitation();
   const onInviteNotify = React.useCallback(
-    (msg: GameMatchDto) => {
+    (msg: GameMatchDto & { scoreForWin: number }) => {
       const gameMode =
         msg.gameMode === GameMode.CLASSIC ? '기본모드' : '스피드모드';
-      invite(msg.opponentNickname, gameMode, false);
+      invite(msg.opponentNickname, gameMode, msg.scoreForWin, false);
     },
     [invite],
   );

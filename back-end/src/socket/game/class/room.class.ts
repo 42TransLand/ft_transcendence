@@ -77,12 +77,11 @@ export class Room {
         if (value.index === this.winnerIndex) {
           return value;
         }
-      }
-      if (value.index !== this.winnerIndex) {
+      } else if (value.index !== this.winnerIndex) {
         return value;
       }
     }
-    throw new Error('No winner');
+    throw new Error(`No ${findWinner ? 'winner' : 'loser'} found`);
   }
 
   public get winner(): Player {
@@ -94,11 +93,13 @@ export class Room {
   }
 
   public isEmpty() {
-    return this.players.size === 0 && this.gameTime > 10000;
-  }
+    let presentPlayers = 0;
 
-  public isFull() {
-    return this.players.size > 2;
+    this.players.forEach((player) => {
+      if (player.isPresent) presentPlayers += 1;
+    });
+
+    return presentPlayers === 0 && this.gameTime > 10000;
   }
 
   public join(user: UserContext, index: number) {
@@ -110,10 +111,15 @@ export class Room {
   }
 
   public leave(user: UserContext) {
-    this.players.delete(user.id);
+    const leftUser = this.players.get(user.id);
+    if (leftUser) {
+      leftUser.isPresent = false;
+      leftUser.score = -1;
+    }
     if (this.state !== GameState.WAITING) {
       this.state = GameState.ENDED;
     }
+    // this.players.delete(user.id);
   }
 
   public leaveSpectator(user: UserContext) {
@@ -225,8 +231,8 @@ export class Room {
   private determineWinner() {
     const players = this.getPlayers();
 
-    const leftScore = players[0]?.score || -1;
-    const rightScore = players[1]?.score || -1;
+    const leftScore = players[0].score;
+    const rightScore = players[1].score;
 
     if (leftScore > rightScore) {
       this.winnerIndex = 0;
@@ -239,6 +245,7 @@ export class Room {
     this.players.forEach((player) => {
       if (player) {
         if (except && except.id === player.user.id) return;
+        if (!player.isPresent) return;
         player.user.socket.emit(event, data);
       }
     });

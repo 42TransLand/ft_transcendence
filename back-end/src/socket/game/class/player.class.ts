@@ -8,6 +8,8 @@ import {
 export class Player {
   public score = 0;
 
+  public isPresent = true;
+
   private x: number;
 
   private y: number;
