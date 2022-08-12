@@ -7,6 +7,7 @@ import { GameRecord } from './entities/game.entity';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { GameMode } from './constants/game.mode.enum';
+import { GameResult } from 'src/socket/game/dto/game.result.type';
 
 @Injectable()
 export class GameService {
@@ -46,23 +47,7 @@ export class GameService {
     return boards;
   }
 
-  async updateGame(
-    gameId: string,
-    winUser: User,
-    loseUser: User,
-    winScore: number,
-    loseScore: number,
-    isLadder: boolean,
-    type: GameMode,
-  ): Promise<void> {
-    await this.gameRepository.updateGame(
-      gameId,
-      winUser,
-      loseUser,
-      winScore,
-      loseScore,
-      isLadder,
-      type,
-    );
+  async updateGame(gameResult: GameResult): Promise<void> {
+    await this.gameRepository.updateGame(gameResult);
   }
 }

@@ -7,6 +7,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { GameResult } from 'src/socket/game/dto/game.result.type';
 
 @CustomRepository(GameRecord)
 export class GameRepository extends Repository<GameRecord> {
@@ -31,27 +32,19 @@ export class GameRepository extends Repository<GameRecord> {
     return game.id;
   }
 
-  async updateGame(
-    gameId: string,
-    winUser: User,
-    loseUser: User,
-    winScore: number,
-    loseScore: number,
-    isLadder: boolean,
-    type: GameMode,
-  ): Promise<void> {
+  async updateGame(gameResult: GameResult): Promise<void> {
     const game = await this.findOne({
-      where: { id: gameId },
+      where: { id: gameResult.gameId },
     });
     if (!game) {
       throw new BadRequestException([`만들어 지지 않은 게임방입니다.`]);
     }
-    game.winUser = winUser;
-    game.loseUser = loseUser;
-    game.winUserScore = winScore;
-    game.loseUserScore = loseScore;
-    game.isLadder = isLadder;
-    game.type = type;
+    game.winUser = gameResult.winUser;
+    game.loseUser = gameResult.loseUser;
+    game.winUserScore = gameResult.winScore;
+    game.loseUserScore = gameResult.loseScore;
+    game.isLadder = gameResult.isLadder;
+    game.type = gameResult.type;
     try {
       await this.save(game);
     } catch (error) {

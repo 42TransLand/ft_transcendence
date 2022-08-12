@@ -190,7 +190,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server
           .to(opponentSocket)
           .emit(SocketEventName.GAME_INVITE_NOTIFY, {
-            mode: gameMatchDto.gameMode,
+            gameMode: gameMatchDto.gameMode,
             opponentNickname: this.userContexts.get(client.id).user.nickname,
           });
         client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{

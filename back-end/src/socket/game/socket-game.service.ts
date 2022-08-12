@@ -13,6 +13,7 @@ import {
 import GameState from './constants/game.state.enum';
 import GameCreateResDto from './dto/res/game.create.res.dto';
 import GameJoinResDto from './dto/res/game.join.res.dto';
+import { GameResult } from './dto/game.result.type';
 
 type DequeueSuccessType = {
   success: true;
@@ -126,15 +127,16 @@ export class SocketGameService {
       room.update();
       if (room.state === GameState.ENDED || room.isEmpty()) {
         // TODO 게임이 종료되어, 게임 결과를 저장해야 함
-        this.gameService.updateGame(
-          room.id,
-          room.winner.user.user,
-          room.loser.user.user,
-          room.winner.score,
-          room.loser.score,
-          room.ladder,
-          room.gameMode,
-        );
+        const gameResult: GameResult = {
+          gameId: room.id,
+          winUser: room.winner.user.user,
+          loseUser: room.loser.user.user,
+          winScore: room.winner.score,
+          loseScore: room.loser.score,
+          isLadder: room.ladder,
+          type: room.gameMode,
+        };
+        this.gameService.updateGame(gameResult);
         rooms.delete(index);
       }
     });
