@@ -30,10 +30,12 @@ function ProfileContent({
 
 function MyProfile() {
   const { id, nickname, profileImg } = useMe();
-
   return (
     <UserContextMenu target={id} targetName={nickname} mode="self">
-      <ProfileContent nickname={nickname} profileImg={profileImg} />
+      <ProfileContent
+        nickname={nickname}
+        profileImg={`${process.env.REACT_APP_WEBSOCKET_HOST}/${profileImg}`}
+      />
     </UserContextMenu>
   );
 }
