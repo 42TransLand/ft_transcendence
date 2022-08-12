@@ -1,7 +1,9 @@
 name: Build Test Back-end
 
 on:
-  push
+  push:
+    branches:
+      - !master
 
 jobs:
 
