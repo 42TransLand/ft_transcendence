@@ -1,16 +1,8 @@
-/* eslint-disable */
 import React from 'react';
 import axios from 'axios';
 import { ChatIcon } from '@chakra-ui/icons';
 import { Grid, GridItem, VStack, Input, Button, Text } from '@chakra-ui/react';
-import {
-  ErrorMessage,
-  Field,
-  Form,
-  Formik,
-  FormikHelpers,
-  FormikValues,
-} from 'formik';
+import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
@@ -41,12 +33,11 @@ function CreateChannel() {
     ) => {
       axios
         .post('/chat/create', {
-          name: name,
+          name,
           type: password.length ? 'PROTECT' : 'PUBLIC', // TODO
           password: password ?? '',
         })
         .then((response) => {
-          console.log('here then');
           actions.resetForm();
           actions.setSubmitting(false);
           navigate(`/chat/${response.data}`);
