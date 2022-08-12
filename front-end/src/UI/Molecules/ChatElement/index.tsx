@@ -21,14 +21,14 @@ export default function ChatElement({ message, name }: ChatElementProps) {
     >
       {!self && (
         <Box alignItems="flex-end">
-          {speaker?.profileIcon && (
+          {speaker?.profileImg && (
             <Image
-              src={speaker?.profileIcon}
+              src={speaker?.profileImg}
               borderRadius="full"
               boxSize="2em"
             />
           )}
-          {!speaker?.profileIcon && <Box boxSize="2em" />}
+          {!speaker?.profileImg && <Box boxSize="2em" />}
         </Box>
       )}
       <VStack alignItems="flex-start">

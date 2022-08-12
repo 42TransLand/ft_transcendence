@@ -12,7 +12,7 @@ import { BsFillMicMuteFill } from 'react-icons/bs';
 import ChatMemberProps from '../../../Props/ChatMemberProps';
 
 export default function ChatMemberElement({
-  profileIcon,
+  profileImg,
   name,
   role,
   muted,
@@ -23,7 +23,7 @@ export default function ChatMemberElement({
       <Avatar
         opacity={blocked ? '35%' : '100%'}
         boxSize="1.25em"
-        src={profileIcon}
+        src={profileImg}
         name={name}
         size="lg"
       >

@@ -1,5 +1,5 @@
 export default interface ChatMemberProps {
-  profileIcon: string;
+  profileImg: string;
   userId: number;
   name: string;
   role: 'owner' | 'admin' | 'member';

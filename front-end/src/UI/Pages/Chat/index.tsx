@@ -24,7 +24,7 @@ function ChatExampleChannel() {
       chatMember: {
         userId: 1,
         name: '엄준식은살아있다',
-        profileIcon: '/profileicons/umjunsik.jpeg',
+        profileImg: '/profileimgs/umjunsik.jpeg',
         role: 'member',
         muted: false,
         blocked: false,
@@ -35,7 +35,7 @@ function ChatExampleChannel() {
       chatMember: {
         userId: 2,
         name: 'YuriMyWife',
-        profileIcon: '/profileicons/yuri.jpeg',
+        profileImg: '/profileimgs/yuri.jpeg',
         role: 'member',
         muted: false,
         blocked: false,
@@ -46,7 +46,7 @@ function ChatExampleChannel() {
       chatMember: {
         userId: 3,
         name: '박수고양이',
-        profileIcon: '/profileicons/catclap.gif',
+        profileImg: '/profileimgs/catclap.gif',
         role: 'member',
         muted: false,
         blocked: false,
@@ -57,7 +57,7 @@ function ChatExampleChannel() {
       chatMember: {
         userId: 4,
         name: '새침소녀',
-        profileIcon: '/profileicons/deregirl.jpeg',
+        profileImg: '/profileimgs/deregirl.jpeg',
         role: 'member',
         muted: false,
         blocked: true,
@@ -68,7 +68,7 @@ function ChatExampleChannel() {
       chatMember: {
         userId: 5,
         name: '아그래요',
-        profileIcon: '/profileicons/orly.jpeg',
+        profileImg: '/profileimgs/orly.jpeg',
         role: 'member',
         muted: true,
         blocked: false,
@@ -80,7 +80,7 @@ function ChatExampleChannel() {
         chatMember: {
           userId: 6 + i,
           name: `아그래요${i}`,
-          profileIcon: '/profileicons/orly.jpeg',
+          profileImg: '/profileimgs/orly.jpeg',
           role: 'member',
           muted: true,
           blocked: false,
@@ -211,7 +211,7 @@ function ChatExampleDM() {
       chatMember: {
         userId: 1,
         name: '엄준식은살아있다',
-        profileIcon: '/profileicons/umjunsik.jpeg',
+        profileImg: '/profileimgs/umjunsik.jpeg',
         role: 'member',
         muted: false,
         blocked: false,
@@ -222,7 +222,7 @@ function ChatExampleDM() {
       chatMember: {
         userId: 2,
         name: 'YuriMyWife',
-        profileIcon: '/profileicons/yuri.jpeg',
+        profileImg: '/profileimgs/yuri.jpeg',
         role: 'member',
         muted: false,
         blocked: false,

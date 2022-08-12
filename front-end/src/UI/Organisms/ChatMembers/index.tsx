@@ -26,7 +26,7 @@ export default function ChatMembers() {
           >
             <ChatMemberElement
               userId={member.userId}
-              profileIcon={member.profileIcon}
+              profileImg={member.profileImg}
               name={member.name}
               role={member.role}
               muted={member.muted}
