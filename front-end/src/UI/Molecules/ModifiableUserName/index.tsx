@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState } from 'react';
 import {
   Text,
@@ -8,13 +7,13 @@ import {
   InputGroup,
   InputRightElement,
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { IoMdSave } from 'react-icons/io';
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import axios from 'axios';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
-import { useNavigate } from 'react-router-dom';
 
 type ChangeNameProps = {
   nickname: string;
@@ -53,7 +52,7 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
           helper.setSubmitting(false);
         });
     },
-    [setModUserName, setIsEditing, setError, QueryClient, navigate],
+    [setModUserName, setIsEditing, setError, queryClient, navigate],
   );
 
   if (!isMyself) {
