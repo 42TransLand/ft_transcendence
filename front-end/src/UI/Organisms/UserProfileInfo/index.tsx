@@ -1,5 +1,4 @@
-/* eslint-disable */
-import React, { useState } from 'react';
+import React from 'react';
 import {
   HStack,
   Avatar,
@@ -32,10 +31,6 @@ function UserProfileInfo(props: {
       });
     }
   };
-
-  React.useEffect(() => {
-    console.log(`Image rerender: ${userImage}`);
-  }, [userImage]);
 
   return (
     <HStack spacing={5} fontSize="5xl">
