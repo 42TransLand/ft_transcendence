@@ -35,6 +35,7 @@ export default function useInvitation() {
   const newInvitation = (
     userName: string,
     gameMode: string,
+    scoreForWin: number,
     isRanked: boolean,
   ) => {
     setInvitations([
@@ -48,6 +49,7 @@ export default function useInvitation() {
             userName={userName}
             gameMode={gameMode}
             isRanked={isRanked}
+            scoreForWin={scoreForWin}
             handleInvitation={handleInvitation}
           />
         ),

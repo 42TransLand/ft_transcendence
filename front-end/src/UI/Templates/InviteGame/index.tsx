@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { Icon, ChevronDownIcon } from '@chakra-ui/icons';
 import { GrGamepad } from 'react-icons/gr';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import useInviteGame from '../../../Hooks/useInviteGame';
 import GameMode from '../../../Games/dto/constants/game.mode.enum';
@@ -57,6 +57,9 @@ function InviteGame({ nickname }: { nickname: string }) {
                     승리 목표 점수
                   </Text>
                   <Field as={Input} name="scoreForWin" />
+                  <Text fontSize="xs" textColor="red.500">
+                    <ErrorMessage name="scoreForWin" />
+                  </Text>
                   <Text fontSize={10} color="gray">
                     초대할 상대방
                   </Text>

@@ -126,17 +126,21 @@ export class SocketGameService {
     this.rooms.forEach((room, index, rooms) => {
       room.update();
       if (room.state === GameState.ENDED || room.isEmpty()) {
-        // TODO 게임이 종료되어, 게임 결과를 저장해야 함
-        const gameResult: GameResult = {
-          gameId: room.id,
-          winUser: room.winner.user.user,
-          loseUser: room.loser.user.user,
-          winScore: room.winner.score,
-          loseScore: room.loser.score,
-          isLadder: room.ladder,
-          type: room.gameMode,
-        };
-        this.gameService.updateGame(gameResult);
+        if (!room.isEmpty()) {
+          // TODO 게임이 종료되어, 게임 결과를 저장해야 함
+          const { user: winnerUser, score: winnerScore } = room.winner;
+          const { user: loserUser, score: loserScore } = room.loser;
+          const gameResult: GameResult = {
+            gameId: room.id,
+            winUser: winnerUser.user,
+            loseUser: loserUser.user,
+            winScore: winnerScore,
+            loseScore: loserScore,
+            isLadder: room.ladder,
+            type: room.gameMode,
+          };
+          this.gameService.updateGame(gameResult);
+        }
         rooms.delete(index);
       }
     });

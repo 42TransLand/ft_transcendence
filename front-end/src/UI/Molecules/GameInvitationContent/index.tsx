@@ -12,6 +12,7 @@ import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 function GameInvitationContent(props: {
   userName: string;
   gameMode: string;
+  scoreForWin: number;
   isRanked: boolean;
   handleInvitation: (
     toastId: string,
@@ -19,7 +20,8 @@ function GameInvitationContent(props: {
     userName: string,
   ) => void;
 }) {
-  const { userName, gameMode, isRanked, handleInvitation } = props;
+  const { userName, gameMode, isRanked, scoreForWin, handleInvitation } = props;
+  // TODO: 아래 Avatar에 프로필 사진이 나와야 함.
 
   return (
     <Grid
@@ -41,14 +43,16 @@ function GameInvitationContent(props: {
         <Text fontSize="lg" lineHeight={1.25}>
           {userName}님께서
           <br />
-          {gameMode} {isRanked ? '랭크' : '일반'} 게임에 초대하였습니다.
+          {`${gameMode} ${scoreForWin}점 선승 ${
+            isRanked ? '랭크' : '일반'
+          } 게임에 초대하였습니다.`}
         </Text>
       </GridItem>
       <GridItem rowSpan={2} colSpan={1} />
       <GridItem rowSpan={1} colSpan={4} flex="">
-        <Text fontSize="sm" paddingY={1.5}>
-          방금전
-        </Text>
+        {/* <Text fontSize="sm" paddingY={1.5}>
+          방금 전
+        </Text> */}
       </GridItem>
       <GridItem rowSpan={1} colSpan={2} />
       <GridItem rowSpan={1} colSpan={2}>
