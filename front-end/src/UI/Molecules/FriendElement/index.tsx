@@ -5,9 +5,10 @@ import { FriendOnlineState } from '../../../Hooks/useSocket';
 
 function FriendElement(props: {
   userName: string;
+  userProfileImage: string;
   connectionStatus: FriendOnlineState;
 }) {
-  const { userName, connectionStatus } = props;
+  const { userName, userProfileImage, connectionStatus } = props;
   const StatusColors = {
     ONLINE: 'green.500',
     OFFLINE: 'red.500',
@@ -27,7 +28,7 @@ function FriendElement(props: {
       padding={3}
       to={`/dm/${userName}`}
     >
-      <Avatar name={userName} size="lg">
+      <Avatar name={userName} src={userProfileImage} size="lg">
         <AvatarBadge boxSize="1em" bgColor={statusColor} />
       </Avatar>
       <Spacer />

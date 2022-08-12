@@ -44,6 +44,7 @@ function FriendTab() {
             >
               <FriendElement
                 userName={f.nickname}
+                userProfileImage={`${process.env.REACT_APP_WEBSOCKET_HOST}/${f.profileImg}`}
                 connectionStatus={socket.state.friendState[f.id]}
               />
             </UserContextMenu>
