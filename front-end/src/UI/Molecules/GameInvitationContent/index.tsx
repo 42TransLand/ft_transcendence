@@ -1,4 +1,5 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Grid,
   GridItem,
@@ -8,6 +9,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import USERS_PROFILE_GET from '../../../Queries/Users/Profile';
 
 function GameInvitationContent(props: {
   userName: string;
@@ -21,7 +23,8 @@ function GameInvitationContent(props: {
   ) => void;
 }) {
   const { userName, gameMode, isRanked, scoreForWin, handleInvitation } = props;
-  // TODO: 아래 Avatar에 프로필 사진이 나와야 함.
+  const { data } = useQuery(USERS_PROFILE_GET(userName));
+  const { profileImg } = data ?? { profileSrc: '' };
 
   return (
     <Grid
@@ -36,7 +39,11 @@ function GameInvitationContent(props: {
       paddingY={2}
     >
       <GridItem rowSpan={3} colSpan={1} margin="auto">
-        <Avatar name={userName} size="md" />
+        <Avatar
+          name={userName}
+          src={`${process.env.REACT_APP_WEBSOCKET_HOST}/${profileImg}`}
+          size="md"
+        />
       </GridItem>
       <GridItem rowSpan={1} colSpan={1} />
       <GridItem rowSpan={2} colSpan={8}>
