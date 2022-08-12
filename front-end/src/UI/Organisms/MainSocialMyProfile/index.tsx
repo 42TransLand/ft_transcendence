@@ -30,7 +30,6 @@ function ProfileContent({
 
 function MyProfile() {
   const { id, nickname, profileImg } = useMe();
-
   return (
     <UserContextMenu target={id} targetName={nickname} mode="self">
       <ProfileContent
