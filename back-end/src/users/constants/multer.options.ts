@@ -19,11 +19,11 @@ export const loaclOptions: MulterOptions = {
     },
   }),
   fileFilter: (req, file, cb) => {
-    const fileMimeType = file.mimetype.split('/')[1];
-    if (fileMimeType === 'jpg' || fileMimeType === 'jpeg') {
+    const type: string = file.mimetype.split('/')[0];
+    if (type === 'image') {
       cb(null, true);
     } else {
-      cb(new BadRequestException(`지원하지 않는 형식입니다.`), false);
+      cb(new BadRequestException(`이미지 파일이 아닙니다.`), false);
     }
   },
 };

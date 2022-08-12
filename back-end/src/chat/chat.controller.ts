@@ -62,9 +62,9 @@ export class ChatController {
   updatePassword(
     @GetUser() user: User,
     @Param('id') id: string,
-    @Body() { password }: UpdateChatPasswordDto,
+    @Body() { password, type }: UpdateChatPasswordDto,
   ): Promise<void> {
-    return this.chatService.updatePassword(id, user, password);
+    return this.chatService.updatePassword(id, user, type, password);
   }
 
   @ApiOperation({ summary: '채팅방 유저 조회' })
