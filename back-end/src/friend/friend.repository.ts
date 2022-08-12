@@ -131,30 +131,28 @@ export class FriendRepository extends Repository<Friend> {
     if (result !== null) {
       if (result.block === false) {
         throw new BadRequestException([`차단하지 않은 유저 입니다.`]);
+      } else if (
+        // 과거에 친구 요청 혹은 친구였던 기록 있다면 차단만 false로 바꿔서 저장
+        result.status === FriendStatus.FRIEND ||
+        result.status === FriendStatus.PENDDING
+      ) {
+        result.block = false;
+        try {
+          await this.save(result);
+        } catch (error) {
+          throw new InternalServerErrorException();
+        }
       } else {
-        if (
-          // 과거에 친구 요청 혹은 친구였던 기록 있다면 차단만 false로 바꿔서 저장
-          result.status === FriendStatus.FRIEND ||
-          result.status === FriendStatus.PENDDING
-        ) {
-          result.block = false;
-          try {
-            await this.save(result);
-          } catch (error) {
-            throw new InternalServerErrorException();
-          }
-        } else {
-          // 과거에 친구 요청 혹은 친구였던 기록 없다면 행 삭제
-          try {
-            await this.delete({
-              requestor: { id: Equal(requestor.id) },
-              receiver: { id: Equal(receiver.id) },
-              status: FriendStatus.NONE,
-              block: true,
-            });
-          } catch (error) {
-            throw new InternalServerErrorException();
-          }
+        // 과거에 친구 요청 혹은 친구였던 기록 없다면 행 삭제
+        try {
+          await this.delete({
+            requestor: { id: Equal(requestor.id) },
+            receiver: { id: Equal(receiver.id) },
+            status: FriendStatus.NONE,
+            block: true,
+          });
+        } catch (error) {
+          throw new InternalServerErrorException();
         }
       }
     } else {

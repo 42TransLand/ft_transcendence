@@ -51,8 +51,8 @@ export class User extends BaseEntity {
     type: GameRecord,
     isArray: true,
   })
-  @OneToMany(() => GameRecord, (record) => record.leftUser, { eager: true })
-  @OneToMany(() => GameRecord, (record) => record.rightUser, {
+  @OneToMany(() => GameRecord, (record) => record.winUser, { eager: true })
+  @OneToMany(() => GameRecord, (record) => record.loseUser, {
     eager: true,
   })
   records: GameRecord[];

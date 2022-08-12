@@ -82,14 +82,14 @@ export class Room {
         return value;
       }
     }
-    return null;
+    throw new Error('No winner');
   }
 
-  public get winner(): Player | null {
+  public get winner(): Player {
     return this.getWinnerOrLoser(true);
   }
 
-  public get loser(): Player | null {
+  public get loser(): Player {
     return this.getWinnerOrLoser(false);
   }
 

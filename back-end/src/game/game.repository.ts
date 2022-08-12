@@ -3,7 +3,11 @@ import { Repository } from 'typeorm';
 import { GameMode } from './constants/game.mode.enum';
 import { GameRecord } from './entities/game.entity';
 import { User } from 'src/users/entities/user.entity';
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { GameResult } from 'src/socket/game/dto/game.result.type';
 
 @CustomRepository(GameRecord)
 export class GameRepository extends Repository<GameRecord> {
@@ -15,8 +19,8 @@ export class GameRepository extends Repository<GameRecord> {
     ladder: boolean,
   ): Promise<string> {
     const game = await this.create({
-      leftUser: leftUser.id,
-      rightUser: rightUser.id,
+      winUser: leftUser,
+      loseUser: rightUser,
       type: gameMode, // : gameMode.LADDER_GAME
       isLadder: ladder,
     });
@@ -26,5 +30,25 @@ export class GameRepository extends Repository<GameRecord> {
       throw new InternalServerErrorException();
     }
     return game.id;
+  }
+
+  async updateGame(gameResult: GameResult): Promise<void> {
+    const game = await this.findOne({
+      where: { id: gameResult.gameId },
+    });
+    if (!game) {
+      throw new BadRequestException([`만들어 지지 않은 게임방입니다.`]);
+    }
+    game.winUser = gameResult.winUser;
+    game.loseUser = gameResult.loseUser;
+    game.winUserScore = gameResult.winScore;
+    game.loseUserScore = gameResult.loseScore;
+    game.isLadder = gameResult.isLadder;
+    game.type = gameResult.type;
+    try {
+      await this.save(game);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }
