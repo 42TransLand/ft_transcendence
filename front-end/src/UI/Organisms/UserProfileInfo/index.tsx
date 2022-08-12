@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable */
+import React, { useState } from 'react';
 import {
   HStack,
   Avatar,
@@ -9,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { MdAddPhotoAlternate } from 'react-icons/md';
 import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import ModifiableUserName from '../../Molecules/ModifiableUserName';
 
 function UserProfileInfo(props: {
@@ -17,15 +19,23 @@ function UserProfileInfo(props: {
   isMyself: boolean;
 }) {
   const { userName, userImage, isMyself } = props;
+  const queryClient = useQueryClient();
 
   const onChangeHandler = (event: { target: HTMLInputElement }): void => {
     const { target } = event;
     const formData = new FormData();
     if (target.files?.length) {
       formData.append('file', target.files[0]);
-      axios.patch('/users/me', formData);
+      axios.patch('/users/me', formData).then(() => {
+        queryClient.invalidateQueries(['profile', userName]);
+        queryClient.invalidateQueries(['me']);
+      });
     }
   };
+
+  React.useEffect(() => {
+    console.log(`Image rerender: ${userImage}`);
+  }, [userImage]);
 
   return (
     <HStack spacing={5} fontSize="5xl">

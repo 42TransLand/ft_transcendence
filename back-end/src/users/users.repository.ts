@@ -6,7 +6,7 @@ import {
 import { Auth42userDto } from 'src/auth/dto/auth.42user.dto';
 import { Like, Repository } from 'typeorm';
 import { CustomRepository } from '../custom/typeorm.decorator';
-import { User } from './entities/user.entity';
+import { User, DEFAULT_PROFILE_IMG } from './entities/user.entity';
 
 @CustomRepository(User)
 export class UserRepository extends Repository<User> {
@@ -74,6 +74,14 @@ export class UserRepository extends Repository<User> {
       user.nickname = nickName;
     }
     if (profileImg) {
+      const fs = require('fs');
+      if (user.profileImg !== DEFAULT_PROFILE_IMG) {
+        fs.unlink(`${user.profileImg}`, (err) => {
+          if (err) {
+            throw new NotFoundException();
+          }
+        });
+      }
       user.profileImg = profileImg;
     }
     try {
