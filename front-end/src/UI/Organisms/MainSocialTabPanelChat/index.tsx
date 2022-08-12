@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Flex, HStack, VStack } from '@chakra-ui/react';
@@ -50,7 +49,7 @@ function ChatTab() {
     <VStack>
       <HStack w="full">
         <Flex>
-          <PopoverButton h={200} icon={<AddIcon />} placement="right-start">
+          <PopoverButton h={210} icon={<AddIcon />} placement="right-start">
             <CreateChannel />
           </PopoverButton>
         </Flex>
