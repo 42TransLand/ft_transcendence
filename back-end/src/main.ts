@@ -2,11 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'],
   });
   if (process.env.NODE_ENV === 'dev')
@@ -14,6 +16,10 @@ async function bootstrap() {
       origin: 'http://localhost:3001',
       credentials: true,
     });
+
+  app.useStaticAssets(join(__dirname, '..', 'files'), {
+    prefix: '/files',
+  });
 
   app.use(cookieParser());
   const config = new DocumentBuilder()

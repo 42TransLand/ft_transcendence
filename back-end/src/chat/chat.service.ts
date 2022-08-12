@@ -45,6 +45,7 @@ export class ChatService {
   async updatePassword(
     id: string,
     user: User,
+    type: ChatType,
     password?: string,
   ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
@@ -55,11 +56,7 @@ export class ChatService {
     if (chatUser.role !== ChatRole.OWNER) {
       throw new BadRequestException(`권한이 없습니다.`);
     }
-    await this.chatRoomRepository.updatePassword(
-      chatRoom,
-      password,
-      chatRoom.type,
-    );
+    await this.chatRoomRepository.updatePassword(chatRoom, password, type);
   }
 
   findAllChatRoom(): Promise<ChatRoom[]> {
