@@ -15,7 +15,7 @@ export const loaclOptions: MulterOptions = {
     filename(req, file, cb) {
       const userId = req['user'].id;
       const fileMimeType = file.mimetype.split('/')[1];
-      cb(null, `${userId}.${fileMimeType}`);
+      cb(null, `${userId}.${new Date().getTime()}.${fileMimeType}`);
     },
   }),
   fileFilter: (req, file, cb) => {

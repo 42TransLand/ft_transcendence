@@ -10,6 +10,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export const DEFAULT_PROFILE_IMG = 'files/profileImg/default.jpg';
+
 @Entity()
 export class User extends BaseEntity {
   @Column({ primary: true })
@@ -25,7 +27,7 @@ export class User extends BaseEntity {
   @Column()
   email: string;
 
-  @Column({ default: 'files/profileImg/default.jpg' })
+  @Column({ default: DEFAULT_PROFILE_IMG })
   profileImg: string;
 
   //@Column()

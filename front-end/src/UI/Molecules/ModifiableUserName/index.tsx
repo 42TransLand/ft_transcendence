@@ -7,10 +7,12 @@ import {
   InputGroup,
   InputRightElement,
 } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { IoMdSave } from 'react-icons/io';
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 type ChangeNameProps = {
@@ -26,6 +28,8 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
   const [isEditing, setIsEditing] = useState(false);
   const [modUserName, setModUserName] = useState(userName);
   const { setError, WarningDialogComponent } = useWarningDialog();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const onSubmitHandler = React.useCallback(
     ({ nickname }: ChangeNameProps, helper: FormikHelpers<ChangeNameProps>) => {
@@ -33,8 +37,10 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
         .patch('/users/me', { nickname })
         .then(() => {
           setModUserName(nickname);
+          queryClient.invalidateQueries(['me']);
           setIsEditing(false);
           helper.setSubmitting(false);
+          navigate(`/user/${nickname}`, { replace: true });
         })
         .catch((err) => {
           if (err.response.status === 409) {
@@ -46,7 +52,7 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
           helper.setSubmitting(false);
         });
     },
-    [setModUserName, setIsEditing, setError],
+    [setModUserName, setIsEditing, setError, queryClient, navigate],
   );
 
   if (!isMyself) {
