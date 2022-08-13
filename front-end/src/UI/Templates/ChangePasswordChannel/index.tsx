@@ -5,6 +5,7 @@ import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 type ChangePasswordProps = {
@@ -21,6 +22,7 @@ const ChangePasswordChannelScheme = Yup.object().shape({
 function ChangePasswordChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const onSubmitHandler = React.useCallback(
     (
       { password }: ChangePasswordProps,
@@ -33,6 +35,7 @@ function ChangePasswordChannel() {
         })
         .then(() => {
           actions.resetForm();
+          queryClient.invalidateQueries(['channels']);
           actions.setSubmitting(false);
         })
         .catch((err) => {
@@ -47,7 +50,7 @@ function ChangePasswordChannel() {
           }
         });
     },
-    [setError, id],
+    [setError, id, queryClient],
   );
 
   return (
