@@ -13,7 +13,11 @@ function Profile() {
   const { data, isLoading, error } = useQuery(
     USERS_PROFILE_GET(name ?? myNickname),
   );
-  const { nickname, profileImg } = data ?? { nickname: '', profileImg: '' };
+  const { nickname, profileImg, records } = data ?? {
+    nickname: '',
+    profileImg: '',
+    records: [],
+  };
   let modalBody;
 
   if (isLoading) {
@@ -29,6 +33,7 @@ function Profile() {
         userRating={rankScore}
         userWins={7500}
         userLosses={2500}
+        records={records}
       />
     );
   }
