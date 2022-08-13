@@ -19,6 +19,7 @@ import { ChatDto } from 'src/chat/dto/chat.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/users/get.user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { ChatInfoDto } from './dto/chat.info.dto';
 
 @ApiTags('chat')
 @Controller('chat')
@@ -48,7 +49,7 @@ export class ChatController {
   @ApiOperation({ summary: '모든 채팅방 조회' })
   @ApiResponse({ status: 200, description: '성공' })
   @Get()
-  findAllChatRoom(): Promise<ChatRoom[]> {
+  findAllChatRoom(): Promise<ChatInfoDto[]> {
     return this.chatService.findAllChatRoom();
   }
 

@@ -8,7 +8,7 @@ import { CreateChatRoomDto } from './dto/create.chat.room.dto';
 import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
 import { ChatRoom } from './entities/chat.room.entity';
 import * as bcrypt from 'bcrypt';
-import { ChatType } from './constants/chat.type.enum';
+import { ChatType, CountType } from './constants/chat.type.enum';
 
 @CustomRepository(ChatRoom)
 export class ChatRoomRepository extends Repository<ChatRoom> {
@@ -24,6 +24,7 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
       name,
       type,
       password: encryptPassword,
+      count: 1,
     });
     try {
       await this.save(chatRoom);
@@ -66,5 +67,23 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
 
   async deleteChatRoom(id: string): Promise<void> {
     await this.delete({ id });
+  }
+
+  async updateCount(chatRoom: ChatRoom, type: CountType): Promise<void> {
+    if (type === 'JOIN') {
+      chatRoom.count += 1;
+      try {
+        await this.save(chatRoom);
+      } catch (error) {
+        throw new InternalServerErrorException();
+      }
+    } else {
+      chatRoom.count -= 1;
+      try {
+        await this.save(chatRoom);
+      } catch (error) {
+        throw new InternalServerErrorException();
+      }
+    }
   }
 }
