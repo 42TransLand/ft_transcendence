@@ -86,8 +86,11 @@ export class UserRepository extends Repository<User> {
       user.nickname = nickName;
     }
     if (profileImg) {
-      if (user.profileImg !== DEFAULT_PROFILE_IMG) {
-        fs.unlink(`${user.profileImg}`, (err) => {
+      if (
+        user.profileImg !== DEFAULT_PROFILE_IMG &&
+        fs.existsSync(user.profileImg)
+      ) {
+        fs.unlink(user.profileImg, (err) => {
           if (err) {
             throw new NotFoundException();
           }
