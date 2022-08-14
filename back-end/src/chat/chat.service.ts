@@ -11,7 +11,7 @@ import { ChatRoomRepository } from './chat.room.repository';
 import { ChatRoom } from './entities/chat.room.entity';
 import { CreateChatRoomDto } from './dto/create.chat.room.dto';
 import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
-import { ChatType } from './constants/chat.type.enum';
+import { ChatType, CountType } from './constants/chat.type.enum';
 import { UsersService } from 'src/users/users.service';
 import { ChatUserRepository } from './chat.user.repository';
 import { ChatRole } from './constants/chat.role.enum';
@@ -21,6 +21,7 @@ import { ChatUser } from './entities/chat.user.entity';
 import { ChatDto } from './dto/chat.dto';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { User } from 'src/users/entities/user.entity';
+import { ChatInfoDto } from './dto/chat.info.dto';
 
 @Injectable()
 export class ChatService {
@@ -59,9 +60,22 @@ export class ChatService {
     await this.chatRoomRepository.updatePassword(chatRoom, password, type);
   }
 
-  findAllChatRoom(): Promise<ChatRoom[]> {
-    return this.chatRoomRepository.findAllChatRoom();
-  }
+  async findAllChatRoom(): Promise<ChatInfoDto[]> {
+    const result = await this.chatRoomRepository.findAllChatRoom();
+
+    const rooms = result.map((findRoom) => {
+      const room: ChatInfoDto = {
+        id: findRoom.id,
+        name: findRoom.name,
+        type: findRoom.type,
+        createdAt: findRoom.createdAt,
+        updateAt: findRoom.updatedAt,
+        count: findRoom.count,
+    };
+  return room;
+  });
+  return rooms;
+}
 
   async findChatRoomById(id: string): Promise<ChatRoom> {
     const chatRoom = await this.chatRoomRepository.findChatRoomById(id);
@@ -104,9 +118,11 @@ export class ChatService {
   async joinChatRoom(id: string, user: User, password: string): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
     if (chatRoom.type === ChatType.PROTECT && password !== undefined) {
-      return this.chatUserRepository.joinChatRoom(user, chatRoom, password);
+      this.chatUserRepository.joinChatRoom(user, chatRoom, password);
+      return this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
     }
-    return this.chatUserRepository.joinChatRoom(user, chatRoom);
+    this.chatUserRepository.joinChatRoom(user, chatRoom);
+    return this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
   }
 
   async leaveChatRoom(id: string, user: User): Promise<string> {
@@ -131,6 +147,7 @@ export class ChatService {
       await this.chatUserRepository.updateOwnerRole(newOwner);
       return `${newOwner.id}님이 채팅방 오너로 설정되었습니다.`; // 지금은 db의 PK값 반환
     }
+    this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
     return `${user.nickname}님이 채팅방에서 나가셨습니다.`;
   }
 

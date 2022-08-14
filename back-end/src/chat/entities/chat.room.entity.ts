@@ -52,4 +52,10 @@ export class ChatRoom extends BaseEntity {
   })
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ApiProperty({
+    description: '채팅방 인원 수',
+  })
+  @Column()
+  count: number;
 }
