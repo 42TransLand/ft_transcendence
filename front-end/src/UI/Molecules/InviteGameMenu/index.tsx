@@ -28,7 +28,7 @@ function InviteGameMenu() {
           paddingTop={10}
           paddingBottom={5}
           w="420px"
-          h="280px"
+          h="320px"
         >
           <PopoverCloseButton />
           <InviteGame nickname={userName} />
