@@ -8,46 +8,11 @@ import Loading from '../../Templates/Loading';
 import OTPRevise from '../OTPRevise';
 import Profile from '../Profile';
 import Chat from '../Chat';
-import useInvitation from '../../../Hooks/useInvitation';
-import { SocketEventName } from '../../../Games/dto/constants/game.constants';
-import GameMatchDto from '../../../Games/dto/req/game.match.dto';
-import GameMode from '../../../Games/dto/constants/game.mode.enum';
-import useWarningDialog from '../../../Hooks/useWarningDialog';
+import useGameInviteNotify from '../../../Hooks/useGameInviteNotify';
 
 function Main() {
-  const { state, dispatch } = useSocket();
-  const clearSocketError = React.useCallback(() => {
-    dispatch({
-      action: 'setSocketError',
-      error: { headerMessage: '', bodyMessage: '' },
-    });
-  }, [dispatch]);
-  const { setError, WarningDialogComponent } = useWarningDialog(() => {
-    clearSocketError();
-  });
-  const invite = useInvitation();
-  const onInviteNotify = React.useCallback(
-    (msg: GameMatchDto & { scoreForWin: number }) => {
-      const gameMode =
-        msg.gameMode === GameMode.CLASSIC ? '기본모드' : '스피드모드';
-      invite(msg.opponentNickname, gameMode, msg.scoreForWin, false);
-    },
-    [invite],
-  );
-  React.useEffect(() => {
-    if (state.socket) {
-      state.socket.on(SocketEventName.GAME_INVITE_NOTIFY, onInviteNotify);
-    }
-    return () => {
-      state.socket?.off(SocketEventName.GAME_INVITE_NOTIFY);
-    };
-  }, [state.socket, onInviteNotify]);
-  React.useEffect(() => {
-    if (state.socketError.headerMessage) {
-      setError(state.socketError);
-    }
-    return () => clearSocketError();
-  }, [state.socketError, clearSocketError, setError]);
+  const { state } = useSocket();
+  const { WarningDialogComponent } = useGameInviteNotify();
 
   if (process.env.REACT_APP_WEBSOCKET_REQUIRED === 'true') {
     switch (state.socketState) {
