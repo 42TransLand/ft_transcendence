@@ -41,7 +41,7 @@ function GameInvitationContent(props: {
       <GridItem rowSpan={3} colSpan={1} margin="auto">
         <Avatar
           name={userName}
-          src={`${process.env.REACT_APP_WEBSOCKET_HOST}/${profileImg}`}
+          src={`${process.env.REACT_APP_API_HOST}/${profileImg}`}
           size="md"
         />
       </GridItem>

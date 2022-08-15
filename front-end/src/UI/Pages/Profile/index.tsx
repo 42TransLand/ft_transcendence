@@ -24,7 +24,7 @@ function Profile() {
     modalBody = (
       <ProfileContent
         nickname={nickname}
-        userImage={`${process.env.REACT_APP_WEBSOCKET_HOST}/${profileImg}`}
+        userImage={`${process.env.REACT_APP_API_HOST}/${profileImg}`}
         isMyself={myNickname === nickname}
         userRating={rankScore}
         userWins={7500}

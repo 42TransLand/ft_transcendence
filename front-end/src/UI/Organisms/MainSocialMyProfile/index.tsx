@@ -34,7 +34,7 @@ function MyProfile() {
     <UserContextMenu target={id} targetName={nickname} mode="self">
       <ProfileContent
         nickname={nickname}
-        profileImg={`${process.env.REACT_APP_WEBSOCKET_HOST}/${profileImg}`}
+        profileImg={`${process.env.REACT_APP_API_HOST}/${profileImg}`}
       />
     </UserContextMenu>
   );
