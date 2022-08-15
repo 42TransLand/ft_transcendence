@@ -36,8 +36,8 @@ function ChatTab() {
               <ChannelElement
                 roomType={c.type}
                 channelName={c.name}
-                /* currentHeadCount={c.currentHeadCount}
-                maxHeadCount={c.maxHeadCount} */
+                currentHeadCount={c.count}
+                /* maxHeadCount={c.maxHeadCount} */
               />
             </ChannelLink>
           ))}

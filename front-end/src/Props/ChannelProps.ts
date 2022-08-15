@@ -3,4 +3,5 @@ export default interface ChannelProps {
   name: string;
   type: 'PUBLIC' | 'PROTECT';
   password: string;
+  count: number;
 }
