@@ -40,6 +40,7 @@ function InviteGame({ nickname }: { nickname: string }) {
               w="100%"
               templateRows="reapeat(3, 1fr)"
               templateColumns="repeat(6, 1fr)"
+              gap={2}
             >
               <GridItem rowSpan={1} colSpan={1}>
                 <Icon as={GrGamepad} fontSize={40} />
