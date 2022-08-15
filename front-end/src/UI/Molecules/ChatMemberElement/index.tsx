@@ -1,23 +1,12 @@
 import React from 'react';
-import {
-  Text,
-  HStack,
-  Avatar,
-  AvatarBadge,
-  Icon,
-  Spacer,
-} from '@chakra-ui/react';
-import { FaCrown } from 'react-icons/fa';
+import { Text, HStack, Icon, Spacer, Avatar } from '@chakra-ui/react';
 import { BsFillMicMuteFill } from 'react-icons/bs';
 import ChatMemberProps from '../../../Props/ChatMemberProps';
+import ChatAvatarBadge from '../../Atoms/ChatAvatar';
 
-export default function ChatMemberElement({
-  profileImg,
-  name,
-  role,
-  muted,
-  blocked,
-}: ChatMemberProps) {
+export default function ChatMemberElement(props: ChatMemberProps) {
+  const { profileImg, name, role, muted, blocked } = props;
+
   return (
     <HStack borderWidth="1px" borderRadius="md" h="60px" w="100%" padding={3}>
       <Avatar
@@ -27,21 +16,7 @@ export default function ChatMemberElement({
         name={name}
         size="lg"
       >
-        {(role === 'owner' || role === 'admin') && (
-          <AvatarBadge
-            opacity={blocked ? '35%' : '100%'}
-            border={0}
-            position="absolute"
-            top="-360%"
-            left="-100%"
-          >
-            <Icon
-              as={FaCrown}
-              boxSize="0.75em"
-              color={role === 'owner' ? 'yellow.300' : 'gray.500'}
-            />
-          </AvatarBadge>
-        )}
+        <ChatAvatarBadge role={role} blocked={blocked} />
       </Avatar>
       <Text
         opacity={blocked ? '35%' : '100%'}

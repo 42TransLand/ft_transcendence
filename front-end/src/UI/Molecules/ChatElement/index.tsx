@@ -1,9 +1,13 @@
 import React from 'react';
-import { Image, Box, HStack, VStack, Text } from '@chakra-ui/react';
+import { Box, HStack, VStack, Text, Avatar } from '@chakra-ui/react';
 import ChatElementProps from '../../../Props/ChatElementProps';
 import ChatBalloon from '../../Atoms/ChatBalloon';
 import { useChat } from '../../../Hooks/useChat';
 import useMe from '../../../Hooks/useMe';
+import ChatMemberRole from '../../../Props/ChatMemberRole';
+import ChatAvatarBadge from '../../Atoms/ChatAvatar';
+// import ChatAvatarBadge from '../../Atoms/ChatAvatar';
+// import ChatMemberRole from '../../../Props/ChatMemberRole';
 
 export default function ChatElement({ message, name }: ChatElementProps) {
   const [chat] = useChat();
@@ -21,14 +25,12 @@ export default function ChatElement({ message, name }: ChatElementProps) {
     >
       {!self && (
         <Box alignItems="flex-end">
-          {speaker?.profileImg && (
-            <Image
-              src={speaker?.profileImg}
-              borderRadius="full"
-              boxSize="2em"
+          <Avatar src={speaker?.profileImg} boxSize="2em" borderRadius="full">
+            <ChatAvatarBadge
+              role={speaker?.role ?? ChatMemberRole.MEMBER}
+              blocked={speaker?.blocked ?? false}
             />
-          )}
-          {!speaker?.profileImg && <Box boxSize="2em" />}
+          </Avatar>
         </Box>
       )}
       <VStack alignItems="flex-start">
