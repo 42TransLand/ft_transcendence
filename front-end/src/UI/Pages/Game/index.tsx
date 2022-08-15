@@ -6,6 +6,7 @@ import Loading from '../../Templates/Loading';
 import { SocketEventName } from '../../../Games/dto/constants/game.constants';
 import useGame from '../../../Hooks/useGame';
 import { useSocket } from '../../../Hooks/useSocket';
+import GameTicket from '../../../Games/dto/constants/game.ticket.enum';
 
 const GameView = styled.div`
   min-height: 100vh;
@@ -33,7 +34,7 @@ function RealGame() {
     [navigate, dispatch],
   );
   React.useEffect(() => {
-    if (state.gameState?.mode === 'create') {
+    if (state.gameState?.ticket === GameTicket.CREATE) {
       state.socket?.on(
         SocketEventName.GAME_INVITE_RES,
         (msg) => !msg.success && onInviteResult('게임 초대 실패', msg.error),
@@ -42,7 +43,7 @@ function RealGame() {
         onInviteResult('게임 초대 거절됨', msg.message),
       );
     }
-    if (state.gameState?.mode === 'join') {
+    if (state.gameState?.ticket === GameTicket.JOIN) {
       state.socket?.on(
         SocketEventName.GAME_ACCEPT_RES,
         (msg) => !msg.success && onInviteResult('게임 참여 실패', msg.error),

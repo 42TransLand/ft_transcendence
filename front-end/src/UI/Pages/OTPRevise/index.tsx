@@ -6,6 +6,7 @@ import {
   Text,
   VStack,
   Box,
+  Button,
 } from '@chakra-ui/react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
@@ -19,6 +20,8 @@ export const OTPInputScheme = Yup.object().shape({
     .min(6, '6자리 코드를 입력해주세요.')
     .max(6, '6자리 코드를 입력해주세요.'),
 });
+
+const EmptyScheme = Yup.object();
 
 export type CodeValueType = {
   code: string;
@@ -56,14 +59,9 @@ function OTPBody({
             2차인증이 활성화 되었습니다. 해제하려면 OTP 인증을 한 번 더
             수행하십시오.
           </Text>
-          <Box w="15vw" h="20vh" bgColor="blue.200">
-            대충 QR 코드 나타날 곳
-          </Box>
-          <TwoFAInput
-            size="30%"
-            textColor="black"
-            isSubmitting={isSubmitting}
-          />
+          <Button colorScheme="red" type="submit" isLoading={isSubmitting}>
+            Disable
+          </Button>
         </>
       )}
     </VStack>
@@ -76,11 +74,13 @@ function OTPRevise() {
   const onSubmitHandler = React.useCallback(
     (values: CodeValueType, actions: FormikHelpers<CodeValueType>) => {
       setTimeout(() => {
-        actions.setSubmitting(false);
-        if (values.code === tempKey) {
+        if (isEnabled === true) {
+          setIsEnabled(false);
+        } else if (isEnabled === false && values.code === tempKey) {
           setIsEnabled(!isEnabled);
           actions.resetForm();
         }
+        actions.setSubmitting(false);
       }, 500);
     },
     [isEnabled],
@@ -91,7 +91,7 @@ function OTPRevise() {
       <Formik
         initialValues={{ code: '' }}
         onSubmit={onSubmitHandler}
-        validationSchema={OTPInputScheme}
+        validationSchema={isEnabled ? EmptyScheme : OTPInputScheme}
       >
         {({ isSubmitting }) => (
           <Form>

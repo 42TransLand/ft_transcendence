@@ -1,7 +1,0 @@
-42:
-  uid: '4e244310294600c81f08b37834f7f742258e9a2ed98c9af9e9dc68c4e103583b'
-  secret: '4c8b5ed9d29636006d7106d57ac6a97f40b7711fa03cbe3eba1d1bbe49ecbd82'
-  callbackURL: 'http://localhost:3000/auth/42/redirect'
-
-jwt:
-  secret: 'secret'

@@ -5,6 +5,7 @@ import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 type ChangePasswordProps = {
@@ -21,6 +22,7 @@ const ChangePasswordChannelScheme = Yup.object().shape({
 function ChangePasswordChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const onSubmitHandler = React.useCallback(
     (
       { password }: ChangePasswordProps,
@@ -33,21 +35,25 @@ function ChangePasswordChannel() {
         })
         .then(() => {
           actions.resetForm();
+          queryClient.invalidateQueries(['channels']);
           actions.setSubmitting(false);
         })
         .catch((err) => {
-          if (err) {
-            setTimeout(() => {
-              setError({
-                headerMessage: '비밀번호 변경 실패',
-                bodyMessage: '입장 비밀번호를 변경하는데에 실패했습니다.',
-              });
-              actions.setSubmitting(false);
-            }, 1000);
+          if (err.response) {
+            setError({
+              headerMessage: '비밀번호 변경 실패',
+              bodyMessage: err.response.data.message,
+            });
+          } else {
+            setError({
+              headerMessage: '비밀번호 변경 실패',
+              bodyMessage: err.message,
+            });
           }
+          actions.setSubmitting(false);
         });
     },
-    [setError, id],
+    [setError, id, queryClient],
   );
 
   return (

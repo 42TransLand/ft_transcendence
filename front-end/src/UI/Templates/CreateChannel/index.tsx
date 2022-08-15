@@ -4,6 +4,7 @@ import { ChatIcon } from '@chakra-ui/icons';
 import { Grid, GridItem, VStack, Input, Button, Text } from '@chakra-ui/react';
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
@@ -26,6 +27,7 @@ const CreateChannelScheme = Yup.object().shape({
 function CreateChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const onSubmitHandler = React.useCallback(
     (
       { name, password }: CreateChannelProps,
@@ -40,6 +42,7 @@ function CreateChannel() {
         .then((response) => {
           actions.resetForm();
           actions.setSubmitting(false);
+          queryClient.invalidateQueries(['channels']);
           navigate(`/chat/${response.data}`);
         })
         .catch((err) => {
@@ -52,7 +55,7 @@ function CreateChannel() {
           }
         });
     },
-    [setError, navigate],
+    [setError, navigate, queryClient],
   );
 
   return (
