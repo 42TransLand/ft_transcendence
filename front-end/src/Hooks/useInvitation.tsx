@@ -4,6 +4,7 @@ import { useToast, ToastId } from '@chakra-ui/react';
 import GameInvitationContent from '../UI/Molecules/GameInvitationContent';
 import { SocketEventName } from '../Games/dto/constants/game.constants';
 import { useSocket } from './useSocket';
+import GameTicket from '../Games/dto/constants/game.ticket.enum';
 
 export default function useInvitation() {
   const [invitations, setInvitations] = useState<ToastId[]>([]);
@@ -18,7 +19,7 @@ export default function useInvitation() {
         setInvitations([]);
         dispatch({
           action: 'setCustomGame',
-          gameState: { mode: 'join', opponentNickname: userName },
+          gameState: { ticket: GameTicket.JOIN, opponentNickname: userName },
         });
         navigate('/game?mode=custom');
       } else {

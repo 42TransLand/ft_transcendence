@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useWarningDialog from './useWarningDialog';
 import { useSocket } from './useSocket';
 import InviteGameProps from '../Props/InviteGameProps';
+import GameTicket from '../Games/dto/constants/game.ticket.enum';
 
 export default function useInviteGame(inviteeNickname: string) {
   const { setError, WarningDialogComponent } = useWarningDialog();
@@ -13,7 +14,7 @@ export default function useInviteGame(inviteeNickname: string) {
       socket.dispatch({
         action: 'setCustomGame',
         gameState: {
-          mode: 'create',
+          ticket: GameTicket.CREATE,
           gameMode: values.mode,
           scoreForWin: values.scoreForWin,
           opponentNickname: inviteeNickname,

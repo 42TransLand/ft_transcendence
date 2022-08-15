@@ -14,6 +14,7 @@ import {
   SocketEventName,
 } from './dto/constants/game.constants';
 import GameState from './dto/constants/game.state.enum';
+import GameTicket from './dto/constants/game.ticket.enum';
 import BallMoveNotifyDto from './dto/res/ball.move.notify.dto';
 import GameCreateResDto from './dto/res/game.create.res.dto';
 import GameEndNotifyDto from './dto/res/game.end.notify.dto';
@@ -94,13 +95,13 @@ export default class GameContext {
       case 'custom':
         if (!gameState) {
           this.displayHud('INVALID CUSTOM GAME');
-        } else if (gameState.mode === 'create') {
+        } else if (gameState.ticket === GameTicket.CREATE) {
           this.send(SocketEventName.GAME_INVITE_REQ, {
             gameMode: gameState.gameMode,
             opponentNickname: gameState.opponentNickname,
             scoreForWin: gameState.scoreForWin,
           });
-        } else if (gameState.mode === 'join') {
+        } else if (gameState.ticket === GameTicket.JOIN) {
           this.send(SocketEventName.GAME_ACCEPT_REQ, {
             opponentNickname: gameState.opponentNickname,
           });
