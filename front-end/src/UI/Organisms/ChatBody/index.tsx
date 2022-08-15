@@ -12,7 +12,7 @@ export default function ChatBody() {
   const scrollBottom = React.useRef<HTMLDivElement>(null);
   React.useLayoutEffect(() => {
     if (scrollBottom.current) scrollBottom.current.scrollIntoView(true);
-  }, [chat]);
+  }, [chat.chats]);
 
   return (
     <Sidebar header={<ChatHeader />} sidebar={<ChatMembers />}>
