@@ -3,6 +3,7 @@ import { Box, VStack } from '@chakra-ui/react';
 import UserProfileInfo from '../../Organisms/UserProfileInfo';
 import UserGameInfo from '../../Organisms/UserGameInfo';
 import UserMatchHistory from '../../Organisms/UserMatchHistory';
+import RecordProps from '../../../Props/RecordProps';
 
 function ProfileContent(props: {
   nickname: string;
@@ -11,9 +12,17 @@ function ProfileContent(props: {
   userWins: number;
   userLosses: number;
   isMyself: boolean;
+  records: RecordProps[];
 }) {
-  const { nickname, userImage, userRating, userWins, userLosses, isMyself } =
-    props;
+  const {
+    nickname,
+    userImage,
+    userRating,
+    userWins,
+    userLosses,
+    isMyself,
+    records,
+  } = props;
 
   return (
     <Box w="100%" h="500px" paddingY={2}>
@@ -28,7 +37,7 @@ function ProfileContent(props: {
           userWins={userWins}
           userLosses={userLosses}
         />
-        <UserMatchHistory />
+        <UserMatchHistory records={records} />
       </VStack>
     </Box>
   );

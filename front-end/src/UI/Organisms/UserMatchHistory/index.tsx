@@ -2,6 +2,7 @@ import React from 'react';
 import { Box } from '@chakra-ui/react';
 import UserMatch from '../../Molecules/UserMatch';
 import ElementList from '../ElementList';
+import RecordProps from '../../../Props/RecordProps';
 
 const matchHistories = [
   {
@@ -34,11 +35,38 @@ const matchHistories = [
     isRankedGame: true,
     isNormalMode: true,
   },
+  {
+    matchId: 4,
+    opponentUserName: 'test',
+    opponentUserImage:
+      'https://w.namu.la/s/cb44538b575f372318ce9c28cd806dde1e6ac146514283b57b696ad7226ca18971fdae5716367e639a3345594b8cdfbf119bcc971b7a686b17c0873402ad659d555a847603c4aa8462a6f783e206b9381a506042def4729ceb696cf6394d4db8',
+    userScore: 5,
+    opponentScore: 3,
+    isRankedGame: true,
+    isNormalMode: true,
+  },
+  {
+    matchId: 5,
+    opponentUserName: 'test2',
+    opponentUserImage:
+      'https://w.namu.la/s/cb44538b575f372318ce9c28cd806dde1e6ac146514283b57b696ad7226ca18971fdae5716367e639a3345594b8cdfbf119bcc971b7a686b17c0873402ad659d555a847603c4aa8462a6f783e206b9381a506042def4729ceb696cf6394d4db8',
+    userScore: 5,
+    opponentScore: 3,
+    isRankedGame: true,
+    isNormalMode: true,
+  },
 ];
 
-function UserMatchHistory() {
+function UserMatchHistory(props: { records: RecordProps[] }) {
+  const { records } = props;
   return (
-    <Box width="100%" height="100%" borderWidth="1px" borderRadius="md">
+    <Box
+      width="100%"
+      height="100%"
+      borderWidth="1px"
+      borderRadius="md"
+      overflowY="scroll"
+    >
       <ElementList>
         {matchHistories.map((m) => (
           <UserMatch
@@ -49,6 +77,20 @@ function UserMatchHistory() {
             opponentScore={m.opponentScore}
             isRankedGame={m.isRankedGame}
             isNormalMode={m.isNormalMode}
+          />
+        ))}
+        ;
+      </ElementList>
+      <ElementList>
+        {records.map((record) => (
+          <UserMatch
+            key={record.id}
+            opponentUserName={record.rightUserName}
+            opponentUserImage={record.rightUserImage}
+            userScore={record.leftUserScore}
+            opponentScore={record.rightUserScore}
+            isRankedGame={record.isLadder}
+            isNormalMode={record.type === 'CLASSIC'}
           />
         ))}
         ;
