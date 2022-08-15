@@ -12,6 +12,7 @@ import USERS_ME_GET from './Queries/Users/Me';
 import Loading from './UI/Templates/Loading';
 import { LogoutProvider } from './Hooks/useLogout';
 import useMe from './Hooks/useMe';
+import InitialSetup from './UI/Pages/InitialSetup';
 
 function App() {
   React.useEffect(() => {
@@ -57,6 +58,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/game" element={<Game />} />
+                <Route path="/1" element={<InitialSetup />} />
                 <Route path="/*" element={<Main />} />
               </Routes>
             </BrowserRouter>
