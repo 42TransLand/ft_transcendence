@@ -12,11 +12,10 @@ const FullSquare = styled(Square)`
 function ChannelElement(props: {
   roomType: 'PUBLIC' | 'PROTECT';
   channelName: string;
-  /*   currentHeadCount: number;
-  maxHeadCount: number; */
+  currentHeadCount: number;
+  /* maxHeadCount: number; */
 }) {
-  const { roomType, channelName /*  currentHeadCount, maxHeadCount  */ } =
-    props;
+  const { roomType, channelName, currentHeadCount /* maxHeadCount */ } = props;
 
   return (
     <HStack
@@ -37,9 +36,9 @@ function ChannelElement(props: {
           {channelName}
         </Text>
       </HStack>
-      {/*       <Text fontSize="xl" paddingX="0.5em">
-        {currentHeadCount}/{maxHeadCount}
-      </Text> */}
+      <Text fontSize="xl" textAlign="center" paddingX="0.5em">
+        {`${currentHeadCount}명`} {/* /{maxHeadCount} */}
+      </Text>
     </HStack>
   );
 }

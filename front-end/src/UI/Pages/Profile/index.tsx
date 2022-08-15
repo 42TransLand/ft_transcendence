@@ -13,7 +13,11 @@ function Profile() {
   const { data, isLoading, error } = useQuery(
     USERS_PROFILE_GET(name ?? myNickname),
   );
-  const { nickname, profileImg } = data ?? { nickname: '', profileImg: '' };
+  const { nickname, profileImg, records } = data ?? {
+    nickname: '',
+    profileImg: '',
+    records: [],
+  };
   let modalBody;
 
   if (isLoading) {
@@ -24,11 +28,12 @@ function Profile() {
     modalBody = (
       <ProfileContent
         nickname={nickname}
-        userImage={`${process.env.REACT_APP_WEBSOCKET_HOST}/${profileImg}`}
+        userImage={`${process.env.REACT_APP_API_HOST}/${profileImg}`}
         isMyself={myNickname === nickname}
         userRating={rankScore}
         userWins={7500}
         userLosses={2500}
+        records={records}
       />
     );
   }
