@@ -43,10 +43,15 @@ function ModifiableUserName(props: { userName: string; isMyself: boolean }) {
           navigate(`/user/${nickname}`, { replace: true });
         })
         .catch((err) => {
-          if (err.response.status === 409) {
+          if (err.response) {
             setError({
               headerMessage: '닉네임 변경 실패',
-              bodyMessage: '중복된 닉네임입니다.',
+              bodyMessage: err.response.data.message,
+            });
+          } else {
+            setError({
+              headerMessage: '닉네임 변경 실패',
+              bodyMessage: err.message,
             });
           }
           helper.setSubmitting(false);

@@ -11,6 +11,7 @@ import { MdAddPhotoAlternate } from 'react-icons/md';
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
 import ModifiableUserName from '../../Molecules/ModifiableUserName';
+import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 function UserProfileInfo(props: {
   userName: string;
@@ -18,6 +19,7 @@ function UserProfileInfo(props: {
   isMyself: boolean;
 }) {
   const { userName, userImage, isMyself } = props;
+  const { setError, WarningDialogComponent } = useWarningDialog();
   const queryClient = useQueryClient();
 
   const onChangeHandler = (event: { target: HTMLInputElement }): void => {
@@ -25,10 +27,25 @@ function UserProfileInfo(props: {
     const formData = new FormData();
     if (target.files?.length) {
       formData.append('file', target.files[0]);
-      axios.patch('/users/me', formData).then(() => {
-        queryClient.invalidateQueries(['profile', userName]);
-        queryClient.invalidateQueries(['me']);
-      });
+      axios
+        .patch('/users/me', formData)
+        .then(() => {
+          queryClient.invalidateQueries(['profile', userName]);
+          queryClient.invalidateQueries(['me']);
+        })
+        .catch((err) => {
+          if (err.response) {
+            setError({
+              headerMessage: '이미지 변경 실패',
+              bodyMessage: err.response.data.message,
+            });
+          } else {
+            setError({
+              headerMessage: '이미지 변경 실패',
+              bodyMessage: err.message,
+            });
+          }
+        });
     }
   };
 
@@ -63,6 +80,7 @@ function UserProfileInfo(props: {
           </AvatarBadge>
         )}
       </Avatar>
+      {WarningDialogComponent}
       <ModifiableUserName userName={userName} isMyself={isMyself} />
     </HStack>
   );
