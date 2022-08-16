@@ -67,7 +67,8 @@ function ChatReducer(state: ChatStateType, action: ChatActionType) {
       return { ...state, events: [...state.events, action.event] };
     }
     case 'clearEvents': {
-      return { ...state, events: [] };
+      if (state.events.length > 0) return { ...state, events: [] };
+      return state;
     }
     default:
       return state;
