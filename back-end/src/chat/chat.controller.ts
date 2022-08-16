@@ -123,6 +123,19 @@ export class ChatController {
     return this.chatService.leaveChatRoom(id, user);
   }
 
+  @ApiOperation({ summary: '채팅방 강퇴' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 401, description: '권한이 없는 경우' })
+  @ApiResponse({ status: 404, description: '채팅방, 유저 없는 경우' })
+  @Delete('/kick/:id/:nickname')
+  kickChatUser(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.chatService.kickChatUser(id, user, nickname);
+  }
+
   @ApiOperation({ summary: '채팅 보내기' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 400, description: '음소거된 유저인 경우' })
@@ -138,7 +151,7 @@ export class ChatController {
 
   @ApiOperation({ summary: '해당 유저 음소거' })
   @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 400, description: '권힌이 없는 경우' })
+  @ApiResponse({ status: 401, description: '권한이 없는 경우' })
   @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Patch('/mute/:id/:nickname')
@@ -152,7 +165,7 @@ export class ChatController {
 
   @ApiOperation({ summary: '해당 유저 음소거 해제' })
   @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 400, description: '권힌이 없는 경우' })
+  @ApiResponse({ status: 400, description: '권한이 없는 경우' })
   @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Patch('/unmute/:id/:nickname/')
