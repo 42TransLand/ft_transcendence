@@ -25,7 +25,7 @@ function NotificationElement({
       <GridItem rowSpan={3} colSpan={1} margin="auto">
         <Avatar
           name={requestor.nickname}
-          src={`${process.env.REACT_APP_WEBSOCKET_HOST}/${requestor.profileImg}`}
+          src={`${process.env.REACT_APP_API_HOST}/${requestor.profileImg}`}
           size="md"
         />
       </GridItem>
