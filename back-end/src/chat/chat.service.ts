@@ -71,11 +71,11 @@ export class ChatService {
         createdAt: findRoom.createdAt,
         updateAt: findRoom.updatedAt,
         count: findRoom.count,
-    };
-  return room;
-  });
-  return rooms;
-}
+      };
+      return room;
+    });
+    return rooms;
+  }
 
   async findChatRoomById(id: string): Promise<ChatRoom> {
     const chatRoom = await this.chatRoomRepository.findChatRoomById(id);
@@ -149,6 +149,23 @@ export class ChatService {
     }
     this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
     return `${user.nickname}님이 채팅방에서 나가셨습니다.`;
+  }
+
+  async kickChatUser(id: string, user: User, nickname: string): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    const findChatUser = await this.chatUserRepository.findChatUser(
+      user,
+      chatRoom,
+    );
+    if (!findChatUser) {
+      throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
+    }
+    if (findChatUser.role !== ChatRole.OWNER) {
+      throw new UnauthorizedException(`권한이 없습니다.`);
+    }
+    const kickUser = await this.userService.findByNickname(nickname);
+    await this.chatUserRepository.leaveChatRoom(kickUser, chatRoom);
+    await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
   }
 
   async sendChat(id: string, user: User, content: string): Promise<void> {
