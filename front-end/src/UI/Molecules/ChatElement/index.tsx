@@ -6,8 +6,6 @@ import { useChat } from '../../../Hooks/useChat';
 import useMe from '../../../Hooks/useMe';
 import ChatMemberRole from '../../../Props/ChatMemberRole';
 import ChatAvatarBadge from '../../Atoms/ChatAvatar';
-// import ChatAvatarBadge from '../../Atoms/ChatAvatar';
-// import ChatMemberRole from '../../../Props/ChatMemberRole';
 
 export default function ChatElement({ message, name }: ChatElementProps) {
   const [chat] = useChat();
