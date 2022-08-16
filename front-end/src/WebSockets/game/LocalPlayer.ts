@@ -1,13 +1,13 @@
 import * as PIXI from 'pixi.js';
 import { Socket } from 'socket.io-client';
+import InputManager from './InputManager';
+import AbstractPlayer from './AbstractPlayer';
 import {
   PLAYER_RACKET_MOVE_SPEED,
   PLAYER_RACKET_HEIGHT,
   GAME_SCREEN_HEIGHT,
-  SocketEventName,
-} from './dto/constants/game.constants';
-import InputManager from './InputManager';
-import AbstractPlayer from './AbstractPlayer';
+} from '../dto/constants/game.constants';
+import SocketEventName from '../dto/constants/socket.events.enum';
 
 export default class LocalPlayer extends AbstractPlayer {
   public constructor(

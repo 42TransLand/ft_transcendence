@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast, ToastId } from '@chakra-ui/react';
 import GameInvitationContent from '../UI/Molecules/GameInvitationContent';
-import { SocketEventName } from '../Games/dto/constants/game.constants';
 import { useSocket } from './useSocket';
-import GameTicket from '../Games/dto/constants/game.ticket.enum';
+import GameTicket from '../WebSockets/dto/constants/game.ticket.enum';
+import SocketEventName from '../WebSockets/dto/constants/socket.events.enum';
 
 export default function useInvitation() {
   const [invitations, setInvitations] = useState<ToastId[]>([]);
