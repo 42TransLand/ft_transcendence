@@ -19,6 +19,7 @@ import { HiPencilAlt } from 'react-icons/hi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoMdSave } from 'react-icons/io';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import USERS_ME_GET from '../../../Queries/Users/Me';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
@@ -39,6 +40,7 @@ export default function InitialSetup() {
   const [inputName, setInputName] = useState(nickname);
   const queryClient = useQueryClient();
   const { setError, WarningDialogComponent } = useWarningDialog();
+  const navigate = useNavigate();
 
   const onSubmitHandler = React.useCallback(
     (
@@ -46,17 +48,18 @@ export default function InitialSetup() {
       helper: FormikHelpers<ChangeNameProps>,
     ) => {
       axios
-        .patch('/users/me', { submitName })
+        .patch('/users/me', { nickname: submitName })
         .then(() => {
           setInputName(submitName);
           queryClient.invalidateQueries(['me']);
           helper.setSubmitting(false);
+          navigate('/', { replace: true });
         })
         .catch(() => {
           helper.setSubmitting(false);
         });
     },
-    [queryClient],
+    [queryClient, navigate],
   );
 
   const imageFormRef = React.useRef<HTMLInputElement>(null);

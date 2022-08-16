@@ -58,7 +58,7 @@ function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/game" element={<Game />} />
-                <Route path="/1" element={<InitialSetup />} />
+                <Route path="/first-login" element={<InitialSetup />} />
                 <Route path="/*" element={<Main />} />
               </Routes>
             </BrowserRouter>
