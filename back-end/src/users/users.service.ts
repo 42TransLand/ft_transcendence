@@ -1,14 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { UserRepository } from './users.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Auth42userDto } from 'src/auth/dto/auth.42user.dto';
+import { GameService } from 'src/game/game.service';
+import { GameRepository } from 'src/game/game.repository';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserRepository)
     private userRepository: UserRepository,
+    @Inject(forwardRef(() => GameService))
+    private gameService: GameService,
   ) {}
 
   async createUser(user: Auth42userDto): Promise<void> {
@@ -20,6 +24,7 @@ export class UsersService {
   }
 
   async findByUser(user: User): Promise<User> {
+    this.gameService.getGamesByUserId(user);
     return this.userRepository.findByUser(user);
   }
 

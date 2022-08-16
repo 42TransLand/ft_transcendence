@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { GameRepository } from './game.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameCreateDto } from './dto/game.create.dto';
@@ -14,6 +14,7 @@ export class GameService {
   constructor(
     @InjectRepository(GameRepository)
     private gameRepository: GameRepository,
+    @Inject(forwardRef(() => UsersService))
     private userService: UsersService,
   ) {}
 
@@ -36,12 +37,12 @@ export class GameService {
   }
 
   // 프로필에서 유저의 게임 전적 가져오기
-  async getGamesByUserId(user: UserDto): Promise<GameRecord[]> {
+  async getGamesByUserId(user: User): Promise<GameRecord[]> {
     const query = this.gameRepository.createQueryBuilder('game');
 
     query
-      .where('game.leftUserId = :userId', { userId: user.id })
-      .orWhere('game.rightUserId = :userId', { userId: user.id });
+      .where('game.windUserId = :userId', { userId: user.id })
+      .orWhere('game.loseUserId = :userId', { userId: user.id });
 
     const boards = await query.getMany();
     return boards;

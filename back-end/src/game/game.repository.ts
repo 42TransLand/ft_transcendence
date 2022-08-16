@@ -51,4 +51,15 @@ export class GameRepository extends Repository<GameRecord> {
       throw new InternalServerErrorException();
     }
   }
+
+  async getGamesByUserId(user: User): Promise<GameRecord[]> {
+    const query = this.createQueryBuilder('game');
+
+    query
+      .where('game.windUserId = :userId', { userId: user.id })
+      .orWhere('game.loseUserId = :userId', { userId: user.id });
+
+    const boards = await query.getMany();
+    return boards;
+  }
 }
