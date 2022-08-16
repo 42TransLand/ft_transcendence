@@ -1,11 +1,14 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ChatProvider, useChat } from '../../../Hooks/useChat';
+import useMe from '../../../Hooks/useMe';
+import ChatMemberRole from '../../../Props/ChatMemberRole';
 import ChatModal from '../../Templates/ChatModal';
 
 function ChatExampleChannel() {
   const { id } = useParams();
   const [, dispatch] = useChat();
+  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
 
   React.useEffect(() => {
     // eslint-disable-next-line no-console
@@ -22,10 +25,21 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: myId,
+        name: myName,
+        profileImg: myProfileImg,
+        role: ChatMemberRole.OWNER,
+        muted: false,
+        blocked: false,
+      },
+    });
+    dispatch({
+      action: 'insertMember',
+      chatMember: {
         userId: 1,
         name: '엄준식은살아있다',
         profileImg: '/profileimgs/umjunsik.jpeg',
-        role: 'member',
+        role: ChatMemberRole.ADMIN,
         muted: false,
         blocked: false,
       },
@@ -36,7 +50,7 @@ function ChatExampleChannel() {
         userId: 2,
         name: 'YuriMyWife',
         profileImg: '/profileimgs/yuri.jpeg',
-        role: 'member',
+        role: ChatMemberRole.MEMBER,
         muted: false,
         blocked: false,
       },
@@ -47,7 +61,7 @@ function ChatExampleChannel() {
         userId: 3,
         name: '박수고양이',
         profileImg: '/profileimgs/catclap.gif',
-        role: 'member',
+        role: ChatMemberRole.MEMBER,
         muted: false,
         blocked: false,
       },
@@ -58,7 +72,7 @@ function ChatExampleChannel() {
         userId: 4,
         name: '새침소녀',
         profileImg: '/profileimgs/deregirl.jpeg',
-        role: 'member',
+        role: ChatMemberRole.MEMBER,
         muted: false,
         blocked: true,
       },
@@ -69,7 +83,7 @@ function ChatExampleChannel() {
         userId: 5,
         name: '아그래요',
         profileImg: '/profileimgs/orly.jpeg',
-        role: 'member',
+        role: ChatMemberRole.MEMBER,
         muted: true,
         blocked: false,
       },
@@ -81,7 +95,7 @@ function ChatExampleChannel() {
           userId: 6 + i,
           name: `아그래요${i}`,
           profileImg: '/profileimgs/orly.jpeg',
-          role: 'member',
+          role: ChatMemberRole.MEMBER,
           muted: true,
           blocked: false,
         },
@@ -185,7 +199,7 @@ function ChatExampleChannel() {
       // eslint-disable-next-line no-console
       console.log(`채팅방-${id}에서 퇴장합니다.`);
     };
-  }, [dispatch, id]);
+  }, [dispatch, id, myId, myName, myProfileImg]);
 
   return <div />;
 }
@@ -193,6 +207,7 @@ function ChatExampleChannel() {
 function ChatExampleDM() {
   const { userName } = useParams();
   const [, dispatch] = useChat();
+  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
 
   React.useEffect(() => {
     // eslint-disable-next-line no-console
@@ -209,10 +224,21 @@ function ChatExampleDM() {
     dispatch({
       action: 'insertMember',
       chatMember: {
+        userId: myId,
+        name: myName,
+        profileImg: myProfileImg,
+        role: ChatMemberRole.MEMBER,
+        muted: false,
+        blocked: false,
+      },
+    });
+    dispatch({
+      action: 'insertMember',
+      chatMember: {
         userId: 1,
         name: '엄준식은살아있다',
         profileImg: '/profileimgs/umjunsik.jpeg',
-        role: 'member',
+        role: ChatMemberRole.MEMBER,
         muted: false,
         blocked: false,
       },
@@ -223,7 +249,7 @@ function ChatExampleDM() {
         userId: 2,
         name: 'YuriMyWife',
         profileImg: '/profileimgs/yuri.jpeg',
-        role: 'member',
+        role: ChatMemberRole.MEMBER,
         muted: false,
         blocked: false,
       },
@@ -263,7 +289,7 @@ function ChatExampleDM() {
       // eslint-disable-next-line no-console
       console.log(`채팅방-${userName}에서 퇴장합니다.`);
     };
-  }, [dispatch, userName]);
+  }, [dispatch, userName, myId, myName, myProfileImg]);
 
   return <div />;
 }
