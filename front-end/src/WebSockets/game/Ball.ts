@@ -3,8 +3,8 @@ import {
   GAME_SCREEN_WIDTH,
   GAME_SCREEN_HEIGHT,
   BALL_RADIUS,
-} from './dto/constants/game.constants';
-import BallMoveNotifyDto from './dto/res/ball.move.notify.dto';
+} from '../dto/constants/game.constants';
+import BallMoveNotifyDto from '../dto/res/ball.move.notify.dto';
 import GameObject from './GameObject';
 
 export default class Ball extends GameObject {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Socket } from 'socket.io-client';
-import GameContext from '../Games/GameContext';
+import GameContext from '../WebSockets/game/GameContext';
 import { GameStateType } from './useSocket';
 
 export default function useGame(

@@ -13,7 +13,7 @@ import { GrGamepad } from 'react-icons/gr';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import useInviteGame from '../../../Hooks/useInviteGame';
-import GameMode from '../../../Games/dto/constants/game.mode.enum';
+import GameMode from '../../../WebSockets/dto/constants/game.mode.enum';
 
 const InviteGameScheme = Yup.object().shape({
   mode: Yup.mixed<GameMode>().required('올바른 게임모드를 선택해주세요.'),

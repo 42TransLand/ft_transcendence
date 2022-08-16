@@ -1,8 +1,8 @@
 import React from 'react';
 import { io, Socket } from 'socket.io-client';
 import WarningDialogProps from '../Props/WarningDialogProps';
-import GameMode from '../Games/dto/constants/game.mode.enum';
-import GameTicket from '../Games/dto/constants/game.ticket.enum';
+import GameMode from '../WebSockets/dto/constants/game.mode.enum';
+import GameTicket from '../WebSockets/dto/constants/game.ticket.enum';
 
 enum SocketState {
   CONNECTING,
