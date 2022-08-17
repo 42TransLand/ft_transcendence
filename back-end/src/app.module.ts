@@ -14,6 +14,7 @@ import { ChatModule } from './chat/chat.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { DmModule } from './dm/dm.module';
 import { AuthModule } from './auth/auth.module';
+import { TypeOrmExModule } from './custom/typeorm.module';
 
 @Module({
   imports: [

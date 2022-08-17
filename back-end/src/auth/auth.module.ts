@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmExModule } from 'src/custom/typeorm.module';
+import { GameRepository } from 'src/game/game.repository';
+import { GameService } from 'src/game/game.service';
 import { UserRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { Strategy42 } from './42auth.strategy';
@@ -19,11 +21,12 @@ import { AuthService } from './auth.service';
       useFactory: AuthJwtFactory,
     }),
     HttpModule,
+    TypeOrmExModule.forCustomRepository([GameRepository]),
     TypeOrmExModule.forCustomRepository([UserRepository]),
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, Strategy42, UsersService],
+  providers: [AuthService, Strategy42, GameService, UsersService],
   exports: [PassportModule, Strategy42],
 })
 export class AuthModule {}

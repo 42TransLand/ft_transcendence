@@ -16,6 +16,7 @@ import { User } from './entities/user.entity';
 import { GetUser } from './get.user.decorator';
 import { UsersService } from './users.service';
 import { loaclOptions } from './constants/multer.options';
+import { UserProfileDto } from './dto/user.profile.dto';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard('jwt'))
@@ -34,8 +35,8 @@ export class UsersController {
   @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
   @Get('/me')
-  getMe(@GetUser() user: User): Promise<User> {
-    return this.usersService.findByUser(user);
+  getMe(@GetUser() user: User): Promise<UserProfileDto> {
+    return this.usersService.infoUser(user);
   }
 
   @ApiOperation({ summary: '유저 프로필 조회' })
@@ -43,14 +44,23 @@ export class UsersController {
   @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
   @Get('/profile/:nickname')
-  getProfile(@Param('nickname') nickname: string): Promise<User> {
-    return this.usersService.findByNickname(nickname);
+  getProfile(
+    @GetUser() user: User,
+    @Param('nickname') nickname: string,
+  ): Promise<UserProfileDto> {
+    return this.usersService.infoUser(user, nickname);
+  }
+
+  @ApiOperation({ summary: '유저 검색 에러 처리용' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @Get('/search/')
+  searchUsersError(): [] {
+    return [];
   }
 
   @ApiOperation({ summary: '유저 검색' })
   @ApiResponse({ status: 200, description: '유저 검색 성공' })
   @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
-  @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
   @Get('/search/:nickname')
   searchUsers(@Param('nickname') nickname: string): Promise<User[]> {
     return this.usersService.searchUsers(nickname);
