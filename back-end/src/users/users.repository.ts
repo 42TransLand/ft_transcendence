@@ -8,6 +8,9 @@ import { Like, Repository } from 'typeorm';
 import { CustomRepository } from '../custom/typeorm.decorator';
 import { User, DEFAULT_PROFILE_IMG } from './entities/user.entity';
 import * as fs from 'fs';
+import { GameRecord } from 'src/game/entities/game.entity';
+import { UserProfileDto } from './dto/user.profile.dto';
+import { UserRecordDto } from './dto/user.record.dto';
 
 @CustomRepository(User)
 export class UserRepository extends Repository<User> {
@@ -28,6 +31,14 @@ export class UserRepository extends Repository<User> {
     }
   }
 
+  async findByUser(user: User): Promise<User> {
+    const userProfile: User = await this.findOneBy({ id: user.id });
+    if (userProfile === null) {
+      throw new NotFoundException(`User not found`);
+    }
+    return userProfile;
+  }
+
   async findByNickname(nickname: string): Promise<User> {
     const user: User = await this.findOneBy({ nickname });
     if (user === null) {
@@ -42,25 +53,6 @@ export class UserRepository extends Repository<User> {
       return false;
     }
     return true;
-  }
-
-  async findByUser(user: User): Promise<User> {
-    // const findUser: User = await this.findOneBy({ id: user.id });
-
-    const findUser: User = await this.findOne({
-      where: { id: user.id },
-      relations: ['records.winUser', 'records.loseUser'],
-    });
-    if (findUser === null) {
-      throw new NotFoundException(`User not found`);
-    }
-    // console.log(findUser);
-    // findUser.records.forEach((record) => {
-    //   console.log(
-    //     `winUser: ${record.winUser.id} loseUser: ${record.loseUser.id}`,
-    //   );
-    // });
-    return findUser;
   }
 
   async findById(id: string): Promise<User> {
@@ -116,5 +108,45 @@ export class UserRepository extends Repository<User> {
       }
     }
     return user;
+  }
+
+  async infoUser(
+    user: User,
+    gameRecord: GameRecord[],
+  ): Promise<UserProfileDto> {
+    let winCount = 0;
+    let loseCount = 0;
+    const arrRecord: UserRecordDto[] = [];
+    gameRecord.forEach((param) => {
+      if (param.winUser.id === user.id && param.isLadder) winCount += 1;
+      else if (param.loseUser.id === user.id && param.isLadder) loseCount += 1;
+      const record: UserRecordDto = {
+        id: param.id,
+        winUserId: param.winUser.id,
+        winUserNickname: param.winUser.nickname,
+        winUserProfileImg: param.winUser.profileImg,
+        winUserScore: param.winUserScore,
+        loseUserId: param.loseUser.id,
+        loseUserNickname: param.loseUser.nickname,
+        loseUserProfileImg: param.loseUser.profileImg,
+        loseUserScore: param.loseUserScore,
+        isLadder: param.isLadder,
+        type: param.type,
+      };
+      arrRecord.push(record);
+    });
+    const result: UserProfileDto = {
+      id: user.id,
+      nickname: user.nickname,
+      email: user.email,
+      rankScore: user.rankScore,
+      profileImg: user.profileImg,
+      winCount,
+      loseCount,
+      totalCount: winCount + loseCount,
+      gameRecord: arrRecord,
+    };
+
+    return result;
   }
 }

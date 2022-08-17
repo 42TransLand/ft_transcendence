@@ -1,22 +1,21 @@
 import React from 'react';
 import { Text, HStack, Spacer, Avatar, AvatarBadge } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { FriendOnlineState } from '../../../Hooks/useSocket';
+import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 
 function FriendElement(props: {
   userName: string;
   userProfileImage: string;
-  connectionStatus: FriendOnlineState;
+  connectionStatus: UserState;
   isBlocked: boolean;
 }) {
   const { userName, userProfileImage, connectionStatus, isBlocked } = props;
   const StatusColors = {
     ONLINE: 'green.500',
     OFFLINE: 'red.500',
-    PLAYING: 'yellow.500',
-    SPECTATING: 'pink.500',
+    INGAME: 'yellow.500',
+    OBSERVE: 'pink.500',
   };
-  const statusColor = StatusColors[connectionStatus] ?? 'blackAlpha.900';
 
   return (
     <HStack
@@ -35,7 +34,7 @@ function FriendElement(props: {
         src={userProfileImage}
         size="lg"
       >
-        <AvatarBadge boxSize="1em" bgColor={statusColor} />
+        <AvatarBadge boxSize="1em" bgColor={StatusColors[connectionStatus]} />
       </Avatar>
       <Spacer />
       <Text opacity={isBlocked ? '35%' : '100%'}>{userName}</Text>

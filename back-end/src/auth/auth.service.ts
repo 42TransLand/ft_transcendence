@@ -18,14 +18,12 @@ export class AuthService {
       },
     })
       .then((res) => {
-        console.log('good');
         user = {
           id: res.data.id,
           username: res.data.login,
           email: res.data.email,
           avatar: res.data.image_url,
         };
-        console.log(user);
         return user;
       })
       .catch((err) => {

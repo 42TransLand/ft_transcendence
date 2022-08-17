@@ -10,16 +10,25 @@ import { SocketModule } from 'src/socket/socket.module';
 import { FriendService } from 'src/friend/friend.service';
 import { AlertService } from 'src/alert/alert.service';
 import { AlertRepository } from 'src/alert/alert.Repository';
+import { GameRepository } from 'src/game/game.repository';
+import { GameService } from 'src/game/game.service';
 
 @Module({
   imports: [
     TypeOrmExModule.forCustomRepository([DMRepository]),
     TypeOrmExModule.forCustomRepository([UserRepository]),
+    TypeOrmExModule.forCustomRepository([GameRepository]),
     TypeOrmExModule.forCustomRepository([FriendRepository]),
     TypeOrmExModule.forCustomRepository([AlertRepository]),
     SocketModule,
   ],
   controllers: [DmController],
-  providers: [DmService, UsersService, FriendService, AlertService],
+  providers: [
+    DmService,
+    UsersService,
+    GameService,
+    FriendService,
+    AlertService,
+  ],
 })
 export class DmModule {}
