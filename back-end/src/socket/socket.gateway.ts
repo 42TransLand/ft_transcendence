@@ -93,14 +93,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // 채팅방
-  // @SubscribeMessage(SocketEventName.CHAT_JOIN_NOTIFY)
   @SubscribeMessage('joinChatRoom')
-  handleChatJoinNotify(roomid: string, userId: string): void {
+  handleJoinChatRoom(roomid: string, userId: string): void {
     try {
       const usersSocket = this.usersSocket.get(userId);
       const userContext = this.userContexts.get(usersSocket);
       userContext.chatRoom = roomid;
-      console.log(1);
       if (userContext) {
         this.socketService.handleJoinChatRoom(userContext);
       }
@@ -108,33 +106,33 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // ignore
     }
   }
-  // handleChatJoinNotify(roomid: string, userId: string): void {
-  //   try {
-  //     const usersSocket = this.usersSocket.get(userId);
-  //     const userContext = this.userContexts.get(usersSocket);
-  //     userContext.chatRoom = roomid;
-  //     console.log(1);
-  //     if (userContext) {
-  //       this.socketService.handleJoinChatRoom(userContext);
-  //     }
-  //   } catch (error) {
-  //     // ignore
-  //   }
-  // }
 
-  // @SubscribeMessage(SocketEventName.CHAT_LEAVE_NOTIFY)
   @SubscribeMessage('leaveChatRoom')
-  handleChatLeaveNotify(roomid: string, userId: string): void {
+  handleLeaveChatRoom(roomid: string, userId: string): void {
     try {
       const usersSocket = this.usersSocket.get(userId);
       const userContext = this.userContexts.get(usersSocket);
-      userContext.chatRoom = roomid;
       if (userContext) {
         this.socketService.handleLeaveChatRoom(userContext);
       }
     } catch (error) {
       // ignore
     }
+  }
+
+  @SubscribeMessage('sendMessage')
+  handleChatMessage(nickname: string, chatRoomId: string, content: string) {
+    this.socketService.handleChatMessage(
+      this.server,
+      nickname,
+      chatRoomId,
+      content,
+    );
+  }
+
+  @SubscribeMessage('updateChatType')
+  handleUpdateChatType(chatRoomId: string, isChange: boolean) {
+    this.socketService.handleUpdateChatType(this.server, chatRoomId, isChange);
   }
 
   // 게임

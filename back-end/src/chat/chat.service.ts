@@ -37,7 +37,7 @@ export class ChatService {
   ): Promise<void> {
     const room = await this.chatRoomRepository.createChatRoom(chatRoomDto);
     this.chatUserRepository.createRoomOwner(user, room);
-    this.socketGateway.handleChatJoinNotify(room.id, user.id);
+    this.socketGateway.handleJoinChatRoom(room.id, user.id);
   }
 
   async updatePassword(
@@ -54,6 +54,9 @@ export class ChatService {
     if (chatUser.role !== ChatRole.OWNER) {
       throw new BadRequestException(`권한이 없습니다.`);
     }
+    if (type !== chatRoom.type)
+      this.socketGateway.handleUpdateChatType(chatRoom.id, true);
+    else this.socketGateway.handleUpdateChatType(chatRoom.id, false);
     await this.chatRoomRepository.updatePassword(chatRoom, password, type);
   }
 
@@ -117,11 +120,11 @@ export class ChatService {
     if (chatRoom.type === ChatType.PROTECT && password !== undefined) {
       this.chatUserRepository.joinChatRoom(user, chatRoom, password);
       this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
-      this.socketGateway.handleChatJoinNotify(chatRoom.id, user.id);
+      this.socketGateway.handleJoinChatRoom(chatRoom.id, user.id);
     }
     this.chatUserRepository.joinChatRoom(user, chatRoom);
     this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
-    this.socketGateway.handleChatJoinNotify(chatRoom.id, user.id);
+    this.socketGateway.handleJoinChatRoom(chatRoom.id, user.id);
   }
 
   async leaveChatRoom(id: string, user: User): Promise<string> {
@@ -134,6 +137,7 @@ export class ChatService {
       throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
     }
     await this.chatUserRepository.leaveChatRoom(user, chatRoom);
+    this.socketGateway.handleLeaveChatRoom(chatRoom.id, user.id);
     const chatUsers = await this.chatUserRepository.findChatRoomById(chatRoom);
     if (chatUsers.length === 0) {
       // 채팅방에 유저가 없으면 삭제
@@ -165,7 +169,7 @@ export class ChatService {
     const kickUser = await this.userService.findByNickname(nickname);
     await this.chatUserRepository.leaveChatRoom(kickUser, chatRoom);
     await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
-    this.socketGateway.handleChatLeaveNotify(chatRoom.id, kickUser.id);
+    this.socketGateway.handleLeaveChatRoom(chatRoom.id, kickUser.id);
   }
 
   async sendChat(id: string, user: User, content: string): Promise<void> {
@@ -185,14 +189,7 @@ export class ChatService {
         ]);
       }
     }
-
-    this.socketGateway.server.to(id).emit(
-      'chat',
-      JSON.stringify({
-        nickname: user.nickname,
-        content,
-      }),
-    );
+    this.socketGateway.handleChatMessage(user.nickname, chatRoom.id, content);
   }
 
   async updateChatMute(
