@@ -22,7 +22,6 @@ export default function ChatMembers() {
             target={member.userId}
             targetName={member.name}
             mode={chat.chatInfo.roomType === 'private' ? 'friend' : 'chat'}
-            eventType="contextmenu"
           >
             <ChatMemberElement
               userId={member.userId}
