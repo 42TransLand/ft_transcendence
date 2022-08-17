@@ -8,4 +8,5 @@ export default interface RecordProps {
   winUserScore: number;
   isLadder: boolean;
   type: string;
+  updatedAt: string;
 }

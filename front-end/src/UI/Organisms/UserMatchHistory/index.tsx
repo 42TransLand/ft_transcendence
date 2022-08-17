@@ -6,6 +6,8 @@ import RecordProps from '../../../Props/RecordProps';
 
 function UserMatchHistory(props: { records: RecordProps[]; userName: string }) {
   const { records, userName } = props;
+  records.sort((a, b) => a.updatedAt.localeCompare(b.updatedAt));
+  records.reverse();
 
   return (
     <Box
