@@ -8,11 +8,20 @@ import ProfileContent from '../../Templates/ProfileContent';
 import useMe from '../../../Hooks/useMe';
 
 function Profile() {
-  const { name } = useParams();
+  const { id: chatid, userName, name } = useParams();
   const { nickname: myNickname, rankScore } = useMe();
   const { data, isLoading, error } = useQuery(
     USERS_PROFILE_GET(name ?? myNickname),
   );
+  const baseUrl = React.useMemo(() => {
+    if (chatid) {
+      return `/chat/${chatid}`;
+    }
+    if (userName) {
+      return `/dm/${userName}`;
+    }
+    return '/';
+  }, [chatid, userName]);
 
   const { nickname, profileImg, gameRecord, winCount, loseCount } = data ?? {
     nickname: '',
@@ -41,7 +50,7 @@ function Profile() {
     );
   }
   return (
-    <RoutedModal>
+    <RoutedModal baseUrl={baseUrl}>
       <ModalCloseButton />
       <ModalBody>{modalBody}</ModalBody>
     </RoutedModal>
