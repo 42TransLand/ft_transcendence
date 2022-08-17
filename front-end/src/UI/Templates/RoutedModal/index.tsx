@@ -17,6 +17,7 @@ export default function RoutedModal({
   return (
     <Modal
       closeOnOverlayClick={closeOnOverlayClick}
+      blockScrollOnMount={false}
       isCentered
       isOpen={isOpen}
       onClose={() => onClose(false)}
