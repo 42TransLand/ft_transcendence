@@ -13,10 +13,14 @@ function Profile() {
   const { data, isLoading, error } = useQuery(
     USERS_PROFILE_GET(name ?? myNickname),
   );
-  const { nickname, profileImg, gameRecord } = data ?? {
+
+  console.log('data = ', data);
+  const { nickname, profileImg, gameRecord, winCount, loseCount } = data ?? {
     nickname: '',
     profileImg: '',
     gameRecord: [],
+    winCount: 0,
+    loseCount: 0,
   };
   let modalBody;
 
@@ -31,8 +35,8 @@ function Profile() {
         userImage={`${process.env.REACT_APP_API_HOST}/${profileImg}`}
         isMyself={myNickname === nickname}
         userRating={rankScore}
-        userWins={7500}
-        userLosses={2500}
+        userWins={winCount}
+        userLosses={loseCount}
         records={gameRecord}
       />
     );
