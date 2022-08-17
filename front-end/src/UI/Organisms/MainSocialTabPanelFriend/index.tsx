@@ -10,6 +10,9 @@ import ElementList from '../ElementList';
 import PopoverButton from '../PopoverButton';
 import FRIEND_GET from '../../../Queries/Friends/All';
 import { useSocket } from '../../../Hooks/useSocket';
+import StateUpdateUserNotify from '../../../WebSockets/dto/res/state.update.user.notify.dto';
+import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
+import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 
 function FriendTab() {
   const [pattern, setPattern] = React.useState('');
@@ -20,7 +23,22 @@ function FriendTab() {
     }
     return data;
   }, [data, isLoading, error]);
-  const socket = useSocket();
+  const { state, dispatch } = useSocket();
+  React.useEffect(() => {
+    state.socket?.on(
+      SocketEventName.STATE_UPDATE_USER_NOTIFY,
+      (dto: StateUpdateUserNotify) => {
+        dispatch({
+          action: 'updateUserState',
+          friendId: dto.id,
+          state: dto.state,
+        });
+      },
+    );
+    return () => {
+      state.socket?.off(SocketEventName.STATE_UPDATE_USER_NOTIFY);
+    };
+  }, [state.socket, dispatch]);
 
   return (
     <VStack>
@@ -45,7 +63,7 @@ function FriendTab() {
               <FriendElement
                 userName={f.nickname}
                 userProfileImage={`${process.env.REACT_APP_API_HOST}/${f.profileImg}`}
-                connectionStatus={socket.state.friendState[f.id]}
+                connectionStatus={state.friendState[f.id] ?? UserState.OFFLINE}
               />
             </UserContextMenu>
           ))}
