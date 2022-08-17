@@ -120,8 +120,8 @@ export default function UserContextMenu({
                   <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
                 </Link>
               </UserContextMenuItem>
-              <UserContextMenuItem flag={UserContextMenuFlag.PROFILE}>
-                <Link to="/otp/bylee">
+              <UserContextMenuItem flag={UserContextMenuFlag.OTP_SETTING}>
+                <Link to={`/otp/${targetName}`}>
                   <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
                 </Link>
               </UserContextMenuItem>
@@ -143,14 +143,12 @@ export default function UserContextMenu({
                   targetName={targetName}
                 />
               </UserContextMenuItem>
-              <MenuDivider />
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_INVITE}>
                 <InviteGameMenu />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_SPECTATE}>
                 <SpectateMenu />
               </UserContextMenuItem>
-              <MenuDivider />
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_BAN}>
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />
               </UserContextMenuItem>
@@ -170,7 +168,6 @@ export default function UserContextMenu({
                   cast={false}
                 />
               </UserContextMenuItem>
-              <MenuDivider />
               <UserContextMenuItem flag={UserContextMenuFlag.LOGOUT}>
                 <LogoutMenu />
               </UserContextMenuItem>
