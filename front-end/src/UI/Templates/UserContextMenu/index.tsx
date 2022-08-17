@@ -64,8 +64,20 @@ export default function UserContextMenu({
                 {friends.filter((f) => f.id === target).length === 0 && (
                   <FriendMenu icon={FaUserPlus} label="친구추가" />
                 )}
-                <BlockMenu icon={FaUserSlash} label="차단하기" />
-                <BlockMenu icon={FaUserSlash} label="차단해제" />
+                {friends.filter((f) => f.id === target && f.isBlocked)
+                  .length === 0 ? (
+                  <BlockMenu
+                    icon={FaUserSlash}
+                    label="차단하기"
+                    targetName={targetName}
+                  />
+                ) : (
+                  <BlockMenu
+                    icon={FaUserSlash}
+                    label="차단해제"
+                    targetName={targetName}
+                  />
+                )}
               </>
             )}
             {mode !== 'self' && (

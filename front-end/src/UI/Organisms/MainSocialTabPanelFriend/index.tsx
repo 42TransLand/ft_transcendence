@@ -46,6 +46,7 @@ function FriendTab() {
                 userName={f.nickname}
                 userProfileImage={`${process.env.REACT_APP_API_HOST}/${f.profileImg}`}
                 connectionStatus={socket.state.friendState[f.id]}
+                isBlocked={f.isBlocked}
               />
             </UserContextMenu>
           ))}
