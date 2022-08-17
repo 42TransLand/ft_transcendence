@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { GameMode } from '../../game/constants/game.mode.enum';
 
 export class UserRecordDto {
+  @ApiProperty({
+    example: 'cfd32f23-a534-4122-8582-caba2c710a6c',
+    description: '게임 기록의 id',
+  })
+  id: string;
+
   @ApiProperty({
     example: 74847,
     description: '이긴 유저의 id',
@@ -48,4 +55,16 @@ export class UserRecordDto {
     description: '진 유저의 점수',
   })
   loseUserScore: number;
+
+  @ApiProperty({
+    example: true,
+    description: '래더 게임 여부',
+  })
+  isLadder: boolean;
+
+  @ApiProperty({
+    example: GameMode.CLASSIC,
+    description: '게임 모드',
+  })
+  type: GameMode;
 }
