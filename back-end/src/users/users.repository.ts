@@ -36,6 +36,14 @@ export class UserRepository extends Repository<User> {
     return user;
   }
 
+  async checkNickname(nickname: string): Promise<boolean> {
+    const user: User = await this.findOneBy({ nickname });
+    if (user === null) {
+      return false;
+    }
+    return true;
+  }
+
   async findByUser(user: User): Promise<User> {
     // const findUser: User = await this.findOneBy({ id: user.id });
 

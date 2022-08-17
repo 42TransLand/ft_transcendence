@@ -23,7 +23,6 @@ import { loaclOptions } from './constants/multer.options';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  //
   @ApiOperation({ summary: '모든 유저 조회' })
   @Get('/all')
   getAllUsers(): Promise<User[]> {
@@ -55,6 +54,15 @@ export class UsersController {
   @Get('/search/:nickname')
   searchUsers(@Param('nickname') nickname: string): Promise<User[]> {
     return this.usersService.searchUsers(nickname);
+  }
+
+  @ApiOperation({ summary: '닉네임 중복 조회' })
+  @ApiResponse({ status: 200, description: '닉네임 중복 조회 성공' })
+  @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
+  @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
+  @Get('/check/:nickname')
+  searchNickname(@Param('nickname') nickname: string): Promise<boolean> {
+    return this.usersService.checkNickname(nickname);
   }
 
   @ApiOperation({ summary: '나의 정보 수정' })

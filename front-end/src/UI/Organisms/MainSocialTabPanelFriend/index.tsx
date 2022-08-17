@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Flex, HStack, VStack } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import SearchBar from '../../Atoms/SearchBar';
-import FriendElement from '../../Molecules/FriendElement';
 import FriendSearch from '../../Templates/FriendSearch';
 import UserContextMenu from '../../Templates/UserContextMenu';
 import ElementList from '../ElementList';
@@ -12,7 +11,7 @@ import FRIEND_GET from '../../../Queries/Friends/All';
 import { useSocket } from '../../../Hooks/useSocket';
 import StateUpdateUserNotify from '../../../WebSockets/dto/res/state.update.user.notify.dto';
 import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
-import UserState from '../../../WebSockets/dto/constants/user.state.enum';
+import FriendElement from '../../Molecules/FriendElement';
 
 function FriendTab() {
   const [pattern, setPattern] = React.useState('');
@@ -63,7 +62,8 @@ function FriendTab() {
               <FriendElement
                 userName={f.nickname}
                 userProfileImage={`${process.env.REACT_APP_API_HOST}/${f.profileImg}`}
-                connectionStatus={state.friendState[f.id] ?? UserState.OFFLINE}
+                connectionStatus={state.friendState[f.id]}
+                isBlocked={f.isBlocked}
               />
             </UserContextMenu>
           ))}
