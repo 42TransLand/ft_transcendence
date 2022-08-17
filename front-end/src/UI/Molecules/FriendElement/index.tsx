@@ -7,8 +7,9 @@ function FriendElement(props: {
   userName: string;
   userProfileImage: string;
   connectionStatus: FriendOnlineState;
+  isBlocked: boolean;
 }) {
-  const { userName, userProfileImage, connectionStatus } = props;
+  const { userName, userProfileImage, connectionStatus, isBlocked } = props;
   const StatusColors = {
     ONLINE: 'green.500',
     OFFLINE: 'red.500',
@@ -28,11 +29,16 @@ function FriendElement(props: {
       padding={3}
       to={`/dm/${userName}`}
     >
-      <Avatar name={userName} src={userProfileImage} size="lg">
+      <Avatar
+        opacity={isBlocked ? '35%' : '100%'}
+        name={userName}
+        src={userProfileImage}
+        size="lg"
+      >
         <AvatarBadge boxSize="1em" bgColor={statusColor} />
       </Avatar>
       <Spacer />
-      <Text>{userName}</Text>
+      <Text opacity={isBlocked ? '35%' : '100%'}>{userName}</Text>
     </HStack>
   );
 }
