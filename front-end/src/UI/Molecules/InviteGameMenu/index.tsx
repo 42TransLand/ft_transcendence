@@ -12,11 +12,21 @@ import { IoGameController } from 'react-icons/io5';
 import InviteGame from '../../Templates/InviteGame';
 import { useTargetUser } from '../../../Hooks/useTargetUser';
 
-function InviteGameMenu() {
+function InviteGameMenu({ isRendered }: { isRendered: boolean }) {
   const { userName } = useTargetUser();
+  const [isOpen, setIsOpen] = React.useState(false);
+  React.useEffect(() => {
+    if (isOpen && !isRendered) setIsOpen(false);
+  }, [isOpen, isRendered, setIsOpen]);
 
   return (
-    <Popover placement="left" closeOnBlur={false}>
+    <Popover
+      placement="left"
+      closeOnBlur={false}
+      isOpen={isOpen && isRendered}
+      onOpen={() => setIsOpen(true)}
+      onClose={() => setIsOpen(false)}
+    >
       <PopoverTrigger>
         <MenuItem icon={<IoGameController />}>
           <Text>게임초대</Text>
