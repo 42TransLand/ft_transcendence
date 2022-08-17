@@ -17,7 +17,6 @@ export default function ChatAvatarBadge({
       position="absolute"
       top="-360%"
       left="-100%"
-      zIndex={30}
     >
       <Icon
         as={FaCrown}

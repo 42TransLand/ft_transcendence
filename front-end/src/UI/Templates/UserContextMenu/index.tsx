@@ -42,6 +42,11 @@ enum UserContextMenuFlag {
   ADMIN_APPROVE = 1 << 10,
   ADMIN_UNAPPROVE = 1 << 11,
   LOGOUT = 1 << 12,
+
+  FRIEND = FRIEND_ADD | BLOCK_ADD | BLOCK_REMOVE,
+  GAME = GAME_INVITE | GAME_SPECTATE,
+  CHAT = CHAT_BAN | CHAT_MUTE | CHAT_UNMUTE | ADMIN_APPROVE | ADMIN_UNAPPROVE,
+  ALL = PROFILE | OTP_SETTING | FRIEND | GAME | CHAT | LOGOUT,
 }
 
 const ChildView = styled.div`
@@ -99,12 +104,9 @@ export default function UserContextMenu({
       }
     }
     if (mode === 'chat') {
-      flag |= UserContextMenuFlag.CHAT_MUTE;
-      flag |= UserContextMenuFlag.CHAT_BAN;
-      flag |= UserContextMenuFlag.CHAT_UNMUTE;
-      flag |= UserContextMenuFlag.ADMIN_APPROVE;
-      flag |= UserContextMenuFlag.ADMIN_UNAPPROVE;
+      flag |= UserContextMenuFlag.CHAT;
     }
+    flag |= UserContextMenuFlag.GAME;
     return flag;
   }, [mode, friends, target, friendState]);
 
@@ -125,7 +127,9 @@ export default function UserContextMenu({
                   <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
                 </Link>
               </UserContextMenuItem>
-              <MenuDivider />
+              <UserContextMenuItem flag={UserContextMenuFlag.FRIEND}>
+                <MenuDivider />
+              </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.FRIEND_ADD}>
                 <FriendMenu icon={FaUserPlus} label="친구추가" />
               </UserContextMenuItem>
@@ -143,11 +147,17 @@ export default function UserContextMenu({
                   targetName={targetName}
                 />
               </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.GAME}>
+                <MenuDivider />
+              </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_INVITE}>
                 <InviteGameMenu />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_SPECTATE}>
                 <SpectateMenu />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.CHAT}>
+                <MenuDivider />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_BAN}>
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />

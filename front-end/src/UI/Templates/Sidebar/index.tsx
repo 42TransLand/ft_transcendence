@@ -79,7 +79,12 @@ export default function Sidebar({
         onOpen={onOpen}
         header={header}
       />
-      <HStack h="full" alignItems="flex-start" justifyContent="space-between">
+      <HStack
+        w="full"
+        h="full"
+        alignItems="flex-start"
+        justifyContent="space-between"
+      >
         <Drawer
           autoFocus={false}
           isOpen={isOpen}
