@@ -36,7 +36,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
-        userId: 1,
+        userId: '1',
         name: '엄준식은살아있다',
         profileImg: '/profileimgs/umjunsik.jpeg',
         role: ChatMemberRole.ADMIN,
@@ -47,7 +47,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
-        userId: 2,
+        userId: '2',
         name: 'YuriMyWife',
         profileImg: '/profileimgs/yuri.jpeg',
         role: ChatMemberRole.MEMBER,
@@ -58,7 +58,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
-        userId: 3,
+        userId: '3',
         name: '박수고양이',
         profileImg: '/profileimgs/catclap.gif',
         role: ChatMemberRole.MEMBER,
@@ -69,7 +69,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
-        userId: 4,
+        userId: '4',
         name: '새침소녀',
         profileImg: '/profileimgs/deregirl.jpeg',
         role: ChatMemberRole.MEMBER,
@@ -80,7 +80,7 @@ function ChatExampleChannel() {
     dispatch({
       action: 'insertMember',
       chatMember: {
-        userId: 5,
+        userId: '5',
         name: '아그래요',
         profileImg: '/profileimgs/orly.jpeg',
         role: ChatMemberRole.MEMBER,
@@ -92,7 +92,7 @@ function ChatExampleChannel() {
       dispatch({
         action: 'insertMember',
         chatMember: {
-          userId: 6 + i,
+          userId: (6 + i).toString(),
           name: `아그래요${i}`,
           profileImg: '/profileimgs/orly.jpeg',
           role: ChatMemberRole.MEMBER,
@@ -235,7 +235,7 @@ function ChatExampleDM() {
     dispatch({
       action: 'insertMember',
       chatMember: {
-        userId: 1,
+        userId: '1',
         name: '엄준식은살아있다',
         profileImg: '/profileimgs/umjunsik.jpeg',
         role: ChatMemberRole.MEMBER,
@@ -246,7 +246,7 @@ function ChatExampleDM() {
     dispatch({
       action: 'insertMember',
       chatMember: {
-        userId: 2,
+        userId: '2',
         name: 'YuriMyWife',
         profileImg: '/profileimgs/yuri.jpeg',
         role: ChatMemberRole.MEMBER,

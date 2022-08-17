@@ -1,5 +1,5 @@
 export default interface UserInfoProps {
-  id: number;
+  id: string;
   nickname: string;
   profileImg: string;
   rankScore: number;

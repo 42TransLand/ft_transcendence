@@ -36,7 +36,7 @@ type SocketStateType = {
 const initialSocketState: SocketStateType = {
   socket: null,
   socketState: SocketState.DISCONNECTED,
-  friendState: [],
+  friendState: {},
   gameState: null,
   socketError: { headerMessage: '', bodyMessage: '' },
 };
@@ -46,7 +46,7 @@ type SocketActionType =
   | { action: 'connect_failed' }
   | { action: 'connected' }
   | { action: 'disconnect' }
-  | { action: 'updateFriendState'; friendId: number; state: FriendOnlineState }
+  | { action: 'updateFriendState'; friendId: string; state: FriendOnlineState }
   | {
       action: 'setCustomGame';
       gameState: GameStateType | null;

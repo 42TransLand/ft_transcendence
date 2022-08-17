@@ -4,7 +4,7 @@ import BuildMutation from '../MutationBuilder';
 
 const FRIEND_REJECT_DELETE = <TData = any>(
   alertId: string,
-  senderId: number,
+  senderId: string,
   options: Omit<UseMutationOptions<TData, AxiosError<any, any>>, 'mutationFn'>,
 ) =>
   BuildMutation<any>(
