@@ -3,10 +3,10 @@ import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import FontFaceObserver from 'fontfaceobserver';
 import styled from 'styled-components';
 import Loading from '../../Templates/Loading';
-import { SocketEventName } from '../../../Games/dto/constants/game.constants';
 import useGame from '../../../Hooks/useGame';
 import { useSocket } from '../../../Hooks/useSocket';
-import GameTicket from '../../../Games/dto/constants/game.ticket.enum';
+import GameTicket from '../../../WebSockets/dto/constants/game.ticket.enum';
+import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
 
 const GameView = styled.div`
   min-height: 100vh;

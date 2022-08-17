@@ -25,7 +25,7 @@ function FriendSearch() {
             key={friend.id}
             id={friend.id}
             nickname={friend.nickname}
-            profileImg={friend.profileImg}
+            profileImg={`${process.env.REACT_APP_API_HOST}/${friend.profileImg}`}
           />
         ))}
       </VStack>

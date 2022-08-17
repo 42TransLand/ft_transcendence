@@ -47,6 +47,10 @@ export class UsersService {
     return this.userRepository.searchUsers(search);
   }
 
+  async checkNickname(nickname: string): Promise<boolean> {
+    return this.userRepository.checkNickname(nickname);
+  }
+
   async updateUser(
     user: User,
     nickName?: string,

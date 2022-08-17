@@ -3,7 +3,7 @@ import {
   PLAYER_SCORE_POS,
   PLAYER_SCORE_FONT_STYLE,
   PLAYER_SCORE_PIVOT,
-} from './dto/constants/game.constants';
+} from '../dto/constants/game.constants';
 import GameObject from './GameObject';
 
 export default class Score extends GameObject {
