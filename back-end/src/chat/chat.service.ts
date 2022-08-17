@@ -37,10 +37,10 @@ export class ChatService {
   async createChatRoom(
     user: User,
     chatRoomDto: CreateChatRoomDto,
-  ): Promise<string> {
+  ): Promise<void> {
     const room = await this.chatRoomRepository.createChatRoom(chatRoomDto);
-    await this.chatUserRepository.createRoomOwner(user, room);
-    return room.id;
+    this.chatUserRepository.createRoomOwner(user, room);
+    this.socketGateway.handleChatJoinNotify(room.id, user.id);
   }
 
   async updatePassword(
@@ -119,10 +119,12 @@ export class ChatService {
     const chatRoom = await this.findChatRoomById(id);
     if (chatRoom.type === ChatType.PROTECT && password !== undefined) {
       this.chatUserRepository.joinChatRoom(user, chatRoom, password);
-      return this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
+      this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
+      this.socketGateway.handleChatJoinNotify(chatRoom.id, user.id);
     }
     this.chatUserRepository.joinChatRoom(user, chatRoom);
-    return this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
+    this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
+    this.socketGateway.handleChatJoinNotify(chatRoom.id, user.id);
   }
 
   async leaveChatRoom(id: string, user: User): Promise<string> {
@@ -166,6 +168,7 @@ export class ChatService {
     const kickUser = await this.userService.findByNickname(nickname);
     await this.chatUserRepository.leaveChatRoom(kickUser, chatRoom);
     await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
+    this.socketGateway.handleChatLeaveNotify(chatRoom.id, kickUser.id);
   }
 
   async sendChat(id: string, user: User, content: string): Promise<void> {

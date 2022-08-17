@@ -93,14 +93,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // 채팅방
+  // @SubscribeMessage(SocketEventName.CHAT_JOIN_NOTIFY)
   @SubscribeMessage('joinChatRoom')
-  handleJoinChatRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() { roomId }: ChatDto,
-  ): void {
+  handleChatJoinNotify(roomid: string, userId: string): void {
     try {
-      const userContext = this.userContexts.get(client.id);
-      userContext.chatRoom = roomId;
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
+      userContext.chatRoom = roomid;
+      console.log(1);
       if (userContext) {
         this.socketService.handleJoinChatRoom(userContext);
       }
@@ -108,15 +108,27 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // ignore
     }
   }
+  // handleChatJoinNotify(roomid: string, userId: string): void {
+  //   try {
+  //     const usersSocket = this.usersSocket.get(userId);
+  //     const userContext = this.userContexts.get(usersSocket);
+  //     userContext.chatRoom = roomid;
+  //     console.log(1);
+  //     if (userContext) {
+  //       this.socketService.handleJoinChatRoom(userContext);
+  //     }
+  //   } catch (error) {
+  //     // ignore
+  //   }
+  // }
 
+  // @SubscribeMessage(SocketEventName.CHAT_LEAVE_NOTIFY)
   @SubscribeMessage('leaveChatRoom')
-  handleLeaveChatRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() { roomId }: ChatDto,
-  ): void {
+  handleChatLeaveNotify(roomid: string, userId: string): void {
     try {
-      const userContext = this.userContexts.get(client.id);
-      userContext.chatRoom = roomId;
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
+      userContext.chatRoom = roomid;
       if (userContext) {
         this.socketService.handleLeaveChatRoom(userContext);
       }
