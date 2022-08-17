@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
@@ -22,12 +23,43 @@ import MuteMenu from '../../Molecules/MuteMenu';
 import AdminApproveMenu from '../../Molecules/AdminApproveMenu';
 import LogoutMenu from '../../Molecules/LogoutMenu';
 import useFriends from '../../../Hooks/useFriends';
+import { useSocket } from '../../../Hooks/useSocket';
+import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
+
+enum UserContextMenuFlag {
+  PROFILE = 1 << 0,
+  OTP_SETTING = 1 << 1,
+  FRIEND_ADD = 1 << 2,
+  BLOCK_ADD = 1 << 3,
+  BLOCK_REMOVE = 1 << 4,
+  GAME_INVITE = 1 << 5,
+  GAME_SPECTATE = 1 << 6,
+  CHAT_BAN = 1 << 7,
+  CHAT_MUTE = 1 << 8,
+  CHAT_UNMUTE = 1 << 9,
+  ADMIN_APPROVE = 1 << 10,
+  ADMIN_UNAPPROVE = 1 << 11,
+  LOGOUT = 1 << 12,
+}
 
 const ChildView = styled.div`
   width: 100%;
 `;
+
+const flagContext = React.createContext<UserContextMenuFlag>(0);
+
+function UserContextMenuItem({
+  flag,
+  children,
+}: {
+  flag: UserContextMenuFlag;
+  children: JSX.Element;
+}) {
+  const currentFlag = React.useContext(flagContext);
+  return currentFlag & flag ? children : null;
+}
 
 export default function UserContextMenu({
   target,
@@ -36,90 +68,126 @@ export default function UserContextMenu({
   children,
   eventType,
 }: {
-  target: number;
+  target: string;
   targetName: string;
   mode: UserContextMenuType;
   children: React.ReactNode;
   eventType?: 'click' | 'contextmenu';
 }) {
+  const { state } = useSocket();
   const friends = useFriends();
+  const friendState = state.friendState[target];
+  const menuFlag = React.useMemo(() => {
+    let flag = UserContextMenuFlag.PROFILE;
+    if (mode === 'self') {
+      flag |= UserContextMenuFlag.OTP_SETTING;
+      flag |= UserContextMenuFlag.LOGOUT;
+    } else {
+      if (friends.filter((f) => f.id === target).length === 0) {
+        flag |= UserContextMenuFlag.FRIEND_ADD;
+      }
+      if (friends.filter((f) => f.id === target && f.isBlocked).length === 0) {
+        flag |= UserContextMenuFlag.BLOCK_ADD;
+      } else {
+        flag |= UserContextMenuFlag.BLOCK_REMOVE;
+      }
+      if (friendState === UserState.ONLINE) {
+        flag |= UserContextMenuFlag.GAME_INVITE;
+      }
+      if (friendState === UserState.INGAME) {
+        flag |= UserContextMenuFlag.GAME_SPECTATE;
+      }
+    }
+    if (mode === 'chat') {
+      flag |= UserContextMenuFlag.CHAT_MUTE;
+      flag |= UserContextMenuFlag.CHAT_BAN;
+      flag |= UserContextMenuFlag.CHAT_UNMUTE;
+      flag |= UserContextMenuFlag.ADMIN_APPROVE;
+      flag |= UserContextMenuFlag.ADMIN_UNAPPROVE;
+    }
+    return flag;
+  }, [mode, friends, target, friendState]);
 
   return (
-    <TargetUserProvider userId={target} userName={targetName}>
-      <ContextMenu
-        eventType={eventType || 'contextmenu'}
-        renderMenu={() => (
-          <MenuList>
-            <Link to={`/user/${targetName}`}>
-              <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
-            </Link>
-            {mode === 'self' && (
-              <Link to="/otp/bylee">
-                <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
-              </Link>
-            )}
-            {mode !== 'self' && (
-              <>
-                <MenuDivider />
-                {friends.filter((f) => f.id === target).length === 0 && (
-                  <FriendMenu icon={FaUserPlus} label="친구추가" />
-                )}
-                {friends.filter((f) => f.id === target && f.isBlocked)
-                  .length === 0 ? (
-                  <BlockMenu
-                    icon={FaUserSlash}
-                    label="차단하기"
-                    targetName={targetName}
-                  />
-                ) : (
-                  <BlockMenu
-                    icon={FaUserSlash}
-                    label="차단해제"
-                    targetName={targetName}
-                  />
-                )}
-              </>
-            )}
-            {mode !== 'self' && (
-              <>
-                <MenuDivider />
+    <flagContext.Provider value={menuFlag}>
+      <TargetUserProvider userId={target} userName={targetName}>
+        <ContextMenu
+          eventType={eventType || 'contextmenu'}
+          renderMenu={() => (
+            <MenuList>
+              <UserContextMenuItem flag={UserContextMenuFlag.PROFILE}>
+                <Link to={`/user/${targetName}`}>
+                  <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
+                </Link>
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.PROFILE}>
+                <Link to="/otp/bylee">
+                  <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
+                </Link>
+              </UserContextMenuItem>
+              <MenuDivider />
+              <UserContextMenuItem flag={UserContextMenuFlag.FRIEND_ADD}>
+                <FriendMenu icon={FaUserPlus} label="친구추가" />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.BLOCK_ADD}>
+                <BlockMenu
+                  icon={FaUserSlash}
+                  label="차단하기"
+                  targetName={targetName}
+                />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.BLOCK_REMOVE}>
+                <BlockMenu
+                  icon={FaUserSlash}
+                  label="차단해제"
+                  targetName={targetName}
+                />
+              </UserContextMenuItem>
+              <MenuDivider />
+              <UserContextMenuItem flag={UserContextMenuFlag.GAME_INVITE}>
                 <InviteGameMenu />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.GAME_SPECTATE}>
                 <SpectateMenu />
-              </>
-            )}
-            {mode === 'chat' && (
-              <>
-                <MenuDivider />
+              </UserContextMenuItem>
+              <MenuDivider />
+              <UserContextMenuItem flag={UserContextMenuFlag.CHAT_BAN}>
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.CHAT_MUTE}>
                 <MuteMenu icon={GiSpeakerOff} label="음소거시키기" cast />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.CHAT_UNMUTE}>
                 <MuteMenu icon={GiSpeaker} label="음소거해제" cast={false} />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.ADMIN_APPROVE}>
                 <AdminApproveMenu icon={TbCrown} label="관리자임명" cast />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.ADMIN_UNAPPROVE}>
                 <AdminApproveMenu
                   icon={TbCrownOff}
                   label="관리자해제"
                   cast={false}
                 />
-              </>
-            )}
-            {mode === 'self' && (
-              <>
-                <MenuDivider />
+              </UserContextMenuItem>
+              <MenuDivider />
+              <UserContextMenuItem flag={UserContextMenuFlag.LOGOUT}>
                 <LogoutMenu />
-              </>
-            )}
-          </MenuList>
-        )}
-      >
-        {(ref: any) => (
-          <ChildView
-            style={{ cursor: eventType === 'click' ? 'pointer' : 'default' }}
-            ref={ref}
-          >
-            {children}
-          </ChildView>
-        )}
-      </ContextMenu>
-    </TargetUserProvider>
+              </UserContextMenuItem>
+            </MenuList>
+          )}
+        >
+          {(ref: any) => (
+            <ChildView
+              style={{ cursor: eventType === 'click' ? 'pointer' : 'default' }}
+              ref={ref}
+            >
+              {children}
+            </ChildView>
+          )}
+        </ContextMenu>
+      </TargetUserProvider>
+    </flagContext.Provider>
   );
 }
 

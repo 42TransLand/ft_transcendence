@@ -3,19 +3,14 @@ import { io, Socket } from 'socket.io-client';
 import WarningDialogProps from '../Props/WarningDialogProps';
 import GameMode from '../WebSockets/dto/constants/game.mode.enum';
 import GameTicket from '../WebSockets/dto/constants/game.ticket.enum';
+import UserState from '../WebSockets/dto/constants/user.state.enum';
+import StateUpdateUserNotify from '../WebSockets/dto/res/state.update.user.notify.dto';
 
 enum SocketState {
   CONNECTING,
   CONNECTED,
   CONNECT_ERROR,
   DISCONNECTED,
-}
-
-enum FriendOnlineState {
-  ONLINE = 'ONLINE',
-  OFFLINE = 'OFFLINE',
-  PLAYING = 'PLAYING',
-  SPECTATING = 'SPECTATING',
 }
 
 export type GameStateType = {
@@ -28,7 +23,7 @@ export type GameStateType = {
 type SocketStateType = {
   socket: Socket | null;
   socketState: SocketState;
-  friendState: { [key: number]: FriendOnlineState };
+  friendState: { [key: string]: UserState };
   gameState: GameStateType | null;
   socketError: WarningDialogProps;
 };
@@ -46,7 +41,7 @@ type SocketActionType =
   | { action: 'connect_failed' }
   | { action: 'connected' }
   | { action: 'disconnect' }
-  | { action: 'updateFriendState'; friendId: string; state: FriendOnlineState }
+  | { action: 'updateUserState'; friendId: string; state: UserState }
   | {
       action: 'setCustomGame';
       gameState: GameStateType | null;
@@ -89,7 +84,7 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
         socket: null,
         socketState: SocketState.DISCONNECTED,
       };
-    case 'updateFriendState':
+    case 'updateUserState':
       return {
         ...beforeState,
         friendState: {
@@ -110,6 +105,19 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
     default:
       return beforeState;
   }
+}
+
+export function UpdateUserStateListener(
+  socket: Socket,
+  dispatch: React.Dispatch<SocketActionType>,
+) {
+  socket.on('updateUserState', (data: StateUpdateUserNotify) => {
+    dispatch({
+      action: 'updateUserState',
+      friendId: data.id,
+      state: data.state,
+    });
+  });
 }
 
 function SocketProvider({
@@ -148,4 +156,4 @@ function SocketProvider({
   );
 }
 
-export { SocketProvider, useSocket, SocketState, FriendOnlineState };
+export { SocketProvider, useSocket, SocketState };
