@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Auth42userDto } from 'src/auth/dto/auth.42user.dto';
 import { GameService } from 'src/game/game.service';
-import { GameRepository } from 'src/game/game.repository';
+import { UserProfileDto } from './dto/user.profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,8 +24,15 @@ export class UsersService {
   }
 
   async findByUser(user: User): Promise<User> {
-    this.gameService.getGamesByUserId(user);
     return this.userRepository.findByUser(user);
+  }
+
+  async infoUser(user: User, nickName?: string): Promise<UserProfileDto> {
+    if (nickName) {
+      user = await this.userRepository.findByNickname(nickName);
+    }
+    const gameRecord = await this.gameService.getGamesByUserId(user);
+    return this.userRepository.infoUser(user, gameRecord);
   }
 
   async findById(id: string): Promise<User> {

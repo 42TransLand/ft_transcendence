@@ -60,6 +60,7 @@ export class GameRepository extends Repository<GameRecord> {
       .orWhere('game.loseUserId = :userId', { userId: user.id });
 
     const boards = await query.getMany();
+
     return boards;
   }
 }

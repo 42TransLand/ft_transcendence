@@ -8,6 +8,7 @@ import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { GameMode } from './constants/game.mode.enum';
 import { GameResult } from 'src/socket/game/dto/game.result.type';
+import { Equal } from 'typeorm';
 
 @Injectable()
 export class GameService {
@@ -38,14 +39,17 @@ export class GameService {
 
   // 프로필에서 유저의 게임 전적 가져오기
   async getGamesByUserId(user: User): Promise<GameRecord[]> {
-    const query = this.gameRepository.createQueryBuilder('game');
-
-    query
-      .where('game.windUserId = :userId', { userId: user.id })
-      .orWhere('game.loseUserId = :userId', { userId: user.id });
-
-    const boards = await query.getMany();
-    return boards;
+    const games = await this.gameRepository.find({
+      relations: {
+        winUser: true,
+        loseUser: true,
+      },
+      where: {
+        winUser: Equal(user),
+        loseUser: Equal(user),
+      },
+    });
+    return games;
   }
 
   async updateGame(gameResult: GameResult): Promise<void> {
