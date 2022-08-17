@@ -188,12 +188,18 @@ export class FriendRepository extends Repository<Friend> {
         status: FriendStatus.FRIEND,
       },
     });
-    const friends = result.map((param) => {
-      const friend: FriendListDto = {};
+    const friends: FriendListDto[] = [];
+    result.forEach((param) => {
       if (param.requestor.id === user.id) {
-        return param.receiver;
+        friends.push({
+          id: param.receiver.id,
+          nickname: param.receiver.nickname,
+          profileImg: param.receiver.profileImg,
+          isBlocked: param.block,
+        });
       }
     });
+
     return friends;
   }
 }
