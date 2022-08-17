@@ -55,7 +55,8 @@ export class UsersService {
     user: User,
     nickName?: string,
     profileImg?: string,
+    score?: number,
   ): Promise<User> {
-    return this.userRepository.updateUser(user, nickName, profileImg);
+    return this.userRepository.updateUser(user, nickName, profileImg, score);
   }
 }
