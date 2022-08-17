@@ -127,7 +127,7 @@ export class SocketGameService {
   @Interval(GAME_TIME_INTERVAL)
   update() {
     this.tryMatch();
-    this.rooms.forEach((room, index, rooms) => {
+    this.rooms.forEach(async (room, index, rooms) => {
       room.update();
       if (room.state === GameState.ENDED || room.isEmpty()) {
         if (!room.isEmpty()) {
@@ -143,9 +143,9 @@ export class SocketGameService {
             isLadder: room.ladder,
             type: room.gameMode,
           };
-          this.gameService.updateGame(gameResult);
-          this.userService.updateUser(winnerUser.user, null, null, 100);
-          this.userService.updateUser(loserUser.user, null, null, -100);
+          await this.userService.updateUser(winnerUser.user, null, null, 100);
+          await this.userService.updateUser(loserUser.user, null, null, -100);
+          await this.gameService.updateGame(gameResult);
         }
         rooms.delete(index);
       }
