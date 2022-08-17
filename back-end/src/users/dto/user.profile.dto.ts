@@ -34,19 +34,19 @@ export class UserProfileDto {
 
   @ApiProperty({
     example: '15',
-    description: '총 승리 횟수',
+    description: '래더 승리 횟수',
   })
   winCount: number;
 
   @ApiProperty({
     example: '10',
-    description: '총 패배 횟수',
+    description: '래더 패배 횟수',
   })
   loseCount: number;
 
   @ApiProperty({
     example: '25',
-    description: '총 전적 횟수',
+    description: '래더 총 전적 횟수',
   })
   totalCount: number;
 
