@@ -10,6 +10,7 @@ import { AlertService } from 'src/alert/alert.service';
 import { User } from 'src/users/entities/user.entity';
 import { Friend } from './entities/friend.entity';
 import { FriendStatus } from './constants/friend.enum';
+import { FriendListDto } from './dto/friend.list.dto';
 
 @Injectable()
 export class FriendService {
@@ -20,7 +21,7 @@ export class FriendService {
     private alertService: AlertService,
   ) {}
 
-  async findAllFriends(user: User): Promise<User[]> {
+  async findAllFriends(user: User): Promise<FriendListDto[]> {
     return this.friendRepository.findAllFriends(user);
   }
 
