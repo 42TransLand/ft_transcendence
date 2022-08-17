@@ -12,6 +12,7 @@ import { useSocket } from '../../../Hooks/useSocket';
 import StateUpdateUserNotify from '../../../WebSockets/dto/res/state.update.user.notify.dto';
 import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
 import FriendElement from '../../Molecules/FriendElement';
+import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 
 function FriendTab() {
   const [pattern, setPattern] = React.useState('');
@@ -62,7 +63,7 @@ function FriendTab() {
               <FriendElement
                 userName={f.nickname}
                 userProfileImage={`${process.env.REACT_APP_API_HOST}/${f.profileImg}`}
-                connectionStatus={state.friendState[f.id]}
+                connectionStatus={state.friendState[f.id] ?? UserState.OFFLINE}
                 isBlocked={f.isBlocked}
               />
             </UserContextMenu>
