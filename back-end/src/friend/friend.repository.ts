@@ -9,6 +9,7 @@ import { Equal, Repository } from 'typeorm';
 import { CustomRepository } from '../custom/typeorm.decorator';
 import { Friend } from './entities/friend.entity';
 import { FriendStatus } from './constants/friend.enum';
+import { FriendListDto } from './dto/friend.list.dto';
 
 @CustomRepository(Friend)
 export class FriendRepository extends Repository<Friend> {
@@ -174,7 +175,7 @@ export class FriendRepository extends Repository<Friend> {
     return result;
   }
 
-  async findAllFriends(user: User): Promise<User[]> {
+  async findAllFriends(user: User): Promise<FriendListDto[]> {
     // 친구인 경우, 자기 자신이 requestor 혹은 receiver 둘 중 하나에는 무조건 있기 때문에
     // requestor가 자기 자신인 경우를 찾아 반환한다.
     const result = await this.find({
@@ -187,9 +188,10 @@ export class FriendRepository extends Repository<Friend> {
         status: FriendStatus.FRIEND,
       },
     });
-    const friends = result.map((friend) => {
-      if (friend.requestor.id === user.id) {
-        return friend.receiver;
+    const friends = result.map((param) => {
+      const friend: FriendListDto = {};
+      if (param.requestor.id === user.id) {
+        return param.receiver;
       }
     });
     return friends;
