@@ -14,7 +14,6 @@ function Profile() {
     USERS_PROFILE_GET(name ?? myNickname),
   );
 
-  console.log('data = ', data);
   const { nickname, profileImg, gameRecord, winCount, loseCount } = data ?? {
     nickname: '',
     profileImg: '',
