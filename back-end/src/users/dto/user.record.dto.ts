@@ -67,4 +67,16 @@ export class UserRecordDto {
     description: '게임 모드',
   })
   type: GameMode;
+
+  @ApiProperty({
+    example: '2020-01-01',
+    description: '게임 시작 시간',
+  })
+  createAt: Date;
+
+  @ApiProperty({
+    example: '2020-01-01',
+    description: '게임 종료 시간',
+  })
+  updateAt: Date;
 }

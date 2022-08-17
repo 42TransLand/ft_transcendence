@@ -81,6 +81,7 @@ export class UserRepository extends Repository<User> {
     user: User,
     nickName?: string,
     profileImg?: string,
+    score?: number,
   ): Promise<User> {
     if (nickName) {
       user.nickname = nickName;
@@ -97,6 +98,13 @@ export class UserRepository extends Repository<User> {
         });
       }
       user.profileImg = profileImg;
+    }
+    if (score) {
+      if (user.rankScore <= score) {
+        user.rankScore = 0;
+      } else {
+        user.rankScore += score;
+      }
     }
     try {
       await this.save(user);
@@ -132,6 +140,8 @@ export class UserRepository extends Repository<User> {
         loseUserScore: param.loseUserScore,
         isLadder: param.isLadder,
         type: param.type,
+        createAt: param.createAt,
+        updateAt: param.updateAt,
       };
       arrRecord.push(record);
     });

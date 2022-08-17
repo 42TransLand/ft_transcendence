@@ -14,6 +14,7 @@ import GameState from './constants/game.state.enum';
 import GameCreateResDto from './dto/res/game.create.res.dto';
 import GameJoinResDto from './dto/res/game.join.res.dto';
 import { GameResult } from './dto/game.result.type';
+import { UsersService } from 'src/users/users.service';
 
 type DequeueSuccessType = {
   success: true;
@@ -26,7 +27,10 @@ type DequeueFalseType = {
 
 @Injectable()
 export class SocketGameService {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly userService: UsersService,
+  ) {}
 
   private rooms: Map<string, Room> = new Map<string, Room>();
 
@@ -140,6 +144,8 @@ export class SocketGameService {
             type: room.gameMode,
           };
           this.gameService.updateGame(gameResult);
+          this.userService.updateUser(winnerUser.user, null, null, 100);
+          this.userService.updateUser(loserUser.user, null, null, -100);
         }
         rooms.delete(index);
       }
