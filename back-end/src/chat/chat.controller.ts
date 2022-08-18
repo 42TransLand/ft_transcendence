@@ -116,10 +116,7 @@ export class ChatController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
   @Delete('/leave/:id')
-  leaveChatRoom(
-    @GetUser() user: User,
-    @Param('id') id: string,
-  ): Promise<string> {
+  leaveChatRoom(@GetUser() user: User, @Param('id') id: string): Promise<void> {
     return this.chatService.leaveChatRoom(id, user);
   }
 

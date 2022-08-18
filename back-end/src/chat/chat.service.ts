@@ -19,7 +19,7 @@ import { ChatUser } from './entities/chat.user.entity';
 import { SocketGateway } from 'src/socket/socket.gateway';
 import { User } from 'src/users/entities/user.entity';
 import { ChatInfoDto } from './dto/chat.info.dto';
-import { ChatUSerUpdateType } from 'src/socket/chat/constants/chat.user.update.type.enum';
+import { ChatUserUpdateType } from 'src/socket/chat/constants/chat.user.update.type.enum';
 
 @Injectable()
 export class ChatService {
@@ -123,7 +123,7 @@ export class ChatService {
     this.socketGateway.handleUpdateChatUser(
       id,
       newAdmin.user.nickname,
-      ChatUSerUpdateType.ADMIN,
+      ChatUserUpdateType.ADMIN,
       true,
     );
   }
@@ -140,7 +140,7 @@ export class ChatService {
     this.socketGateway.handleJoinChatRoom(chatRoom.id, user.id);
   }
 
-  async leaveChatRoom(id: string, user: User): Promise<string> {
+  async leaveChatRoom(id: string, user: User): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
     const findChatUser = await this.chatUserRepository.findChatUser(
       user,
@@ -155,16 +155,19 @@ export class ChatService {
     if (chatUsers.length === 0) {
       // 채팅방에 유저가 없으면 삭제
       await this.chatRoomRepository.deleteChatRoom(chatRoom.id);
-      return `${chatRoom.id} 채팅방이 삭제되었습니다.`;
     }
+    this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
     // 나간 사람이 Owner여서 새로운 오너가 정해져야 하는 경우
     if (findChatUser.role === ChatRole.OWNER) {
       const newOwner = await this.chatUserRepository.findNewOwner(chatRoom);
       await this.chatUserRepository.updateOwnerRole(newOwner);
-      return `${newOwner.id}님이 채팅방 오너로 설정되었습니다.`; // 지금은 db의 PK값 반환
+      this.socketGateway.handleUpdateChatUser(
+        id,
+        newOwner.user.nickname,
+        ChatUserUpdateType.OWNER,
+        true,
+      );
     }
-    this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
-    return `${user.nickname}님이 채팅방에서 나가셨습니다.`;
   }
 
   async kickChatUser(id: string, user: User, nickname: string): Promise<void> {
@@ -187,12 +190,10 @@ export class ChatService {
 
   async sendChat(id: string, user: User, content: string): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-
     const chatUser = await this.chatUserRepository.findChatUser(user, chatRoom);
     if (chatUser === null) {
       throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
     }
-
     if (chatUser.unmutedAt) {
       const now: Date = new Date();
       const diff = chatUser.unmutedAt.getTime() - now.getTime();
@@ -211,7 +212,6 @@ export class ChatService {
     nickname: string,
   ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
-
     const myChatUser = await this.chatUserRepository.findChatUser(
       user,
       chatRoom,
@@ -221,6 +221,7 @@ export class ChatService {
         `본인은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
+
     const opponent = await this.userService.findByNickname(nickname);
     const chatUser = await this.chatUserRepository.findChatUser(
       opponent,
@@ -231,7 +232,6 @@ export class ChatService {
         `상대방은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
-
     if (
       !(
         (myChatUser.role === ChatRole.OWNER ||
@@ -260,7 +260,7 @@ export class ChatService {
       this.socketGateway.handleUpdateChatUser(
         chatUser.chatRoom.id,
         nickname,
-        ChatUSerUpdateType.MUTE,
+        ChatUserUpdateType.MUTE,
         false,
       );
     }, muteMinutes * 60 * 1000);
@@ -268,7 +268,7 @@ export class ChatService {
     this.socketGateway.handleUpdateChatUser(
       chatUser.chatRoom.id,
       nickname,
-      ChatUSerUpdateType.MUTE,
+      ChatUserUpdateType.MUTE,
       true,
     );
   }
@@ -299,7 +299,6 @@ export class ChatService {
         `상대방은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
-
     if (
       !(
         (myChatUser.role === ChatRole.OWNER ||
@@ -320,7 +319,7 @@ export class ChatService {
     this.socketGateway.handleUpdateChatUser(
       chatUser.chatRoom.id,
       nickname,
-      ChatUSerUpdateType.MUTE,
+      ChatUserUpdateType.MUTE,
       false,
     );
   }

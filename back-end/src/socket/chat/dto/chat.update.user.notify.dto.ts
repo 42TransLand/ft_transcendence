@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ChatUSerUpdateType } from '../constants/chat.user.update.type.enum';
+import { ChatUserUpdateType } from '../constants/chat.user.update.type.enum';
 
 export class ChatUpdateUserNotifyDto {
   @ApiProperty({
@@ -10,7 +10,7 @@ export class ChatUpdateUserNotifyDto {
   @ApiProperty({
     description: '채팅방 업데이트 유형',
   })
-  type: ChatUSerUpdateType;
+  type: ChatUserUpdateType;
 
   @ApiProperty({
     description: '업데이트 종류',
