@@ -1,7 +1,12 @@
 /* eslint-disable no-bitwise */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
+import {
+  MenuList,
+  MenuItem,
+  MenuDivider,
+  EventListenerEnv,
+} from '@chakra-ui/react';
 import {
   FaUserCircle,
   FaUserEdit,
@@ -42,6 +47,11 @@ enum UserContextMenuFlag {
   ADMIN_APPROVE = 1 << 10,
   ADMIN_UNAPPROVE = 1 << 11,
   LOGOUT = 1 << 12,
+
+  FRIEND = FRIEND_ADD | BLOCK_ADD | BLOCK_REMOVE,
+  GAME = GAME_INVITE | GAME_SPECTATE,
+  CHAT = CHAT_BAN | CHAT_MUTE | CHAT_UNMUTE | ADMIN_APPROVE | ADMIN_UNAPPROVE,
+  ALL = PROFILE | OTP_SETTING | FRIEND | GAME | CHAT | LOGOUT,
 }
 
 const ChildView = styled.div`
@@ -66,13 +76,13 @@ export default function UserContextMenu({
   targetName,
   mode,
   children,
-  eventType,
+  env,
 }: {
   target: string;
   targetName: string;
   mode: UserContextMenuType;
   children: React.ReactNode;
-  eventType?: 'click' | 'contextmenu';
+  env?: EventListenerEnv;
 }) {
   const { state } = useSocket();
   const friends = useFriends();
@@ -83,13 +93,16 @@ export default function UserContextMenu({
       flag |= UserContextMenuFlag.OTP_SETTING;
       flag |= UserContextMenuFlag.LOGOUT;
     } else {
-      if (friends.filter((f) => f.id === target).length === 0) {
+      const isFriend = friends.filter((f) => f.id === target).length > 0;
+      const isBlocked =
+        friends.filter((f) => f.id === target && f.isBlocked).length > 0;
+      if (!isFriend) {
         flag |= UserContextMenuFlag.FRIEND_ADD;
       }
-      if (friends.filter((f) => f.id === target && f.isBlocked).length === 0) {
-        flag |= UserContextMenuFlag.BLOCK_ADD;
-      } else {
+      if (isBlocked) {
         flag |= UserContextMenuFlag.BLOCK_REMOVE;
+      } else {
+        flag |= UserContextMenuFlag.BLOCK_ADD;
       }
       if (friendState === UserState.ONLINE) {
         flag |= UserContextMenuFlag.GAME_INVITE;
@@ -97,13 +110,12 @@ export default function UserContextMenu({
       if (friendState === UserState.INGAME) {
         flag |= UserContextMenuFlag.GAME_SPECTATE;
       }
-    }
-    if (mode === 'chat') {
-      flag |= UserContextMenuFlag.CHAT_MUTE;
-      flag |= UserContextMenuFlag.CHAT_BAN;
-      flag |= UserContextMenuFlag.CHAT_UNMUTE;
-      flag |= UserContextMenuFlag.ADMIN_APPROVE;
-      flag |= UserContextMenuFlag.ADMIN_UNAPPROVE;
+      if (mode === 'chat') {
+        flag |= UserContextMenuFlag.CHAT;
+        flag |= UserContextMenuFlag.GAME_INVITE;
+      }
+      // TODO: 추후 유저 온라인 상태가 구현되면 삭제
+      // flag |= UserContextMenuFlag.GAME;
     }
     return flag;
   }, [mode, friends, target, friendState]);
@@ -112,11 +124,11 @@ export default function UserContextMenu({
     <flagContext.Provider value={menuFlag}>
       <TargetUserProvider userId={target} userName={targetName}>
         <ContextMenu
-          eventType={eventType || 'contextmenu'}
-          renderMenu={() => (
+          env={env ?? document}
+          renderMenu={(isRendered: boolean) => (
             <MenuList>
               <UserContextMenuItem flag={UserContextMenuFlag.PROFILE}>
-                <Link to={`/user/${targetName}`}>
+                <Link to={`user/${targetName}`}>
                   <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
                 </Link>
               </UserContextMenuItem>
@@ -125,7 +137,9 @@ export default function UserContextMenu({
                   <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
                 </Link>
               </UserContextMenuItem>
-              <MenuDivider />
+              <UserContextMenuItem flag={UserContextMenuFlag.FRIEND}>
+                <MenuDivider />
+              </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.FRIEND_ADD}>
                 <FriendMenu icon={FaUserPlus} label="친구추가" />
               </UserContextMenuItem>
@@ -143,11 +157,17 @@ export default function UserContextMenu({
                   targetName={targetName}
                 />
               </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.GAME}>
+                <MenuDivider />
+              </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_INVITE}>
-                <InviteGameMenu />
+                <InviteGameMenu isRendered={isRendered} />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_SPECTATE}>
                 <SpectateMenu />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.CHAT}>
+                <MenuDivider />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_BAN}>
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />
@@ -175,10 +195,7 @@ export default function UserContextMenu({
           )}
         >
           {(ref: any) => (
-            <ChildView
-              style={{ cursor: eventType === 'click' ? 'pointer' : 'default' }}
-              ref={ref}
-            >
+            <ChildView style={{ cursor: 'pointer' }} ref={ref}>
               {children}
             </ChildView>
           )}
@@ -189,5 +206,5 @@ export default function UserContextMenu({
 }
 
 UserContextMenu.defaultProps = {
-  eventType: 'contextmenu',
+  env: document,
 };

@@ -3,10 +3,12 @@ import React from 'react';
 import { useChat } from '../../../Hooks/useChat';
 import ScrollableVStack from '../../Atoms/ScrollableVStack';
 import ChatMemberElement from '../../Molecules/ChatMemberElement';
+import ChatModalContext from '../../Templates/ChatModal/ChatModalContext';
 import UserContextMenu from '../../Templates/UserContextMenu';
 
 export default function ChatMembers() {
   const [chat] = useChat();
+  const ref = React.useContext(ChatModalContext);
   return (
     <VStack>
       <HStack w="full" justifyContent="space-between">
@@ -18,11 +20,11 @@ export default function ChatMembers() {
       <ScrollableVStack h="70vh" w="full" paddingRight="0.5em">
         {chat.chatMembers.map((member) => (
           <UserContextMenu
+            env={ref?.current ?? document}
             key={member.name}
             target={member.userId}
             targetName={member.name}
             mode={chat.chatInfo.roomType === 'private' ? 'friend' : 'chat'}
-            eventType="contextmenu"
           >
             <ChatMemberElement
               userId={member.userId}
