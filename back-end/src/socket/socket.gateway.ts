@@ -149,6 +149,19 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
   }
 
+  @SubscribeMessage('sendDM')
+  handleSendDM(userId: string, dmId: string, content: string) {
+    try {
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
+      if (userContext) {
+        this.socketService.handleSendDM(userContext, dmId, content);
+      }
+    } catch (error) {
+      // ignore
+    }
+  }
+
   @SubscribeMessage('updateChatType')
   handleUpdateChatType(chatRoomId: string, isChange: boolean) {
     this.socketService.handleUpdateChatType(this.server, chatRoomId, isChange);

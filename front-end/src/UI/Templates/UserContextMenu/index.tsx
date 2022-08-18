@@ -115,7 +115,7 @@ export default function UserContextMenu({
         flag |= UserContextMenuFlag.GAME_INVITE;
       }
       // TODO: 추후 유저 온라인 상태가 구현되면 삭제
-      // flag |= UserContextMenuFlag.GAME;
+      flag |= UserContextMenuFlag.GAME;
     }
     return flag;
   }, [mode, friends, target, friendState]);
@@ -164,7 +164,7 @@ export default function UserContextMenu({
                 <InviteGameMenu isRendered={isRendered} />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_SPECTATE}>
-                <SpectateMenu />
+                <SpectateMenu targetName={targetName} />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT}>
                 <MenuDivider />

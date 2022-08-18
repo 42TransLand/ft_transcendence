@@ -25,13 +25,11 @@ export class DmService {
   }
 
   async createDM(
-    sender: string,
+    senderUser: User,
     receiver: string,
     content: string,
-  ): Promise<Dm> {
-    const senderUser = await this.userService.findByNickname(sender);
+  ): Promise<void> {
     const receiverUser = await this.userService.findByNickname(receiver);
-
     const friendShip = await this.friendService.getFriend(
       senderUser,
       receiverUser,
@@ -44,12 +42,6 @@ export class DmService {
       receiverUser,
       content,
     );
-    this.socketGateway.server
-      .to(receiverUser.id)
-      .emit('dm', JSON.stringify({ nickname: sender, content }));
-    this.socketGateway.server
-      .to(senderUser.id)
-      .emit('dm', JSON.stringify({ nickname: sender, content }));
-    return dm;
+    this.socketGateway.handleSendDM(senderUser.id, dm.id, content);
   }
 }

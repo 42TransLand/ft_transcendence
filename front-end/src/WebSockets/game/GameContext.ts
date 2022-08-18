@@ -107,6 +107,12 @@ export default class GameContext {
           });
         }
         break;
+      case 'spectate':
+        this.input.onComponentWillUnmount();
+        if (gameState?.ticket !== GameTicket.SPECTATE) {
+          this.displayHud('INVALID SPECTATE GAME');
+        }
+        break;
       default:
         this.displayHud('INVALID MODE');
         break;
