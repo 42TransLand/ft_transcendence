@@ -49,10 +49,17 @@ function RealGame() {
         (msg) => !msg.success && onInviteResult('게임 참여 실패', msg.error),
       );
     }
+    if (state.gameState?.ticket === GameTicket.SPECTATE) {
+      state.socket?.on(
+        SocketEventName.GAME_SPECTATE_RES,
+        (msg) => !msg.success && onInviteResult('게임 관전 실패', msg.error),
+      );
+    }
     return () => {
       state.socket?.off(SocketEventName.GAME_INVITE_RES);
       state.socket?.off(SocketEventName.GAME_ACCEPT_RES);
       state.socket?.off(SocketEventName.GAME_REFUSE_RES);
+      state.socket?.off(SocketEventName.GAME_SPECTATE_RES);
     };
   }, [state.socket, state.gameState, onInviteResult]);
   React.useEffect(() => {
