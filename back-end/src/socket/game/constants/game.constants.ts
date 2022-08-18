@@ -75,6 +75,14 @@ enum SocketEventName {
   GAME_REFUSE_RES = 'game-refuse-res',
   GAME_INVITE_NOTIFY = 'game-invite-notify',
   GAME_SPECTATE_RES = 'game-spectate-res',
+
+  CHAT_JOIN_NOTIFY = 'chat-join-notify',
+  CHAT_LEAVE_NOTIFY = 'chat-leave-notify',
+  CHAT_MESSAGE_NOTIFY = 'chat-message-notify',
+  CHAT_UPDATE_PROTECTION_NOTIFY = 'chat-update-protection-notify',
+  CHAT_UPDATE_USER_NOTIFY = 'chat-update-user-notify',
+
+  STATE_UPDATE_USER_NOTIFY = 'state-update-user-notify',
 }
 
 export {

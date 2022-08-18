@@ -86,7 +86,7 @@ export class ChatController {
     status: 409,
     description: 'admin으로 줄 유저가 이미 admin일 경우',
   })
-  @Patch('/role/:id/:nickname')
+  @Patch('/role/:id')
   updateRole(
     @GetUser() user: User,
     @Param('id') id: string,
@@ -116,10 +116,7 @@ export class ChatController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
   @Delete('/leave/:id')
-  leaveChatRoom(
-    @GetUser() user: User,
-    @Param('id') id: string,
-  ): Promise<string> {
+  leaveChatRoom(@GetUser() user: User, @Param('id') id: string): Promise<void> {
     return this.chatService.leaveChatRoom(id, user);
   }
 

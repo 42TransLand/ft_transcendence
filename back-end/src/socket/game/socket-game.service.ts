@@ -131,9 +131,9 @@ export class SocketGameService {
     winnerId: string,
     loserId: string,
   ) {
+    await this.gameService.updateGame(gameResult);
     const winner = await this.userService.findById(winnerId);
     const loser = await this.userService.findById(loserId);
-    await this.gameService.updateGame(gameResult);
     await this.userService.updateUser(winner, null, null, 100);
     await this.userService.updateUser(loser, null, null, -100);
   }
