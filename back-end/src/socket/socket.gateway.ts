@@ -23,10 +23,14 @@ import { User } from 'src/users/entities/user.entity';
 import { GameService } from 'src/game/game.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ChatDto } from '../chat/dto/chat.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import GameReservation from './class/game.reservation.class';
 import GameCreateResDto from './game/dto/res/game.create.res.dto';
 import GameJoinResDto from './game/dto/res/game.join.res.dto';
+import { FriendService } from 'src/friend/friend.service';
+import StateUpdateUserNotifyDto from './chat/dto/state.update.user.notify.dto';
+import UserState from './chat/constants/state.user.enum';
+import { SocketStateService } from './socket-state.service';
 
 type GameInviteReqDtoType = { scoreForWin: number } & GameMatchDto;
 
@@ -40,11 +44,15 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private usersSocket: Map<string, string> = new Map(); // key: userId(나중에 string으로 교체), value: socketId
 
+  private readonly logger = new Logger(SocketGateway.name);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(
     private readonly socketService: SocketService,
     private readonly socketGameService: SocketGameService,
+    private readonly socketStateService: SocketStateService,
     private readonly userService: UsersService,
+    private readonly friendService: FriendService,
   ) {}
 
   async handleConnection(@ConnectedSocket() client: Socket) {
@@ -58,14 +66,21 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         throw new Error('User Not Found');
       }
       client.join(user.id);
-      this.userContexts.set(
+      const userContext = new UserContext(
         socketId,
-        new UserContext(socketId, this.server, client, userToken, user, date),
+        this.server,
+        client,
+        userToken,
+        user,
+        date,
       );
+      this.userContexts.set(socketId, userContext);
       this.usersSocket.set(user.id, socketId);
-      console.log(
+      this.logger.debug(
         `Client connected with id: ${user.id} | token: ${userToken} | socketId: ${socketId} | User: ${this.userContexts.size}`,
       );
+      await this.changeUserState(userContext, UserState.ONLINE);
+      await this.retrieveUserStateFromFriends(userContext);
     } catch (error) {
       // ignore
     }
@@ -76,7 +91,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       const userContext = this.userContexts.get(client.id);
       if (userContext) {
-        console.log(`user disconnected: ${userContext.user.nickname}`);
+        await this.changeUserState(userContext, UserState.OFFLINE);
+        this.logger.debug(`user disconnected: ${userContext.user.nickname}`);
         client.leave(userContext.user.id);
         this.socketGameService.disconnect(userContext);
 
@@ -86,7 +102,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.usersSocket.delete(userContext.user.id);
         this.userContexts.delete(client.id);
       }
-      console.log(`Client ${client.id} disconnected`);
+      this.logger.debug(`Client ${client.id} disconnected`);
     } catch (error) {
       // ignore
     }
@@ -127,14 +143,15 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 게임
   @SubscribeMessage(SocketEventName.GAME_ENQUEUE_MATCH_REQ)
-  handleGameEnqueueMatch(@ConnectedSocket() client: Socket) {
+  async handleGameEnqueueMatch(@ConnectedSocket() client: Socket) {
     try {
       const userContext = this.userContexts.get(client.id);
-      console.log(
+      this.logger.debug(
         `GameEnqueueMatchReq: ${client.id} | User: ${this.userContexts.size}`,
       );
 
       if (userContext) {
+        await this.changeUserState(userContext, UserState.INGAME);
         this.socketGameService.enqueue(userContext);
         client.emit(SocketEventName.GAME_ENQUEUE_MATCH_RES, <BaseResultDto>{
           success: true,
@@ -149,13 +166,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(SocketEventName.GAME_LEAVE_REQ)
-  handleGameLeave(@ConnectedSocket() client: Socket) {
+  async handleGameLeave(@ConnectedSocket() client: Socket) {
     try {
       const userContext = this.userContexts.get(client.id);
       if (userContext) {
         this.socketGameService.disconnect(userContext);
+        await this.changeUserState(userContext, UserState.ONLINE);
       }
-      console.log(`Client ${client.id} leaved game screen`);
+      this.logger.debug(`Client ${client.id} leaved game screen`);
     } catch (error) {
       // ignore
     }
@@ -205,6 +223,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
               opponentNickname: user.user.nickname,
               scoreForWin,
             });
+          await this.changeUserState(user, UserState.INGAME);
           client.emit(SocketEventName.GAME_INVITE_RES, <BaseResultDto>{
             success: true,
           });
@@ -245,6 +264,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             false,
             scoreForWin,
           );
+          await this.changeUserState(userContext, UserState.INGAME);
           opponentContext.socket.emit(SocketEventName.GAME_CREATE_RES, <
             GameCreateResDto
           >{
@@ -281,7 +301,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (opponent) {
         // find socket
         const opponentSocket = this.usersSocket.get(opponent.id);
+        const opponentContext = this.userContexts.get(opponentSocket);
 
+        await this.changeUserState(opponentContext, UserState.INGAME);
         this.server.to(opponentSocket).emit(SocketEventName.GAME_REFUSE_RES, {
           message: '상대가 게임 초대를 거절했습니다.',
         });
@@ -292,5 +314,22 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         error: e.message,
       });
     }
+  }
+
+  async getFriends(user: UserContext) {
+    const friends = await this.friendService.findAllFriends(user.user);
+    return friends
+      .filter((friend) => !friend.isBlocked)
+      .map((friend) => friend.id);
+  }
+
+  async changeUserState(user: UserContext, state: UserState) {
+    const friends = await this.getFriends(user);
+    await this.socketStateService.onChangeState(user, state, friends);
+  }
+
+  async retrieveUserStateFromFriends(user: UserContext) {
+    const friends = await this.getFriends(user);
+    await this.socketStateService.retrieveState(user.user.id, friends);
   }
 }
