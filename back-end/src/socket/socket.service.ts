@@ -5,6 +5,7 @@ import { ChatRoomRepository } from 'src/chat/chat.room.repository';
 import { ChatUserRepository } from 'src/chat/chat.user.repository';
 import { ChatJoinNotifyDto } from 'src/socket/chat/dto/chat.join.notify.dto';
 import { ChatLeaveNotifyDto } from 'src/socket/chat/dto/chat.leave.notify.dto';
+import { ChatUSerUpdateType } from './chat/constants/chat.user.update.type.enum';
 import { ChatMessageNotifyDto } from './chat/dto/chat.message.notify.dto';
 import { ChatUpdateProtectionNotifyDto } from './chat/dto/chat.update.protection.notify.dto';
 import { UserContext } from './class/user.class';
@@ -54,11 +55,18 @@ export class SocketService {
     });
   }
 
-  handleUpdateChatType(server, chatId: string, isChange: boolean) {
-    server.to(chatId).emit(SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY, <
+  handleUpdateChatType(server, chatRoomId: string, isChange: boolean) {
+    server.to(chatRoomId).emit(SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY, <
       ChatUpdateProtectionNotifyDto
     >{
       status: isChange,
     });
   }
+
+  handleUpdateChatUser(
+    server,
+    chatRoomId: string,
+    nickname: string,
+    type: ChatUSerUpdateType,
+  ) {}
 }
