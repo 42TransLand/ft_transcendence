@@ -335,8 +335,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (opponent) {
         const opponentSocket = this.usersSocket.get(opponent.id);
         const opponentContext = this.userContexts.get(opponentSocket);
-        const { gameRooms } = opponentContext;
-        if (gameRooms.size !== 0) {
+        if (opponentContext) {
           const { value: room, done } = opponentContext.gameRooms
             .values()
             .next();
@@ -348,6 +347,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             success: true,
           });
         }
+        throw new Error('No user'); 
       }
       throw new Error('No user');
     } catch (e) {
