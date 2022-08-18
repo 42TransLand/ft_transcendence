@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Patch,
   Post,
   Req,
   Res,
@@ -39,6 +40,12 @@ export class TfaController {
       throw new UnauthorizedException('Invalid code');
     }
     await this.userService.turnOnTfa(req.user);
+  }
+
+  @Patch('turnOff')
+  async turnOff(@Req() req) {
+    await this.userService.turnOffTfa(req.user);
+    return HttpStatus.OK;
   }
 
   @Get('authenticate')

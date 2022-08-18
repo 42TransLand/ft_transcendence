@@ -68,4 +68,11 @@ export class UsersService {
   async turnOnTfa(user: User): Promise<void> {
     await this.userRepository.update(user.id, { tfaEnabled: true });
   }
+
+  async turnOffTfa(user: User): Promise<void> {
+    await this.userRepository.update(user.id, {
+      tfaSecret: null,
+      tfaEnabled: false,
+    });
+  }
 }
