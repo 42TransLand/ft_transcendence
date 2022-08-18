@@ -347,7 +347,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             success: true,
           });
         }
-        throw new Error('No user'); 
+        throw new Error('No user');
       }
       throw new Error('No user');
     } catch (e) {

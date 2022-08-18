@@ -59,4 +59,13 @@ export class UsersService {
   ): Promise<User> {
     return this.userRepository.updateUser(user, nickName, profileImg, score);
   }
+
+  // 2차 인증 부분
+  async setTfaSecret(secret: string, user: User): Promise<void> {
+    await this.userRepository.update(user.id, { tfaSecret: secret });
+  }
+
+  async turnOnTfa(user: User): Promise<void> {
+    await this.userRepository.update(user.id, { tfaEnabled: true });
+  }
 }
