@@ -1,5 +1,12 @@
 import React from 'react';
-import { Text, HStack, Spacer, Avatar, AvatarBadge } from '@chakra-ui/react';
+import {
+  Text,
+  HStack,
+  Spacer,
+  Avatar,
+  AvatarBadge,
+  VStack,
+} from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 
@@ -14,8 +21,22 @@ function FriendElement(props: {
     ONLINE: 'green.500',
     OFFLINE: 'red.500',
     INGAME: 'yellow.500',
-    OBSERVE: 'pink.500',
+    OBSERVE: 'blue.500',
   };
+  const statusText = React.useMemo(() => {
+    switch (connectionStatus) {
+      case UserState.ONLINE:
+        return '온라인';
+      case UserState.OFFLINE:
+        return '오프라인';
+      case UserState.INGAME:
+        return '게임중';
+      case UserState.OBSERVE:
+        return '관전중';
+      default:
+        return '오프라인';
+    }
+  }, [connectionStatus]);
 
   return (
     <HStack
@@ -37,7 +58,18 @@ function FriendElement(props: {
         <AvatarBadge boxSize="1em" bgColor={StatusColors[connectionStatus]} />
       </Avatar>
       <Spacer />
-      <Text opacity={isBlocked ? '35%' : '100%'}>{userName}</Text>
+      <VStack justifyContent="space-evenly">
+        <Text opacity={isBlocked ? '35%' : '100%'}>{userName}</Text>
+        <Text
+          w="full"
+          fontSize="xs"
+          fontWeight="bold"
+          textAlign="right"
+          textColor={StatusColors[connectionStatus]}
+        >
+          {statusText}
+        </Text>
+      </VStack>
     </HStack>
   );
 }
