@@ -25,15 +25,16 @@ import {
   PortalProps,
   MenuButtonProps,
   MenuProps,
+  EventListenerEnv,
 } from '@chakra-ui/react';
 
 export interface ContextMenuProps<T extends HTMLElement> {
-  renderMenu: () => JSX.Element | null;
+  renderMenu: (isRendered: boolean) => JSX.Element | null;
   children: (ref: MutableRefObject<T | null>) => JSX.Element | null;
-  eventType: 'contextmenu' | 'click';
   menuProps?: MenuProps;
   portalProps?: PortalProps;
   menuButtonProps?: MenuButtonProps;
+  env: EventListenerEnv;
 }
 
 export function ContextMenu<T extends HTMLElement = HTMLElement>(
@@ -62,37 +63,33 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
     }
   }, [isOpen]);
 
-  useEventListener('click', (e) => {
-    console.log('any event', e);
-    if (
-      !targetRef.current?.contains(e.target as any) &&
-      e.target !== targetRef.current
-    ) {
-      if (isOpen) {
-        setIsOpen(false);
-        console.log('close');
-      }
-    }
-  });
-
   useEventListener(
-    props.eventType,
+    'click',
     (e) => {
-      console.log('click event', e);
       if (
-        targetRef.current?.contains(e.target as any) ||
-        e.target === targetRef.current
+        !targetRef.current?.contains(e.target as any) &&
+        e.target !== targetRef.current
       ) {
-        if (!isOpen) {
-          e.preventDefault();
-          setIsOpen(true);
-          setPosition([e.pageX, e.pageY]);
-          console.log('open');
+        if (isOpen) {
+          setIsOpen(false);
         }
       }
     },
-    targetRef?.current,
+    props.env,
   );
+
+  useEventListener('contextmenu', (e) => {
+    if (
+      targetRef.current?.contains(e.target as any) ||
+      e.target === targetRef.current
+    ) {
+      e.preventDefault();
+      setIsOpen(true);
+      setPosition([e.pageX, e.pageY]);
+    } else {
+      setIsOpen(false);
+    }
+  });
 
   const onCloseHandler = useCallback(() => {
     props.menuProps?.onClose?.();
@@ -124,7 +121,7 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
               }}
               {...props.menuButtonProps}
             />
-            {props.renderMenu()}
+            {props.renderMenu(isDeferredOpen)}
           </Menu>
         </Portal>
       )}

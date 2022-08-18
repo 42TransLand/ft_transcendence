@@ -14,23 +14,26 @@ import { Formik, Form, Field } from 'formik';
 import RoutedModal from '../RoutedModal';
 import ChatHeader from '../../Organisms/ChatHeader';
 import ChatBody from '../../Organisms/ChatBody';
-import RoutedModalExample from '../../Pages/RoutedModalExample';
 import { useChat } from '../../../Hooks/useChat';
 import useToastedChat from '../../../Hooks/useToastedChat';
 import useMe from '../../../Hooks/useMe';
+import Profile from '../../Pages/Profile';
+import ChatModalContext from './ChatModalContext';
 
 export default function ChatModal() {
   const [, dispatch] = useChat();
   const { nickname } = useMe();
   useToastedChat(nickname);
-
+  const ref = React.useRef<HTMLDivElement>(null);
   return (
     <RoutedModal closeOnOverlayClick={false}>
       <ModalHeader display={{ base: 'none', lg: 'flex' }}>
         <ChatHeader />
       </ModalHeader>
-      <ModalBody pb={6}>
-        <ChatBody />
+      <ModalBody ref={ref} pb={6}>
+        <ChatModalContext.Provider value={ref}>
+          <ChatBody />
+        </ChatModalContext.Provider>
       </ModalBody>
       <ModalFooter>
         <Formik
@@ -65,7 +68,7 @@ export default function ChatModal() {
         </Formik>
       </ModalFooter>
       <Routes>
-        <Route path="/example/:name" element={<RoutedModalExample />} />
+        <Route path="/user/:name" element={<Profile />} />
       </Routes>
     </RoutedModal>
   );
