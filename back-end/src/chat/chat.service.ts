@@ -35,10 +35,11 @@ export class ChatService {
   async createChatRoom(
     user: User,
     chatRoomDto: CreateChatRoomDto,
-  ): Promise<void> {
+  ): Promise<string> {
     const room = await this.chatRoomRepository.createChatRoom(chatRoomDto);
     this.chatUserRepository.createRoomOwner(user, room);
     this.socketGateway.handleJoinChatRoom(room.id, user.id);
+    return room.id;
   }
 
   async updatePassword(
