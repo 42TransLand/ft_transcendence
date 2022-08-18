@@ -8,6 +8,7 @@ import { ChatLeaveNotifyDto } from 'src/socket/chat/dto/chat.leave.notify.dto';
 import { ChatUSerUpdateType } from './chat/constants/chat.user.update.type.enum';
 import { ChatMessageNotifyDto } from './chat/dto/chat.message.notify.dto';
 import { ChatUpdateProtectionNotifyDto } from './chat/dto/chat.update.protection.notify.dto';
+import { ChatUpdateUserNotifyDto } from './chat/dto/chat.update.user.notify.dto';
 import { UserContext } from './class/user.class';
 import { SocketEventName } from './game/constants/game.constants';
 
@@ -31,12 +32,24 @@ export class SocketService {
       });
   }
 
-  handleLeaveChatRoom(userInfo: UserContext): void {
-    userInfo.server
-      .to(userInfo.chatRoom)
-      .emit(SocketEventName.CHAT_LEAVE_NOTIFY, <ChatLeaveNotifyDto>{
-        nickname: userInfo.user.nickname,
-      });
+  handleLeaveChatRoom(userInfo: UserContext, is_kick: boolean): void {
+    if (is_kick) {
+      userInfo.server
+        .to(userInfo.chatRoom)
+        .emit(SocketEventName.CHAT_UPDATE_USER_NOTIFY, <
+          ChatUpdateUserNotifyDto
+        >{
+          nickname: userInfo.user.nickname,
+          type: ChatUSerUpdateType.KICK,
+          status: true,
+        });
+    } else {
+      userInfo.server
+        .to(userInfo.chatRoom)
+        .emit(SocketEventName.CHAT_LEAVE_NOTIFY, <ChatLeaveNotifyDto>{
+          nickname: userInfo.user.nickname,
+        });
+    }
     userInfo.socket.leave(userInfo.chatRoom);
     userInfo.chatRoom = null;
   }
@@ -68,5 +81,14 @@ export class SocketService {
     chatRoomId: string,
     nickname: string,
     type: ChatUSerUpdateType,
-  ) {}
+    status: boolean,
+  ) {
+    server.to(chatRoomId).emit(SocketEventName.CHAT_UPDATE_USER_NOTIFY, <
+      ChatUpdateUserNotifyDto
+    >{
+      nickname,
+      type,
+      status,
+    });
+  }
 }

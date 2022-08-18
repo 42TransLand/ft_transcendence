@@ -86,7 +86,7 @@ export class ChatController {
     status: 409,
     description: 'admin으로 줄 유저가 이미 admin일 경우',
   })
-  @Patch('/role/:id/:nickname')
+  @Patch('/role/:id')
   updateRole(
     @GetUser() user: User,
     @Param('id') id: string,

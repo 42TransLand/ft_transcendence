@@ -82,7 +82,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
-          this.socketService.handleLeaveChatRoom(userContext);
+          this.socketService.handleLeaveChatRoom(userContext, false);
         }
         this.usersSocket.delete(userContext.user.id);
         this.userContexts.delete(client.id);
@@ -109,12 +109,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('leaveChatRoom')
-  handleLeaveChatRoom(roomid: string, userId: string): void {
+  handleLeaveChatRoom(roomid: string, userId: string, is_kick: boolean): void {
     try {
       const usersSocket = this.usersSocket.get(userId);
       const userContext = this.userContexts.get(usersSocket);
       if (userContext) {
-        this.socketService.handleLeaveChatRoom(userContext);
+        this.socketService.handleLeaveChatRoom(userContext, is_kick);
       }
     } catch (error) {
       // ignore
@@ -141,12 +141,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     chatRoomId: string,
     nickname: string,
     type: ChatUSerUpdateType,
+    status: boolean,
   ) {
     this.socketService.handleUpdateChatUser(
       this.server,
       chatRoomId,
       nickname,
       type,
+      status,
     );
   }
 
