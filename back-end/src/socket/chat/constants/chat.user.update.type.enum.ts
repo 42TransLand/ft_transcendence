@@ -1,4 +1,4 @@
-export enum ChatUSerUpdateType {
+export enum ChatUserUpdateType {
   KICK = 'KICK',
   MUTE = 'MUTE',
   ADMIN = 'ADMIN',

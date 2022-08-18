@@ -27,7 +27,7 @@ import { Injectable } from '@nestjs/common';
 import GameReservation from './class/game.reservation.class';
 import GameCreateResDto from './game/dto/res/game.create.res.dto';
 import GameJoinResDto from './game/dto/res/game.join.res.dto';
-import { ChatUSerUpdateType } from './chat/constants/chat.user.update.type.enum';
+import { ChatUserUpdateType } from './chat/constants/chat.user.update.type.enum';
 
 type GameInviteReqDtoType = { scoreForWin: number } & GameMatchDto;
 
@@ -140,7 +140,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleUpdateChatUser(
     chatRoomId: string,
     nickname: string,
-    type: ChatUSerUpdateType,
+    type: ChatUserUpdateType,
     status: boolean,
   ) {
     this.socketService.handleUpdateChatUser(
