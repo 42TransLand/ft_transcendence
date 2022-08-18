@@ -31,6 +31,9 @@ import { FriendService } from 'src/friend/friend.service';
 import StateUpdateUserNotifyDto from './chat/dto/state.update.user.notify.dto';
 import UserState from './chat/constants/state.user.enum';
 import { SocketStateService } from './socket-state.service';
+import { GameSpectateReqDto } from './game/dto/req/game.spectate.req.dto';
+import { GameSpectateResDto } from './game/dto/res/game.spectate.res.dto';
+import { ChatUserUpdateType } from './chat/constants/chat.user.update.type.enum';
 
 type GameInviteReqDtoType = { scoreForWin: number } & GameMatchDto;
 
@@ -97,7 +100,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
-          this.socketService.handleLeaveChatRoom(userContext);
+          this.socketService.handleLeaveChatRoom(userContext, false);
         }
         this.usersSocket.delete(userContext.user.id);
         this.userContexts.delete(client.id);
@@ -110,13 +113,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 채팅방
   @SubscribeMessage('joinChatRoom')
-  handleJoinChatRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() { roomId }: ChatDto,
-  ): void {
+  handleJoinChatRoom(roomid: string, userId: string): void {
     try {
-      const userContext = this.userContexts.get(client.id);
-      userContext.chatRoom = roomId;
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
+      userContext.chatRoom = roomid;
       if (userContext) {
         this.socketService.handleJoinChatRoom(userContext);
       }
@@ -126,19 +127,47 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('leaveChatRoom')
-  handleLeaveChatRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() { roomId }: ChatDto,
-  ): void {
+  handleLeaveChatRoom(roomid: string, userId: string, is_kick: boolean): void {
     try {
-      const userContext = this.userContexts.get(client.id);
-      userContext.chatRoom = roomId;
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
       if (userContext) {
-        this.socketService.handleLeaveChatRoom(userContext);
+        this.socketService.handleLeaveChatRoom(userContext, is_kick);
       }
     } catch (error) {
       // ignore
     }
+  }
+
+  @SubscribeMessage('sendMessage')
+  handleChatMessage(nickname: string, chatRoomId: string, content: string) {
+    this.socketService.handleChatMessage(
+      this.server,
+      nickname,
+      chatRoomId,
+      content,
+    );
+  }
+
+  @SubscribeMessage('updateChatType')
+  handleUpdateChatType(chatRoomId: string, isChange: boolean) {
+    this.socketService.handleUpdateChatType(this.server, chatRoomId, isChange);
+  }
+
+  @SubscribeMessage('updateChatUser')
+  handleUpdateChatUser(
+    chatRoomId: string,
+    nickname: string,
+    type: ChatUserUpdateType,
+    status: boolean,
+  ) {
+    this.socketService.handleUpdateChatUser(
+      this.server,
+      chatRoomId,
+      nickname,
+      type,
+      status,
+    );
   }
 
   // 게임
@@ -310,6 +339,41 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       } else throw new Error('No user');
     } catch (e) {
       client.emit(SocketEventName.GAME_REFUSE_RES, <BaseResultDto>{
+        success: false,
+        error: e.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(SocketEventName.GAME_SPECTATE_REQ)
+  async handleGameSpectateRquest(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { nickname }: GameSpectateReqDto,
+  ) {
+    try {
+      const opponent = await this.userService.findByNickname(nickname);
+      const user = this.userContexts.get(client.id);
+
+      if (opponent) {
+        const opponentSocket = this.usersSocket.get(opponent.id);
+        const opponentContext = this.userContexts.get(opponentSocket);
+        if (opponentContext) {
+          const { value: room, done } = opponentContext.gameRooms
+            .values()
+            .next();
+          if (done) {
+            throw new Error('No game');
+          }
+          room.joinSpectator(user);
+          client.emit(SocketEventName.GAME_SPECTATE_RES, <GameSpectateResDto>{
+            success: true,
+          });
+        }
+        throw new Error('No user');
+      }
+      throw new Error('No user');
+    } catch (e) {
+      client.emit(SocketEventName.GAME_SPECTATE_RES, <BaseResultDto>{
         success: false,
         error: e.message,
       });
