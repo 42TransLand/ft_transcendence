@@ -1,27 +1,39 @@
-import React, { useRef } from 'react';
-import { MenuItem, Text, useDisclosure } from '@chakra-ui/react';
+import React from 'react';
+import { MenuItem, Text } from '@chakra-ui/react';
 import { MdSmartDisplay } from 'react-icons/md';
-import WarningAlertDialog from '../../Templates/WarningAlertDialog';
+import axios from 'axios';
+import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 function SpectateMenu() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const cancelRef = useRef(null);
-  const success = false;
+  const { setError, WarningDialogComponent } = useWarningDialog();
+  const onClickHandler = () => {
+    axios
+      .get('/test/spectate')
+      .then(() => {
+        // 방id response로 받아서 거기로 라우팅 시켜주면 될 듯
+        // api로 차단된 여부를 받았다면, setError실패 해주면 될 듯
+      })
+      .catch((err) => {
+        if (err.response) {
+          setError({
+            headerMessage: '관전하기 실패',
+            bodyMessage: err.response.data.message,
+          });
+        } else {
+          setError({
+            headerMessage: '관전하기 실패',
+            bodyMessage: err.message,
+          });
+        }
+      });
+  };
 
   return (
     <>
-      <MenuItem onClick={onOpen} icon={<MdSmartDisplay />}>
+      <MenuItem onClick={onClickHandler} icon={<MdSmartDisplay />}>
         <Text>관전하기</Text>
       </MenuItem>
-      {success === false && (
-        <WarningAlertDialog
-          isOpen={isOpen}
-          onClose={onClose}
-          cancelRef={cancelRef}
-          headerMessage="엥 이게 뭐지"
-          bodyMessage="관전에 실패했습니다"
-        />
-      )}
+      {WarningDialogComponent}
     </>
   );
 }
