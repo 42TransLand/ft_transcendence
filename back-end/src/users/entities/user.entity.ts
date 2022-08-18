@@ -36,11 +36,11 @@ export class User extends BaseEntity {
   //@Column()
   //accessToken: string;
 
-  //@Column()
-  //twoFactorAuth: boolean;
+  @Column({ nullable: true })
+  tfaSecret?: string;
 
-  //@Column()
-  //twoFactorAuthUri: string;
+  @Column({ default: false })
+  tfaEnabled: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
