@@ -54,6 +54,16 @@ export class SocketService {
     userInfo.chatRoom = null;
   }
 
+  handleSendDM(userInfo: UserContext, dmId: string, content: string) {
+    userInfo.socket.join(dmId);
+    userInfo.server.to(dmId).emit(SocketEventName.CHAT_MESSAGE_NOTIFY, <
+      ChatMessageNotifyDto
+    >{
+      nickname: userInfo.user.nickname,
+      content,
+    });
+  }
+
   handleChatMessage(
     server,
     nickname: string,

@@ -70,7 +70,7 @@ export class FriendService {
   async getFriend(sender: User, receiver: User): Promise<Friend> {
     const friendShip = await this.friendRepository.findRow(receiver, sender);
     if (!friendShip || friendShip.status === FriendStatus.PENDDING) {
-      throw new NotFoundException('아무 관계가 아니다.');
+      throw new NotFoundException('아무 관계가 아닙니다.');
     }
     return friendShip;
   }
