@@ -16,7 +16,7 @@ export class DMRepository extends Repository<Dm> {
     try {
       await this.save(DM);
     } catch (error) {
-      throw new InternalServerErrorException();
+      throw new InternalServerErrorException('server error');
     }
     return DM;
   }
@@ -38,7 +38,7 @@ export class DMRepository extends Repository<Dm> {
         },
       ],
       order: {
-        createdAt: 'DESC',
+        createdAt: 'ASC',
       },
     });
 

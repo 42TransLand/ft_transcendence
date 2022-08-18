@@ -1,14 +1,11 @@
-/* eslint-disable */
-
+import { useEffect } from 'react';
 import axios from 'axios';
-import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { ChatActionType, useChat } from '../../../Hooks/useChat';
-import useMe from '../../../Hooks/useMe';
-import useFriends from '../../../Hooks/useFriends';
-import USERS_PROFILE_GET from '../../../Queries/Users/Profile';
 import { useQuery } from '@tanstack/react-query';
-import ChatMemberRole from '../../../Props/ChatMemberRole';
+import { useParams } from 'react-router-dom';
+import { ChatActionType, useChat } from './useChat';
+import useMe from './useMe';
+import USERS_PROFILE_GET from '../Queries/Users/Profile';
+import ChatMemberRole from '../Props/ChatMemberRole';
 
 function dispatchRoomInfo(
   dispatch: (value: ChatActionType) => void,
@@ -49,7 +46,12 @@ function dispatchRoomMember(
   });
 }
 
-function DMContent() {
+interface DMProps {
+  senderNickName: string;
+  content: string;
+}
+
+function useDM() {
   const { userName } = useParams();
   const targetName: string = userName ?? '';
   const [, dispatch] = useChat();
@@ -58,14 +60,21 @@ function DMContent() {
 
   useEffect(() => {
     axios
-      .get(`/dms/${targetName}`)
+      .get(`/dm/${targetName}`)
       .then((response) => {
-        console.log('response:', response);
+        const DMList: DMProps[] = response.data;
+        DMList.forEach((dm) => {
+          dispatch({
+            action: 'chat',
+            name: dm.senderNickName,
+            message: dm.content,
+          });
+        });
       })
       .catch((err) => {
         console.log('err:', err);
       });
-  }, []);
+  }, [dispatch, targetName]);
   useEffect(() => {
     if (data) {
       dispatchRoomInfo(
@@ -93,8 +102,17 @@ function DMContent() {
         false,
       );
     }
-  }, [targetName, dispatch, isLoading]);
-  return <div />;
+  }, [targetName, dispatch, isLoading, data, myId, myName, myProfileImg]);
+
+  const dispatchDM = (nickname: string, message: string) => {
+    dispatch({
+      action: 'chat',
+      name: nickname,
+      message,
+    });
+  };
+
+  return dispatchDM;
 }
 
-export default DMContent;
+export default useDM;
