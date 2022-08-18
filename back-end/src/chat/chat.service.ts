@@ -131,12 +131,11 @@ export class ChatService {
   async joinChatRoom(id: string, user: User, password: string): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
     if (chatRoom.type === ChatType.PROTECT && password !== undefined) {
-      this.chatUserRepository.joinChatRoom(user, chatRoom, password);
-      this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
-      this.socketGateway.handleJoinChatRoom(chatRoom.id, user.id);
+      await this.chatUserRepository.joinChatRoom(user, chatRoom, password);
+    } else {
+      await this.chatUserRepository.joinChatRoom(user, chatRoom);
     }
-    this.chatUserRepository.joinChatRoom(user, chatRoom);
-    this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
+    await this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
     this.socketGateway.handleJoinChatRoom(chatRoom.id, user.id);
   }
 
@@ -156,7 +155,7 @@ export class ChatService {
       // 채팅방에 유저가 없으면 삭제
       await this.chatRoomRepository.deleteChatRoom(chatRoom.id);
     }
-    this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
+    await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
     // 나간 사람이 Owner여서 새로운 오너가 정해져야 하는 경우
     if (findChatUser.role === ChatRole.OWNER) {
       const newOwner = await this.chatUserRepository.findNewOwner(chatRoom);
