@@ -27,6 +27,7 @@ import { Injectable } from '@nestjs/common';
 import GameReservation from './class/game.reservation.class';
 import GameCreateResDto from './game/dto/res/game.create.res.dto';
 import GameJoinResDto from './game/dto/res/game.join.res.dto';
+import { ChatUSerUpdateType } from './chat/constants/chat.user.update.type.enum';
 
 type GameInviteReqDtoType = { scoreForWin: number } & GameMatchDto;
 
@@ -81,7 +82,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
-          this.socketService.handleLeaveChatRoom(userContext);
+          this.socketService.handleLeaveChatRoom(userContext, false);
         }
         this.usersSocket.delete(userContext.user.id);
         this.userContexts.delete(client.id);
@@ -94,13 +95,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // 채팅방
   @SubscribeMessage('joinChatRoom')
-  handleJoinChatRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() { roomId }: ChatDto,
-  ): void {
+  handleJoinChatRoom(roomid: string, userId: string): void {
     try {
-      const userContext = this.userContexts.get(client.id);
-      userContext.chatRoom = roomId;
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
+      userContext.chatRoom = roomid;
       if (userContext) {
         this.socketService.handleJoinChatRoom(userContext);
       }
@@ -110,19 +109,47 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('leaveChatRoom')
-  handleLeaveChatRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() { roomId }: ChatDto,
-  ): void {
+  handleLeaveChatRoom(roomid: string, userId: string, is_kick: boolean): void {
     try {
-      const userContext = this.userContexts.get(client.id);
-      userContext.chatRoom = roomId;
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
       if (userContext) {
-        this.socketService.handleLeaveChatRoom(userContext);
+        this.socketService.handleLeaveChatRoom(userContext, is_kick);
       }
     } catch (error) {
       // ignore
     }
+  }
+
+  @SubscribeMessage('sendMessage')
+  handleChatMessage(nickname: string, chatRoomId: string, content: string) {
+    this.socketService.handleChatMessage(
+      this.server,
+      nickname,
+      chatRoomId,
+      content,
+    );
+  }
+
+  @SubscribeMessage('updateChatType')
+  handleUpdateChatType(chatRoomId: string, isChange: boolean) {
+    this.socketService.handleUpdateChatType(this.server, chatRoomId, isChange);
+  }
+
+  @SubscribeMessage('updateChatUser')
+  handleUpdateChatUser(
+    chatRoomId: string,
+    nickname: string,
+    type: ChatUSerUpdateType,
+    status: boolean,
+  ) {
+    this.socketService.handleUpdateChatUser(
+      this.server,
+      chatRoomId,
+      nickname,
+      type,
+      status,
+    );
   }
 
   // 게임
