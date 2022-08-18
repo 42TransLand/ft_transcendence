@@ -368,6 +368,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
           client.emit(SocketEventName.GAME_SPECTATE_RES, <GameSpectateResDto>{
             success: true,
           });
+          this.changeUserState(user, UserState.OBSERVE);
         }
         throw new Error('No user');
       }
