@@ -3,7 +3,7 @@ import React from 'react';
 import { useChat } from '../../../Hooks/useChat';
 import ScrollableVStack from '../../Atoms/ScrollableVStack';
 import ChatMemberElement from '../../Molecules/ChatMemberElement';
-import ChatModalContext from '../../Templates/ChatModal/ChatModalContext';
+import ChatModalContext from '../ChatModal/ChatModalContext';
 import UserContextMenu from '../../Templates/UserContextMenu';
 
 export default function ChatMembers() {
@@ -13,9 +13,7 @@ export default function ChatMembers() {
     <VStack>
       <HStack w="full" justifyContent="space-between">
         <Text fontSize="sm">채팅방인원</Text>
-        <Text fontSize="sm">
-          {chat.chatMembers.length}/{chat.chatInfo.maxHeadCount}
-        </Text>
+        <Text fontSize="sm">{chat.chatMembers.length}</Text>
       </HStack>
       <ScrollableVStack h="70vh" w="full" paddingRight="0.5em">
         {chat.chatMembers.map((member) => (

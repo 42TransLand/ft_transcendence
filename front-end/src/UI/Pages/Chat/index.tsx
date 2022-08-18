@@ -1,9 +1,9 @@
 import React from 'react';
 // import { useParams } from 'react-router-dom';
 import { ChatProvider /*  useChat */ } from '../../../Hooks/useChat';
+import DMChat from '../../Templates/DMChat';
 // import useMe from '../../../Hooks/useMe';
 // import ChatMemberRole from '../../../Props/ChatMemberRole';
-import ChatModal from '../../Templates/ChatModal';
 // import DMContent from '../../Templates/DMContent';
 
 // function ChatExampleChannel() {
@@ -206,9 +206,5 @@ import ChatModal from '../../Templates/ChatModal';
 // }
 
 export default function Chat({ dm }: { dm: boolean }) {
-  return (
-    <ChatProvider>
-      <ChatModal isDM={dm} />
-    </ChatProvider>
-  );
+  return <ChatProvider>{dm ? <DMChat /> : <DMChat />}</ChatProvider>;
 }

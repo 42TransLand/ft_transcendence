@@ -87,9 +87,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(ChatReducer, {
     chatInfo: {
       roomType: 'private',
-      channelId: 0,
       channelName: '채팅방',
-      maxHeadCount: 0,
     },
     chatMembers: [],
     chats: [],
