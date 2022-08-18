@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Socket } from 'socket.io';
 import UserState from './chat/constants/state.user.enum';
 import StateUpdateUserNotifyDto from './chat/dto/state.update.user.notify.dto';
 import { UserContext } from './class/user.class';
@@ -18,34 +19,47 @@ export class SocketStateService {
     notificationTargetUserIds?: string[],
   ) {
     let connectedUser = this.connectedUsers.get(user.id);
-    this.logger.debug(
-      `[${user.user.id}] change state to ${state} from ${
-        connectedUser?.state ?? 'UNKNOWN'
-      }`,
-    );
     if (state === UserState.ONLINE) {
-      connectedUser = new UserConnected(user.user.id, user.socket);
-      connectedUser.state = state;
-      this.connectedUsers.set(user.id, connectedUser);
+      connectedUser = this.newConnectedUser(user);
     }
     if (connectedUser) {
       connectedUser.state = state;
-
       this.executeTargets(notificationTargetUserIds, (entry) => {
-        this.logger.debug(
-          `[${user.user.id}] send to friend ${entry.userId} state '${entry.state}'`,
-        );
-        entry.socket.emit(SocketEventName.STATE_UPDATE_USER_NOTIFY, <
-          StateUpdateUserNotifyDto
-        >{
-          id: user.user.id,
-          state: connectedUser.state,
-        });
+        this.emit(entry.socket, user.user.id, connectedUser.state);
       });
     }
     if (state === UserState.OFFLINE) {
       this.connectedUsers.delete(user.id);
     }
+  }
+
+  async retrieveState(selfUserId: string, desiredToKnowUserIds: string[]) {
+    const self = this.findByUserId(selfUserId);
+    if (!self) return;
+
+    this.executeTargets(desiredToKnowUserIds, (entry) => {
+      this.emit(self.socket, entry.userId, entry.state);
+    });
+  }
+
+  notifyOneByUserId(selfUserId: string, targetUserId: string) {
+    const target = this.findByUserId(targetUserId);
+    if (!target) return;
+
+    this.emit(target.socket, selfUserId, this.getCurrentState(selfUserId));
+  }
+
+  getCurrentState(userId: string) {
+    const user = this.findByUserId(userId);
+    if (!user) return UserState.OFFLINE;
+    return user.state;
+  }
+
+  private newConnectedUser(user: UserContext) {
+    const connectedUser = new UserConnected(user.user.id, user.socket);
+    connectedUser.state = UserState.ONLINE;
+    this.connectedUsers.set(user.id, connectedUser);
+    return connectedUser;
   }
 
   private findByUserId(userId: string) {
@@ -62,26 +76,7 @@ export class SocketStateService {
     return ret;
   }
 
-  async retrieveState(selfUserId: string, desiredToKnowUserIds: string[]) {
-    const self = this.findByUserId(selfUserId);
-
-    // no self user found
-    if (!self) return;
-
-    this.executeTargets(desiredToKnowUserIds, (entry) => {
-      this.logger.debug(
-        `[${selfUserId}] retrieve state from friend ${entry.userId} state '${entry.state}'`,
-      );
-      self.socket.emit(SocketEventName.STATE_UPDATE_USER_NOTIFY, <
-        StateUpdateUserNotifyDto
-      >{
-        id: entry.userId,
-        state: entry.state,
-      });
-    });
-  }
-
-  executeTargets(
+  private executeTargets(
     targetUserIds: string[],
     callback: (target: UserConnected) => void,
   ) {
@@ -92,18 +87,12 @@ export class SocketStateService {
     });
   }
 
-  notifyTo(selfUserId: string, targetUserId: string) {
-    const self = this.findByUserId(selfUserId);
-    const target = this.findByUserId(targetUserId);
-
-    // no self user found
-    if (!self || !target) return;
-
-    target.socket.emit(SocketEventName.STATE_UPDATE_USER_NOTIFY, <
+  private emit(target: Socket, userId: string, state: UserState) {
+    target.emit(SocketEventName.STATE_UPDATE_USER_NOTIFY, <
       StateUpdateUserNotifyDto
     >{
-      id: selfUserId,
-      state: self.state,
+      id: userId,
+      state,
     });
   }
 }

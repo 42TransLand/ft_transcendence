@@ -51,7 +51,7 @@ export class FriendService {
       user.id,
       friends.map((f) => f.id),
     );
-    this.socketStateService.notifyTo(user.id, userId);
+    this.socketStateService.notifyOneByUserId(user.id, userId);
   }
 
   async rejectFriend(
