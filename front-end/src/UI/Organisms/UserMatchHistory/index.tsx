@@ -5,7 +5,7 @@ import RecordProps from '../../../Props/RecordProps';
 
 function UserMatchHistory(props: { records: RecordProps[]; userName: string }) {
   const { records, userName } = props;
-  records.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  records.sort((a, b) => b.updateAt.localeCompare(a.updateAt));
 
   return (
     <Box
