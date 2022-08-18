@@ -27,6 +27,8 @@ import { Injectable } from '@nestjs/common';
 import GameReservation from './class/game.reservation.class';
 import GameCreateResDto from './game/dto/res/game.create.res.dto';
 import GameJoinResDto from './game/dto/res/game.join.res.dto';
+import { GameSpectateReqDto } from './game/dto/req/game.spectate.req.dto';
+import { GameSpectateResDto } from './game/dto/res/game.spectate.res.dto';
 
 type GameInviteReqDtoType = { scoreForWin: number } & GameMatchDto;
 
@@ -288,6 +290,41 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       } else throw new Error('No user');
     } catch (e) {
       client.emit(SocketEventName.GAME_REFUSE_RES, <BaseResultDto>{
+        success: false,
+        error: e.message,
+      });
+    }
+  }
+
+  @SubscribeMessage(SocketEventName.GAME_SPECTATE_REQ)
+  async handleGameSpectateRquest(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() { nickname }: GameSpectateReqDto,
+  ) {
+    try {
+      const opponent = await this.userService.findByNickname(nickname);
+      const user = this.userContexts.get(client.id);
+
+      if (opponent) {
+        const opponentSocket = this.usersSocket.get(opponent.id);
+        const opponentContext = this.userContexts.get(opponentSocket);
+        const { gameRooms } = opponentContext;
+        if (gameRooms.size !== 0) {
+          const { value: room, done } = opponentContext.gameRooms
+            .values()
+            .next();
+          if (done) {
+            throw new Error('No game');
+          }
+          room.joinSpectator(user);
+          client.emit(SocketEventName.GAME_SPECTATE_RES, <GameSpectateResDto>{
+            success: true,
+          });
+        }
+      }
+      throw new Error('No user');
+    } catch (e) {
+      client.emit(SocketEventName.GAME_SPECTATE_RES, <BaseResultDto>{
         success: false,
         error: e.message,
       });

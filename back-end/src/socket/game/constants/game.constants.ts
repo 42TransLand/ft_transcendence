@@ -58,6 +58,7 @@ enum SocketEventName {
   GAME_INVITE_REQ = 'game-invite-req',
   GAME_ACCEPT_REQ = 'game-accept-req',
   GAME_REFUSE_REQ = 'game-refuse-req',
+  GAME_SPECTATE_REQ = 'game-spectate-req',
 
   BALL_MOVE_NOTIFY = 'ball-move-notify',
   GAME_CREATE_RES = 'game-create-res',
@@ -73,6 +74,7 @@ enum SocketEventName {
   GAME_ACCEPT_RES = 'game-accept-res',
   GAME_REFUSE_RES = 'game-refuse-res',
   GAME_INVITE_NOTIFY = 'game-invite-notify',
+  GAME_SPECTATE_RES = 'game-spectate-res',
 }
 
 export {
