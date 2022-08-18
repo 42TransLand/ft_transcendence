@@ -26,7 +26,7 @@ export class DmController {
   @ApiOperation({ summary: '서로 주고 받은 DM 전부 불러오기' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '없는 유저를 요청했을 때' })
-  @Get('dms/:nickname/')
+  @Get('/:nickname/')
   getDMsByUser(
     @GetUser() user: User,
     @Param('nickname') nickname: string,
@@ -34,11 +34,12 @@ export class DmController {
     return this.dmService.getDMsByUser(user, nickname);
   }
 
-  //@ApiOperation({ summary: '서로 주고 받은 DM 전부 불러오기' })
-  //@Post('/sendDM')
-  //create(
-  //  @GetUser() user: User,
-  //  @Body() { receiver, content }: SendDmDto): Promise<Dm> {
-  //  return this.dmService.createDM(sender, receiver, content);
-  //}
+  // @ApiOperation({ summary: '서로 주고 받은 DM 전부 불러오기' })
+  // @Post('/sendDM/:nickname')
+  // create(
+  //   @GetUser() user: User,
+  //   @Body() { receiver, content }: SendDmDto,
+  // ): Promise<Dm> {
+  //   return this.dmService.createDM(sender, receiver, content);
+  // }
 }
