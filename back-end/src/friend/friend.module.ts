@@ -9,6 +9,7 @@ import { AlertService } from 'src/alert/alert.service';
 import { AlertRepository } from 'src/alert/alert.Repository';
 import { GameService } from 'src/game/game.service';
 import { GameRepository } from 'src/game/game.repository';
+import { SocketModule } from 'src/socket/socket.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { GameRepository } from 'src/game/game.repository';
     TypeOrmExModule.forCustomRepository([GameRepository]),
     TypeOrmExModule.forCustomRepository([UserRepository]),
     TypeOrmExModule.forCustomRepository([AlertRepository]),
+    SocketModule,
   ],
   controllers: [FriendController],
   providers: [UsersService, FriendService, GameService, AlertService],

@@ -11,6 +11,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Friend } from './entities/friend.entity';
 import { FriendStatus } from './constants/friend.enum';
 import { FriendListDto } from './dto/friend.list.dto';
+import { SocketStateService } from 'src/socket/socket-state.service';
 
 @Injectable()
 export class FriendService {
@@ -19,6 +20,7 @@ export class FriendService {
     private friendRepository: FriendRepository,
     private userService: UsersService,
     private alertService: AlertService,
+    private readonly socketStateService: SocketStateService,
   ) {}
 
   async findAllFriends(user: User): Promise<FriendListDto[]> {
@@ -44,6 +46,12 @@ export class FriendService {
     const opponentUser = await this.userService.findById(userId);
     await this.alertService.updateAlert(alertId);
     await this.friendRepository.acceptFriend(opponentUser, user);
+    const friends = await this.findAllFriends(user);
+    await this.socketStateService.retrieveState(
+      user.id,
+      friends.map((f) => f.id),
+    );
+    this.socketStateService.notifyOneByUserId(user.id, userId);
   }
 
   async rejectFriend(
