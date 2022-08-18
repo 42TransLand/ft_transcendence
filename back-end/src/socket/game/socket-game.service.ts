@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { GameMode } from 'src/game/constants/game.mode.enum';
 import { GameService } from 'src/game/game.service';
@@ -35,6 +35,8 @@ export class SocketGameService {
   private rooms: Map<string, Room> = new Map<string, Room>();
 
   private queues: UserContext[] = [];
+
+  private readonly logger = new Logger(SocketGameService.name);
 
   // 게임 큐에 넣기
   enqueue(user: UserContext) {
@@ -98,7 +100,7 @@ export class SocketGameService {
       gameMode,
       ladder,
     ); // TODO 실제 DB에서 생성된 방의 ID를 반환받아야 함.
-    // console.log(dbRecordRoom); // 테스트 필요
+    // this.logger.debug(dbRecordRoom); // 테스트 필요
     const room = new Room(dbRecordRoom, gameMode, ladder, scoreForWin);
 
     room.join(user1, 0);
@@ -124,13 +126,25 @@ export class SocketGameService {
     this.leaveQueue(user);
   }
 
+  private async recordGame(
+    gameResult: GameResult,
+    winnerId: string,
+    loserId: string,
+  ) {
+    await this.gameService.updateGame(gameResult);
+    const winner = await this.userService.findById(winnerId);
+    const loser = await this.userService.findById(loserId);
+    await this.userService.updateUser(winner, null, null, 100);
+    await this.userService.updateUser(loser, null, null, -100);
+  }
+
   @Interval(GAME_TIME_INTERVAL)
   update() {
     this.tryMatch();
     this.rooms.forEach(async (room, index, rooms) => {
       room.update();
       if (room.state === GameState.ENDED || room.isEmpty()) {
-        if (!room.isEmpty()) {
+        if (room.state === GameState.ENDED) {
           // TODO 게임이 종료되어, 게임 결과를 저장해야 함
           const { user: winnerUser, score: winnerScore } = room.winner;
           const { user: loserUser, score: loserScore } = room.loser;
@@ -143,9 +157,7 @@ export class SocketGameService {
             isLadder: room.ladder,
             type: room.gameMode,
           };
-          await this.userService.updateUser(winnerUser.user, null, null, 100);
-          await this.userService.updateUser(loserUser.user, null, null, -100);
-          await this.gameService.updateGame(gameResult);
+          this.recordGame(gameResult, winnerUser.user.id, loserUser.user.id);
         }
         rooms.delete(index);
       }
@@ -178,6 +190,6 @@ export class SocketGameService {
       scoreForWin: room.scoreForWin,
       myIndex: 1,
     });
-    console.log(`Game matched between ${user1.id} and ${user2.id}`);
+    this.logger.debug(`Game matched between ${user1.id} and ${user2.id}`);
   }
 }
