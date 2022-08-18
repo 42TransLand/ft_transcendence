@@ -34,12 +34,13 @@ export class DmController {
     return this.dmService.getDMsByUser(user, nickname);
   }
 
-  // @ApiOperation({ summary: '서로 주고 받은 DM 전부 불러오기' })
-  // @Post('/sendDM/:nickname')
-  // create(
-  //   @GetUser() user: User,
-  //   @Body() { receiver, content }: SendDmDto,
-  // ): Promise<Dm> {
-  //   return this.dmService.createDM(sender, receiver, content);
-  // }
+  @ApiOperation({ summary: 'DM 전송' })
+  @Post('/send/:nickname')
+  create(
+    @GetUser() user: User,
+    @Param('nickname') receiver: string,
+    @Body() { content }: SendDmDto,
+  ): Promise<void> {
+    return this.dmService.createDM(user, receiver, content);
+  }
 }

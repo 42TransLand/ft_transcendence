@@ -43,7 +43,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private usersSocket: Map<string, string> = new Map(); // key: userId(나중에 string으로 교체), value: socketId
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(
     private readonly socketService: SocketService,
     private readonly socketGameService: SocketGameService,
@@ -131,6 +130,19 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       chatRoomId,
       content,
     );
+  }
+
+  @SubscribeMessage('sendDM')
+  handleSendDM(userId: string, dmId: string, content: string) {
+    try {
+      const usersSocket = this.usersSocket.get(userId);
+      const userContext = this.userContexts.get(usersSocket);
+      if (userContext) {
+        this.socketService.handleSendDM(userContext, dmId, content);
+      }
+    } catch (error) {
+      // ignore
+    }
   }
 
   @SubscribeMessage('updateChatType')
@@ -347,7 +359,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             success: true,
           });
         }
-        throw new Error('No user'); 
+        throw new Error('No user');
       }
       throw new Error('No user');
     } catch (e) {
