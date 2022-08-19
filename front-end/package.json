@@ -18,6 +18,7 @@
     "@types/react-dom": "^18.0.6",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^0.27.2",
+    "buffer": "^6.0.3",
     "fontfaceobserver": "^2.3.0",
     "formik": "^2.2.9",
     "framer-motion": "^6.5.1",

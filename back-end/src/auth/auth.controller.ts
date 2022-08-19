@@ -12,12 +12,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/users/entities/user.entity';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly userService: UsersService,
-    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -38,11 +40,8 @@ export class AuthController {
         await this.userService.createUser(req.user);
       }
     }
-    const accessToken = await this.jwtService.sign({ id: req.user.id });
-    res.setHeader(
-      'Set-Cookie',
-      `Authentication=${accessToken}; Path=/; Max-Age=36000`,
-    );
+    const token = await this.authService.generateAccessToken(req.user.id);
+    res.setHeader('Set-Cookie', token);
     res.redirect(this.configService.get('AUTH_REDIRECT_URL'));
   }
 }
