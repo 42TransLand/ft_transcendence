@@ -56,7 +56,7 @@ export class TfaController {
   }
 
   @UseGuards(JwtTfaAuthGuard)
-  @Get('authenticate')
+  @Post('authenticate')
   async authenticate(@Req() req, @Body() { code }: TfaDto) {
     const isCodeValid = await this.tfaService.isTfaCodeValid(req.user, code);
     if (!isCodeValid) {

@@ -10,6 +10,7 @@ import { LogoutProvider } from './Hooks/useLogout';
 import useMe from './Hooks/useMe';
 import InitialSetup from './UI/Pages/InitialSetup';
 import { AppStatus, useApp } from './Hooks/useApp';
+import OTPLogin from './UI/Pages/OTPLogin';
 
 function App() {
   const { status, logout } = useApp();
@@ -26,6 +27,9 @@ function App() {
   }
   if (status === AppStatus.Error) {
     return <Error message="서버와 통신 중 오류가 발생했습니다." />;
+  }
+  if (status === AppStatus.NeedOTPLogin) {
+    return <OTPLogin />;
   }
 
   return (

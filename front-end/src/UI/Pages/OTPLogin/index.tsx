@@ -1,22 +1,41 @@
 import React from 'react';
 import { Text } from '@chakra-ui/react';
 import { Form, Formik, FormikHelpers } from 'formik';
+import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 import LoginBody from '../../Templates/LoginBody';
 import { OTPInputScheme, CodeValueType } from '../OTPRevise';
 import OTPInput from '../../Molecules/OTPInput';
+import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 function OTPLogin() {
-  const tempKey = '123456';
+  const queryClient = useQueryClient();
+  const { setError, WarningDialogComponent } = useWarningDialog();
   const onSubmitHandler = React.useCallback(
     (values: CodeValueType, actions: FormikHelpers<CodeValueType>) => {
-      setTimeout(() => {
-        actions.setSubmitting(false);
-        if (values.code === tempKey) {
+      axios
+        .post('tfa/authenticate', { code: values.code })
+        .then(() => {
+          actions.setSubmitting(false);
+          queryClient.invalidateQueries(['me']);
+        })
+        .catch((err) => {
+          if (err.response) {
+            setError({
+              headerMessage: 'OTP로그인 실패',
+              bodyMessage: err.response.data.message,
+            });
+          } else {
+            setError({
+              headerMessage: 'OTP로그인 실패',
+              bodyMessage: '서버와의 연결이 원활하지 않습니다.',
+            });
+          }
+          actions.setSubmitting(false);
           actions.resetForm();
-        }
-      }, 500);
+        });
     },
-    [],
+    [setError, queryClient],
   );
 
   return (
@@ -39,6 +58,7 @@ function OTPLogin() {
           </Form>
         )}
       </Formik>
+      {WarningDialogComponent}
     </LoginBody>
   );
 }
