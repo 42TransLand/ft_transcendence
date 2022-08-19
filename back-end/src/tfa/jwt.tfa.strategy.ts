@@ -26,7 +26,6 @@ export class JwtTfaStrategy extends PassportStrategy(Strategy, 'jwt-tfa') {
   }
 
   async validate(payload: any) {
-    console.log('payload', payload);
     const user: User = await this.userRepository.findOne({
       where: { id: payload.id },
     });
