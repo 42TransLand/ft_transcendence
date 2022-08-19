@@ -31,12 +31,12 @@ export class AuthController {
   @Get('/42/redirect')
   @UseGuards(AuthGuard('42'))
   async getRedirect42(@Req() req, @Res() res) {
-    const isUser = await this.userService.findById(req.user.id);
-    if (!isUser) {
-      await this.userService.createUser(req.user);
-    }
-    if (isUser.tfaEnabled) {
-      await res.redirect('/tfa/authenticate');
+    try {
+      await this.userService.findById(req.user.id);
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        await this.userService.createUser(req.user);
+      }
     }
     const accessToken = await this.jwtService.sign({ id: req.user.id });
     res.setHeader(
