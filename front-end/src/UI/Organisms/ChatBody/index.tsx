@@ -16,7 +16,12 @@ export default function ChatBody() {
 
   return (
     <Sidebar header={<ChatHeader />} sidebar={<ChatMembers />}>
-      <ScrollableVStack ref={chatViewRef} h="70vh" paddingRight="0.5em">
+      <ScrollableVStack
+        ref={chatViewRef}
+        w="full"
+        h="70vh"
+        paddingRight="0.5em"
+      >
         {chat.chats.map((c) => (
           <ChatElement key={c.id} name={c.name} message={c.message} id={c.id} />
         ))}

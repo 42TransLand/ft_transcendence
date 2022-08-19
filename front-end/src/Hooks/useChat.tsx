@@ -67,7 +67,8 @@ function ChatReducer(state: ChatStateType, action: ChatActionType) {
       return { ...state, events: [...state.events, action.event] };
     }
     case 'clearEvents': {
-      return { ...state, events: [] };
+      if (state.events.length > 0) return { ...state, events: [] };
+      return state;
     }
     default:
       return state;
@@ -86,9 +87,7 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(ChatReducer, {
     chatInfo: {
       roomType: 'private',
-      channelId: 0,
       channelName: '채팅방',
-      maxHeadCount: 0,
     },
     chatMembers: [],
     chats: [],

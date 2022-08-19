@@ -8,15 +8,27 @@ import ProfileContent from '../../Templates/ProfileContent';
 import useMe from '../../../Hooks/useMe';
 
 function Profile() {
-  const { name } = useParams();
+  const { id: chatid, userName, name } = useParams();
   const { nickname: myNickname, rankScore } = useMe();
   const { data, isLoading, error } = useQuery(
     USERS_PROFILE_GET(name ?? myNickname),
   );
-  const { nickname, profileImg, records } = data ?? {
+  const baseUrl = React.useMemo(() => {
+    if (chatid) {
+      return `/chat/${chatid}`;
+    }
+    if (userName) {
+      return `/dm/${userName}`;
+    }
+    return '/';
+  }, [chatid, userName]);
+
+  const { nickname, profileImg, gameRecord, winCount, loseCount } = data ?? {
     nickname: '',
     profileImg: '',
-    records: [],
+    gameRecord: [],
+    winCount: 0,
+    loseCount: 0,
   };
   let modalBody;
 
@@ -31,14 +43,14 @@ function Profile() {
         userImage={`${process.env.REACT_APP_API_HOST}/${profileImg}`}
         isMyself={myNickname === nickname}
         userRating={rankScore}
-        userWins={7500}
-        userLosses={2500}
-        records={records}
+        userWins={winCount}
+        userLosses={loseCount}
+        records={gameRecord}
       />
     );
   }
   return (
-    <RoutedModal>
+    <RoutedModal baseUrl={baseUrl}>
       <ModalCloseButton />
       <ModalBody>{modalBody}</ModalBody>
     </RoutedModal>

@@ -1,12 +1,12 @@
 import React from 'react';
 
 export interface TargetUserContextProps {
-  userId: number;
+  userId: string;
   userName: string;
 }
 
 const TargetUserContext = React.createContext<TargetUserContextProps>({
-  userId: 0,
+  userId: '0',
   userName: '',
 });
 
@@ -20,7 +20,7 @@ export function TargetUserProvider({
   userName,
 }: {
   children: React.ReactNode;
-  userId: number;
+  userId: string;
   userName: string;
 }) {
   const val = React.useMemo(() => ({ userId, userName }), [userId, userName]);

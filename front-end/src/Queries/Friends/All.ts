@@ -1,8 +1,8 @@
 import axios from 'axios';
-import UserInfoProps from '../../Props/UserInfoProps';
+import FriendInfoProps from '../../Props/FriendInfoProps';
 import BuildQuery from '../QueryBuilder';
 
-const FRIEND_GET = BuildQuery<UserInfoProps[]>(['friend'], () =>
+const FRIEND_GET = BuildQuery<FriendInfoProps[]>(['friend'], () =>
   axios.get('/friend'),
 );
 

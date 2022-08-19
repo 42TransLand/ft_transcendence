@@ -1,28 +1,28 @@
 import * as PIXI from 'pixi.js';
 import { Socket } from 'socket.io-client';
-import { GameStateType } from '../Hooks/useSocket';
-import AbstractPlayer from './AbstractPlayer';
-import Ball from './Ball';
-import Decoration from './Decoration';
-import BaseResultDto from './dto/base.result.dto';
+import { GameStateType } from '../../Hooks/useSocket';
+import BaseResultDto from '../dto/base.result.dto';
 import {
   GAME_SCREEN_WIDTH,
   GAME_SCREEN_HEIGHT,
   GAME_SCREEN_UNIT,
   MIDDLE_LINE_SIZE,
   MIDDLE_LINE_GAP,
-  SocketEventName,
-} from './dto/constants/game.constants';
-import GameState from './dto/constants/game.state.enum';
-import GameTicket from './dto/constants/game.ticket.enum';
-import BallMoveNotifyDto from './dto/res/ball.move.notify.dto';
-import GameCreateResDto from './dto/res/game.create.res.dto';
-import GameEndNotifyDto from './dto/res/game.end.notify.dto';
-import GameJoinResDto from './dto/res/game.join.res.dto';
-import GameReadyNotifyDto from './dto/res/game.ready.notify.dto';
-import GameScoreNotifyDto from './dto/res/game.score.notify.dto';
-import GameStateNotifyDto from './dto/res/game.state.notify.dto';
-import PlayerMoveNotifyDto from './dto/res/player.move.notify.dto';
+} from '../dto/constants/game.constants';
+import GameState from '../dto/constants/game.state.enum';
+import GameTicket from '../dto/constants/game.ticket.enum';
+import SocketEventName from '../dto/constants/socket.events.enum';
+import BallMoveNotifyDto from '../dto/res/ball.move.notify.dto';
+import GameCreateResDto from '../dto/res/game.create.res.dto';
+import GameEndNotifyDto from '../dto/res/game.end.notify.dto';
+import GameJoinResDto from '../dto/res/game.join.res.dto';
+import GameReadyNotifyDto from '../dto/res/game.ready.notify.dto';
+import GameScoreNotifyDto from '../dto/res/game.score.notify.dto';
+import GameStateNotifyDto from '../dto/res/game.state.notify.dto';
+import PlayerMoveNotifyDto from '../dto/res/player.move.notify.dto';
+import AbstractPlayer from './AbstractPlayer';
+import Ball from './Ball';
+import Decoration from './Decoration';
 import InputManager from './InputManager';
 import LocalPlayer from './LocalPlayer';
 import RemotePlayer from './RemotePlayer';
@@ -105,6 +105,12 @@ export default class GameContext {
           this.send(SocketEventName.GAME_ACCEPT_REQ, {
             opponentNickname: gameState.opponentNickname,
           });
+        }
+        break;
+      case 'spectate':
+        this.input.onComponentWillUnmount();
+        if (gameState?.ticket !== GameTicket.SPECTATE) {
+          this.displayHud('INVALID SPECTATE GAME');
         }
         break;
       default:

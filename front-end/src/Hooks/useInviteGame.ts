@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useWarningDialog from './useWarningDialog';
 import { useSocket } from './useSocket';
 import InviteGameProps from '../Props/InviteGameProps';
-import GameTicket from '../Games/dto/constants/game.ticket.enum';
+import GameTicket from '../WebSockets/dto/constants/game.ticket.enum';
 
 export default function useInviteGame(inviteeNickname: string) {
   const { setError, WarningDialogComponent } = useWarningDialog();

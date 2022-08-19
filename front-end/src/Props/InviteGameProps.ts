@@ -1,4 +1,4 @@
-import GameMode from '../Games/dto/constants/game.mode.enum';
+import GameMode from '../WebSockets/dto/constants/game.mode.enum';
 
 export default interface InviteGameProps {
   mode: GameMode;

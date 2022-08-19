@@ -22,6 +22,7 @@ export class GameRecord extends BaseEntity {
 
   @ApiProperty({
     description: '왼쪽 유저 아이디',
+    type: () => User,
   })
   // @ManyToOne(() =>User, () => User)
   @ManyToOne(() => User, (user) => user.id)
@@ -29,6 +30,7 @@ export class GameRecord extends BaseEntity {
 
   @ApiProperty({
     description: '오른쪽 유저 아이디',
+    type: () => User,
   })
   @ManyToOne(() => User, (user) => user.id)
   loseUser: User;

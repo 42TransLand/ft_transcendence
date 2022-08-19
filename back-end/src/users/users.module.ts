@@ -5,22 +5,26 @@ import { UsersService } from './users.service';
 import { TypeOrmExModule } from 'src/custom/typeorm.module';
 import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import * as config from 'config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+import { AuthJwtFactory } from 'src/auth/auth.jwt.factory';
+import { GameService } from 'src/game/game.service';
+import { GameRepository } from 'src/game/game.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    TypeOrmExModule.forCustomRepository([GameRepository]),
     TypeOrmExModule.forCustomRepository([UserRepository]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: config.get('jwt.secret'),
-      signOptions: { expiresIn: 36000 },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: AuthJwtFactory,
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, JwtStrategy],
+  providers: [GameService, UsersService, JwtStrategy],
 })
 export class UsersModule {}

@@ -1,7 +1,7 @@
 import React from 'react';
-import { SocketEventName } from '../Games/dto/constants/game.constants';
-import GameMode from '../Games/dto/constants/game.mode.enum';
-import GameMatchDto from '../Games/dto/req/game.match.dto';
+import GameMode from '../WebSockets/dto/constants/game.mode.enum';
+import SocketEventName from '../WebSockets/dto/constants/socket.events.enum';
+import GameMatchDto from '../WebSockets/dto/req/game.match.dto';
 import useInvitation from './useInvitation';
 import { useSocket } from './useSocket';
 import useWarningDialog from './useWarningDialog';

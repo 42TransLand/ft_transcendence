@@ -1,28 +1,32 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import * as config from 'config';
 import { TypeOrmExModule } from 'src/custom/typeorm.module';
+import { GameRepository } from 'src/game/game.repository';
+import { GameService } from 'src/game/game.service';
 import { UserRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { Strategy42 } from './42auth.strategy';
 import { AuthController } from './auth.controller';
+import { AuthJwtFactory } from './auth.jwt.factory';
 import { AuthService } from './auth.service';
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: config.get('jwt.secret'),
-      signOptions: { expiresIn: 36000 },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: AuthJwtFactory,
     }),
     HttpModule,
+    TypeOrmExModule.forCustomRepository([GameRepository]),
     TypeOrmExModule.forCustomRepository([UserRepository]),
   ],
 
   controllers: [AuthController],
-  providers: [AuthService, Strategy42, UsersService],
+  providers: [AuthService, Strategy42, GameService, UsersService],
   exports: [PassportModule, Strategy42],
 })
 export class AuthModule {}

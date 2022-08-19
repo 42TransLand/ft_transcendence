@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
-import GameScoreNotifyDto from './dto/res/game.score.notify.dto';
-import PlayerMoveNotifyDto from './dto/res/player.move.notify.dto';
+import GameScoreNotifyDto from '../dto/res/game.score.notify.dto';
+import PlayerMoveNotifyDto from '../dto/res/player.move.notify.dto';
 import Racket from './Racket';
 import Score from './Score';
 

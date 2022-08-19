@@ -2,7 +2,7 @@ import {
   PLAYER_RACKET_HEIGHT,
   PLAYER_RACKET_INIT_POS,
   PLAYER_RACKET_WIDTH,
-} from './dto/constants/game.constants';
+} from '../dto/constants/game.constants';
 import GameObject from './GameObject';
 
 export default class Racket extends GameObject {

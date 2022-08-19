@@ -10,10 +10,7 @@ export class UserContext {
 
   public gameReservation: GameReservation | null = null;
 
-  // DM
-  // 채팅방
   public chatRoom: string;
-  // 알림
 
   constructor(
     public readonly id: string,

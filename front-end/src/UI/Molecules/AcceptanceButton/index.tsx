@@ -60,7 +60,7 @@ function AcceptanceButton({
   senderId,
 }: {
   alertId: string;
-  senderId: number;
+  senderId: string;
 }) {
   const [acceptanceState, setAcceptanceState] = useState({
     isChecked: false,

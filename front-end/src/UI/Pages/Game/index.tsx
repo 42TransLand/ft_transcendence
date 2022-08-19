@@ -3,10 +3,10 @@ import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import FontFaceObserver from 'fontfaceobserver';
 import styled from 'styled-components';
 import Loading from '../../Templates/Loading';
-import { SocketEventName } from '../../../Games/dto/constants/game.constants';
 import useGame from '../../../Hooks/useGame';
 import { useSocket } from '../../../Hooks/useSocket';
-import GameTicket from '../../../Games/dto/constants/game.ticket.enum';
+import GameTicket from '../../../WebSockets/dto/constants/game.ticket.enum';
+import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
 
 const GameView = styled.div`
   min-height: 100vh;
@@ -49,10 +49,17 @@ function RealGame() {
         (msg) => !msg.success && onInviteResult('게임 참여 실패', msg.error),
       );
     }
+    if (state.gameState?.ticket === GameTicket.SPECTATE) {
+      state.socket?.on(
+        SocketEventName.GAME_SPECTATE_RES,
+        (msg) => !msg.success && onInviteResult('게임 관전 실패', msg.error),
+      );
+    }
     return () => {
       state.socket?.off(SocketEventName.GAME_INVITE_RES);
       state.socket?.off(SocketEventName.GAME_ACCEPT_RES);
       state.socket?.off(SocketEventName.GAME_REFUSE_RES);
+      state.socket?.off(SocketEventName.GAME_SPECTATE_RES);
     };
   }, [state.socket, state.gameState, onInviteResult]);
   React.useEffect(() => {
