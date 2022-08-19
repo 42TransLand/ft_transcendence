@@ -133,12 +133,12 @@ export default class GameContext {
   }
 
   public onComponentWillUnmount() {
-    this.app.view.onclick = null;
     this.app.ticker.remove(this.input.update);
     if (this.mode !== 'spectate') {
+      this.app.view.onclick = null;
       this.input.onComponentWillUnmount();
-      this.socket.emit(SocketEventName.GAME_LEAVE_REQ);
     }
+    this.socket.emit(SocketEventName.GAME_LEAVE_REQ);
   }
 
   public displayHud(reason: string) {
