@@ -45,8 +45,8 @@ export class GameService {
         loseUser: true,
       },
       where: {
-        winUser: Equal(user),
-        loseUser: Equal(user),
+        winUser: { id: Equal(user.id) },
+        loseUser: { id: Equal(user.id) },
       },
     });
     return games;

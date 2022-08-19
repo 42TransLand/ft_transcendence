@@ -5,11 +5,5 @@ export class Auth42userDto {
   id: string;
 
   @ApiProperty({ description: 'required' })
-  username: string;
-
-  @ApiProperty({ description: 'required' })
   email: string;
-
-  @ApiProperty({ description: 'required' })
-  avatar: string;
 }

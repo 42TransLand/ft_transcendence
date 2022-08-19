@@ -9,10 +9,22 @@ export class UserProfileDto {
   id: string;
 
   @ApiProperty({
+    example: 'true',
+    description: '사용자의 첫 로그인 여부',
+  })
+  isFirstLogin: boolean;
+
+  @ApiProperty({
     example: 'dcho',
     description: '사용자의 닉네임',
   })
   nickname: string;
+
+  @ApiProperty({
+    example: 'true',
+    description: '2차 인증 여부',
+  })
+  tfaEnabled: boolean;
 
   @ApiProperty({
     example: 'dcho@student.42seoul.kr',
