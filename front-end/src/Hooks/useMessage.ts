@@ -35,19 +35,16 @@ export default function useMessage() {
   );
   const displayDMHistory = React.useCallback(
     (targetName: string) => {
-      axios
-        .get(`/dm/${targetName}`)
-        .then((response) => {
-          const DMList: ChatMessageProps[] = response.data;
-          DMList.forEach((dm) => {
-            dispatch({
-              action: 'chat',
-              name: dm.senderNickName,
-              message: dm.content,
-            });
+      axios.get(`/dm/${targetName}`).then((response) => {
+        const DMList: ChatMessageProps[] = response.data;
+        DMList.forEach((dm) => {
+          dispatch({
+            action: 'chat',
+            name: dm.senderNickName,
+            message: dm.content,
           });
-        })
-        .catch((err) => console.log(err));
+        });
+      });
     },
     [dispatch],
   );

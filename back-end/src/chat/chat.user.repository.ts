@@ -113,6 +113,10 @@ export class ChatUserRepository extends Repository<ChatUser> {
         validation = await bcrypt.compare(password, chatRoom.password);
       }
     }
+    if (chatRoom.type === 'PUBLIC') {
+      validation = true;
+    }
+
     if (validation !== true) {
       throw new NotFoundException('패스워드가 올바르지 않습니다.');
     }

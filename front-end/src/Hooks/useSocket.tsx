@@ -46,7 +46,6 @@ type SocketActionType =
       action: 'setCustomGame';
       gameState: GameStateType | null;
     }
-  | { action: 'chat'; nickname: string; content: string }
   | {
       action: 'setSocketError';
       error: WarningDialogProps;
