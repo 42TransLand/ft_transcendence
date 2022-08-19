@@ -42,6 +42,11 @@ export class DmService {
       receiverUser,
       content,
     );
-    this.socketGateway.handleSendDM(senderUser.id, dm.id, content);
+    this.socketGateway.handleSendDM(
+      senderUser.id,
+      receiverUser.id,
+      dm.id,
+      content,
+    );
   }
 }
