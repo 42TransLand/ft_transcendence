@@ -14,7 +14,7 @@ import { UserRecordDto } from './dto/user.record.dto';
 
 @CustomRepository(User)
 export class UserRepository extends Repository<User> {
-  async createUser(user: Auth42userDto): Promise<void> {
+  async createUser(user: Auth42userDto): Promise<User> {
     const newUser = this.create({
       id: user.id,
       nickname: user.username,
@@ -29,6 +29,7 @@ export class UserRepository extends Repository<User> {
         throw new InternalServerErrorException();
       }
     }
+    return newUser;
   }
 
   async findByUser(user: User): Promise<User> {
