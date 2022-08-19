@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
-import TwoFAInput from '../../Molecules/TwoFAInput';
+import OTPInput from '../../Molecules/OTPInput';
 import RoutedModal from '../../Templates/RoutedModal';
 
 export const OTPInputScheme = Yup.object().shape({
@@ -46,11 +46,7 @@ function OTPBody({
           <Box w="15vw" h="20vh" bgColor="blue.200">
             대충 QR 코드 나타날 곳
           </Box>
-          <TwoFAInput
-            size="30%"
-            textColor="black"
-            isSubmitting={isSubmitting}
-          />
+          <OTPInput size="30%" textColor="black" isSubmitting={isSubmitting} />
         </>
       )}
       {isEnabled === true && (
@@ -96,7 +92,7 @@ function OTPRevise() {
         {({ isSubmitting }) => (
           <Form>
             <ModalHeader>
-              Two factor Management
+              OTP Management
               <ModalCloseButton />
             </ModalHeader>
             <ModalBody>
