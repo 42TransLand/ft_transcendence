@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import WarningDialogProps from '../Props/WarningDialogProps';
 import GameMode from '../WebSockets/dto/constants/game.mode.enum';
 import GameTicket from '../WebSockets/dto/constants/game.ticket.enum';
+import SocketEventName from '../WebSockets/dto/constants/socket.events.enum';
 import UserState from '../WebSockets/dto/constants/user.state.enum';
 import StateUpdateUserNotify from '../WebSockets/dto/res/state.update.user.notify.dto';
 
@@ -108,17 +109,20 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
   }
 }
 
-export function UpdateUserStateListener(
+function AddUpdateUserStateListener(
   socket: Socket,
   dispatch: React.Dispatch<SocketActionType>,
 ) {
-  socket.on('updateUserState', (data: StateUpdateUserNotify) => {
-    dispatch({
-      action: 'updateUserState',
-      friendId: data.id,
-      state: data.state,
-    });
-  });
+  socket.on(
+    SocketEventName.STATE_UPDATE_USER_NOTIFY,
+    (data: StateUpdateUserNotify) => {
+      dispatch({
+        action: 'updateUserState',
+        friendId: data.id,
+        state: data.state,
+      });
+    },
+  );
 }
 
 function SocketProvider({
@@ -149,6 +153,11 @@ function SocketProvider({
     });
     socket.connect();
   }, [nickname]);
+  React.useEffect(() => {
+    if (state.socket && state.socketState === SocketState.CONNECTED)
+      AddUpdateUserStateListener(state.socket, dispatch);
+    else state.socket?.off(SocketEventName.STATE_UPDATE_USER_NOTIFY);
+  }, [state.socket, state.socketState, dispatch]);
 
   return (
     <SocketStateContext.Provider value={val}>
