@@ -44,6 +44,8 @@ export class TfaController {
       throw new UnauthorizedException('Invalid code');
     }
     await this.userService.turnOnTfa(req.user);
+    const token = await this.authService.generateAccessToken(req.user.id, true);
+    req.res.setHeader('Set-Cookie', token);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -56,7 +58,7 @@ export class TfaController {
   }
 
   @UseGuards(JwtTfaAuthGuard)
-  @Get('authenticate')
+  @Post('authenticate')
   async authenticate(@Req() req, @Body() { code }: TfaDto) {
     const isCodeValid = await this.tfaService.isTfaCodeValid(req.user, code);
     if (!isCodeValid) {

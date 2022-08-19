@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { getCookie, setCookie } from 'typescript-cookie';
 import USERS_ME_GET from '../Queries/Users/Me';
 import useMe from './useMe';
@@ -11,6 +11,7 @@ export enum AppStatus {
   NeedLogin,
   NeedInitialSetup,
   Authenticated,
+  NeedOTPLogin,
 }
 
 export function useApp() {
@@ -28,10 +29,13 @@ export function useApp() {
   }, [setAuthCookie]);
   const { id: firstLogin } = useMe();
   const status = React.useMemo(() => {
+    const err = error as AxiosError<any, any> | null;
     if (!authCookie) return AppStatus.NeedLogin;
     if (isLoading) return AppStatus.NowLoading;
     if (!firstLogin) return AppStatus.NeedInitialSetup;
-    if (error?.response?.status === 401) {
+    if (err?.response?.status === 401) {
+      if (err?.response?.data.message === 'TFA not authenticated')
+        return AppStatus.NeedOTPLogin;
       logout();
       return AppStatus.NeedLogin;
     }
