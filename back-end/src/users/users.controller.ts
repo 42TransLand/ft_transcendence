@@ -71,12 +71,8 @@ export class UsersController {
   @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
   @Get('/check')
-  searchNickname(
-    @GetUser() user: User,
-    @Body() { nickname }: UserDto,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<boolean> {
-    return this.usersService.checkNickname(user, nickname, file?.path);
+  searchNickname(@Body() { nickname }: UserDto): Promise<boolean> {
+    return this.usersService.checkNickname(nickname);
   }
 
   @ApiOperation({ summary: '나의 정보 수정' })
