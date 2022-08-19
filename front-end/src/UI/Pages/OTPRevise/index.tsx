@@ -13,9 +13,11 @@ import { Buffer } from 'buffer';
 import { Form, Formik, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import OTPInput from '../../Molecules/OTPInput';
 import RoutedModal from '../../Templates/RoutedModal';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
+import useMe from '../../../Hooks/useMe';
 
 export const OTPInputScheme = Yup.object().shape({
   code: Yup.string()
@@ -76,16 +78,17 @@ function OTPBody({
 }
 
 function OTPRevise() {
+  const queryClient = useQueryClient();
+  const { tfaEnabled: isEnabled } = useMe();
   const { setError, WarningDialogComponent } = useWarningDialog();
-  const [isEnabled, setIsEnabled] = useState(false);
   const onSubmitHandler = React.useCallback(
     (values: CodeValueType, actions: FormikHelpers<CodeValueType>) => {
       if (isEnabled === true) {
         axios
           .patch('tfa/turnOff')
           .then(() => {
-            setIsEnabled(false);
             actions.setSubmitting(false);
+            queryClient.invalidateQueries(['me']);
           })
           .catch((err) => {
             if (err.response) {
@@ -105,8 +108,8 @@ function OTPRevise() {
         axios
           .post('tfa/turnOn', { code: values.code })
           .then(() => {
-            setIsEnabled(!isEnabled);
             actions.setSubmitting(false);
+            queryClient.invalidateQueries(['me']);
           })
           .catch((err) => {
             if (err.response) {
@@ -125,7 +128,7 @@ function OTPRevise() {
         actions.resetForm();
       }
     },
-    [isEnabled, setError],
+    [isEnabled, setError, queryClient],
   );
 
   const [img, setImg] = useState('');
