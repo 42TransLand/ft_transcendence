@@ -1,7 +1,7 @@
 import React from 'react';
 // import { useParams } from 'react-router-dom';
 import { ChatProvider /*  useChat */ } from '../../../Hooks/useChat';
-import DMChat from '../../Templates/DMChat';
+import DirectMessage from '../../Templates/DirectMessage';
 // import useMe from '../../../Hooks/useMe';
 // import ChatMemberRole from '../../../Props/ChatMemberRole';
 // import DMContent from '../../Templates/DMContent';
@@ -206,5 +206,7 @@ import DMChat from '../../Templates/DMChat';
 // }
 
 export default function Chat({ dm }: { dm: boolean }) {
-  return <ChatProvider>{dm ? <DMChat /> : <DMChat />}</ChatProvider>;
+  return (
+    <ChatProvider>{dm ? <DirectMessage /> : <DirectMessage />}</ChatProvider>
+  );
 }

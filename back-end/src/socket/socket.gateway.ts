@@ -150,12 +150,24 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sendDM')
-  handleSendDM(userId: string, dmId: string, content: string) {
+  handleSendDM(
+    senderId: string,
+    receiverId: string,
+    dmId: string,
+    content: string,
+  ) {
     try {
-      const usersSocket = this.usersSocket.get(userId);
-      const userContext = this.userContexts.get(usersSocket);
-      if (userContext) {
-        this.socketService.handleSendDM(userContext, dmId, content);
+      const senderSocket = this.usersSocket.get(senderId);
+      const senderContext = this.userContexts.get(senderSocket);
+      const receiverSocket = this.usersSocket.get(receiverId);
+      const receiverContext = this.userContexts.get(receiverSocket);
+      if (senderContext && receiverContext) {
+        this.socketService.handleSendDM(
+          senderContext,
+          receiverContext,
+          dmId,
+          content,
+        );
       }
     } catch (error) {
       // ignore
