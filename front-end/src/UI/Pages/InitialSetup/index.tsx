@@ -19,7 +19,6 @@ import { HiPencilAlt } from 'react-icons/hi';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { IoMdSave } from 'react-icons/io';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import USERS_ME_GET from '../../../Queries/Users/Me';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
@@ -40,7 +39,6 @@ export default function InitialSetup() {
   const [inputName, setInputName] = useState(nickname);
   const queryClient = useQueryClient();
   const { setError, WarningDialogComponent } = useWarningDialog();
-  const navigate = useNavigate();
 
   const onSubmitHandler = React.useCallback(
     (
@@ -53,13 +51,12 @@ export default function InitialSetup() {
           setInputName(submitName);
           queryClient.invalidateQueries(['me']);
           helper.setSubmitting(false);
-          navigate('/', { replace: true });
         })
         .catch(() => {
           helper.setSubmitting(false);
         });
     },
-    [queryClient, navigate],
+    [queryClient],
   );
 
   const imageFormRef = React.useRef<HTMLInputElement>(null);
@@ -93,6 +90,12 @@ export default function InitialSetup() {
     },
     [queryClient, setError],
   );
+  const onCommitHandler = React.useCallback(() => {
+    // TODO: 첫번째 로그인 비활성화 API 호출
+    axios.patch('/users/me', { commit: true }).then(() => {
+      queryClient.invalidateQueries(['me']);
+    });
+  }, [queryClient]);
 
   return (
     <Center w="100%" h="100vh">
@@ -160,6 +163,9 @@ export default function InitialSetup() {
             )}
           </Formik>
         </Box>
+        <Center pt="3em">
+          <Button onClick={onCommitHandler}>설정 완료</Button>
+        </Center>
       </VStack>
       {WarningDialogComponent}
     </Center>
