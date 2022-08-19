@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GameRecord } from 'src/game/entities/game.entity';
-import { Transform } from 'stream';
 import {
   BaseEntity,
   Column,
@@ -28,12 +27,6 @@ export class User extends BaseEntity {
 
   @Column({ default: DEFAULT_PROFILE_IMG })
   profileImg: string;
-
-  //@Column()
-  //status: string;
-
-  //@Column()
-  //accessToken: string;
 
   @Column({ nullable: true })
   tfaSecret?: string;

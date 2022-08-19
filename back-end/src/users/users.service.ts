@@ -16,7 +16,7 @@ export class UsersService {
   ) {}
 
   async createUser(user: Auth42userDto): Promise<void> {
-    const randomName = Math.random().toString(36).substr(2, 11);
+    const randomName = Math.random().toString(36).substring(2, 12);
     return this.userRepository.createUser(user, randomName);
   }
 
@@ -33,7 +33,6 @@ export class UsersService {
       user = await this.userRepository.findByNickname(nickName);
     }
     const gameRecord = await this.gameService.getGamesByUserId(user);
-    console.log(gameRecord);
     return this.userRepository.infoUser(user, gameRecord);
   }
 
@@ -49,11 +48,7 @@ export class UsersService {
     return this.userRepository.searchUsers(search);
   }
 
-  async checkNickname(
-    user: User,
-    nickname: string,
-    profileImg?: string,
-  ): Promise<boolean> {
+  async checkNickname(nickname: string): Promise<boolean> {
     return this.userRepository.checkNickname(nickname);
   }
 
