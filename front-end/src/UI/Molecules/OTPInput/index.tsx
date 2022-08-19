@@ -9,14 +9,14 @@ import {
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { ErrorMessage, Field } from 'formik';
 
-export interface TwoFAProps {
+export interface OTPProps {
   isSubmitting: boolean;
   size: string;
   textColor: string;
 }
 
-function TwoFAInput(twofaProps: TwoFAProps) {
-  const { isSubmitting, size, textColor } = twofaProps;
+function OTPInput(otpProps: OTPProps) {
+  const { isSubmitting, size, textColor } = otpProps;
 
   return (
     <>
@@ -46,4 +46,4 @@ function TwoFAInput(twofaProps: TwoFAProps) {
   );
 }
 
-export default TwoFAInput;
+export default OTPInput;

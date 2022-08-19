@@ -37,16 +37,7 @@ export class DmService {
     if (friendShip.block === true) {
       throw new NotFoundException('차단된 사용자입니다.');
     }
-    const dm = await this.dmRepository.createDM(
-      senderUser,
-      receiverUser,
-      content,
-    );
-    this.socketGateway.handleSendDM(
-      senderUser.id,
-      receiverUser.id,
-      dm.id,
-      content,
-    );
+    await this.dmRepository.createDM(senderUser, receiverUser, content);
+    this.socketGateway.handleSendDM(senderUser.id, receiverUser.id, content);
   }
 }

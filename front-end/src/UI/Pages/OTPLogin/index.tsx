@@ -3,7 +3,7 @@ import { Text } from '@chakra-ui/react';
 import { Form, Formik, FormikHelpers } from 'formik';
 import LoginBody from '../../Templates/LoginBody';
 import { OTPInputScheme, CodeValueType } from '../OTPRevise';
-import TwoFAInput from '../../Molecules/TwoFAInput';
+import OTPInput from '../../Molecules/OTPInput';
 
 function OTPLogin() {
   const tempKey = '123456';
@@ -31,7 +31,7 @@ function OTPLogin() {
             <Text color="white" fontSize="4xl">
               <b>Authentication Code를 입력하세요</b>
             </Text>
-            <TwoFAInput
+            <OTPInput
               textColor="white"
               size="100%"
               isSubmitting={isSubmitting}

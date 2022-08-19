@@ -57,17 +57,14 @@ export class SocketService {
   handleSendDM(
     senderInfo: UserContext,
     receiverInfo: UserContext,
-    dmId: string,
     content: string,
   ) {
-    senderInfo.socket.join(dmId);
-    receiverInfo.socket.join(dmId);
-    senderInfo.server.to(dmId).emit(SocketEventName.CHAT_MESSAGE_NOTIFY, <
-      ChatMessageNotifyDto
-    >{
-      nickname: senderInfo.user.nickname,
-      content,
-    });
+    senderInfo.server
+      .to(receiverInfo.id)
+      .emit(SocketEventName.CHAT_MESSAGE_NOTIFY, <ChatMessageNotifyDto>{
+        nickname: senderInfo.user.nickname,
+        content,
+      });
   }
 
   handleChatMessage(

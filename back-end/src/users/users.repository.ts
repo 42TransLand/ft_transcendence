@@ -29,6 +29,7 @@ export class UserRepository extends Repository<User> {
         throw new InternalServerErrorException();
       }
     }
+    return newUser;
   }
 
   async findByUser(user: User): Promise<User> {
