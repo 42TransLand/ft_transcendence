@@ -30,7 +30,7 @@ export function useApp() {
   const status = React.useMemo(() => {
     if (!authCookie) return AppStatus.NeedLogin;
     if (isLoading) return AppStatus.NowLoading;
-    if (firstLogin) return AppStatus.NeedInitialSetup;
+    if (!firstLogin) return AppStatus.NeedInitialSetup;
     if (error?.response?.status === 401) {
       logout();
       return AppStatus.NeedLogin;
