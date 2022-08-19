@@ -50,6 +50,8 @@ export default class GameContext {
 
   private readonly hudMessage: PIXI.Text;
 
+  private readonly mode: string;
+
   constructor(
     public readonly socket: Socket,
     public readonly gameState: GameStateType | null,
@@ -85,10 +87,10 @@ export default class GameContext {
     this.hudMessage.anchor.y = 0.5;
     this.app.stage.addChild(this.hudMessage);
 
-    const mode = searchParams.get('mode');
+    this.mode = searchParams.get('mode') ?? '';
 
-    if (!mode) this.hudMessage.text = 'INVALID ACCESS :(';
-    switch (mode) {
+    if (!this.mode) this.hudMessage.text = 'INVALID ACCESS :(';
+    switch (this.mode) {
       case 'match-making':
         socket.emit(SocketEventName.GAME_ENQUEUE_MATCH_REQ);
         break;
@@ -108,7 +110,6 @@ export default class GameContext {
         }
         break;
       case 'spectate':
-        this.input.onComponentWillUnmount();
         if (gameState?.ticket !== GameTicket.SPECTATE) {
           this.displayHud('INVALID SPECTATE GAME');
         }
@@ -124,15 +125,19 @@ export default class GameContext {
   }
 
   public onComponentDidMount() {
-    this.app.view.onclick = this.input.requestPointerLock;
     this.app.ticker.add(this.input.update);
-    this.input.onComponentDidMount();
+    if (this.mode !== 'spectate') {
+      this.app.view.onclick = this.input.requestPointerLock;
+      this.input.onComponentDidMount();
+    }
   }
 
   public onComponentWillUnmount() {
-    this.app.view.onclick = null;
     this.app.ticker.remove(this.input.update);
-    this.input.onComponentWillUnmount();
+    if (this.mode !== 'spectate') {
+      this.app.view.onclick = null;
+      this.input.onComponentWillUnmount();
+    }
     this.socket.emit(SocketEventName.GAME_LEAVE_REQ);
   }
 
