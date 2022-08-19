@@ -80,6 +80,7 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
     case 'connected':
       return { ...beforeState, socketState: SocketState.CONNECTED };
     case 'disconnect':
+      beforeState.socket?.disconnect();
       return {
         ...beforeState,
         socket: null,
