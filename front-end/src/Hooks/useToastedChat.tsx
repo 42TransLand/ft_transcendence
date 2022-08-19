@@ -5,11 +5,9 @@ import { useChat } from './useChat';
 export default function useToastedChat(selfName: string) {
   const [state, dispatch] = useChat();
   const toast = useToast();
-  const isSelf = React.useCallback(
-    (target: string): boolean => selfName === target,
-    [selfName],
-  );
+
   React.useEffect(() => {
+    const isSelf = (target: string): boolean => selfName === target;
     const events = state.events.slice();
     dispatch({ action: 'clearEvents' });
     events.forEach((event) => {
@@ -64,5 +62,5 @@ export default function useToastedChat(selfName: string) {
         });
       }
     });
-  }, [state, dispatch, isSelf, toast]);
+  }, [state.events, dispatch, selfName, toast]);
 }

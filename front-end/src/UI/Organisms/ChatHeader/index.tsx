@@ -11,8 +11,8 @@ import { LockIcon } from '@chakra-ui/icons';
 import { IoIosChatbubbles } from 'react-icons/io';
 import { FiSend } from 'react-icons/fi';
 import { useChat } from '../../../Hooks/useChat';
-import PopoverButton from '../PopoverButton';
 import ChangePasswordChannel from '../../Templates/ChangePasswordChannel';
+import PopoverButton from '../PopoverButton';
 
 export default function ChatHeader() {
   const [chat] = useChat();
@@ -22,21 +22,25 @@ export default function ChatHeader() {
     if (chat.chatInfo.roomType === 'protected')
       return <Icon as={LockIcon} boxSize="3em" />;
     return <Icon as={FiSend} boxSize="3em" />;
-  }, [chat]);
+  }, [chat.chatInfo.roomType]);
 
   return (
     <HStack justifyContent="space-between">
       <HStack justifyContent="flex-start">
         <Square centerContent>
-          <PopoverButton
-            icon={iconType}
-            placement="bottom-end"
-            transparent
-            w="420px"
-            h="170px"
-          >
-            <ChangePasswordChannel />
-          </PopoverButton>
+          {chat.chatInfo.roomType !== 'private' ? (
+            <PopoverButton
+              icon={iconType}
+              placement="bottom-end"
+              transparent
+              w="420px"
+              h="170px"
+            >
+              <ChangePasswordChannel />
+            </PopoverButton>
+          ) : (
+            iconType
+          )}
         </Square>
         <VStack textAlign="left">
           <Text

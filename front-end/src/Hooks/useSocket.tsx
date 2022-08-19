@@ -1,21 +1,17 @@
 import React from 'react';
 import { io, Socket } from 'socket.io-client';
 import WarningDialogProps from '../Props/WarningDialogProps';
-import GameMode from '../Games/dto/constants/game.mode.enum';
-import GameTicket from '../Games/dto/constants/game.ticket.enum';
+import GameMode from '../WebSockets/dto/constants/game.mode.enum';
+import GameTicket from '../WebSockets/dto/constants/game.ticket.enum';
+import SocketEventName from '../WebSockets/dto/constants/socket.events.enum';
+import UserState from '../WebSockets/dto/constants/user.state.enum';
+import StateUpdateUserNotify from '../WebSockets/dto/res/state.update.user.notify.dto';
 
 enum SocketState {
   CONNECTING,
   CONNECTED,
   CONNECT_ERROR,
   DISCONNECTED,
-}
-
-enum FriendOnlineState {
-  ONLINE = 'ONLINE',
-  OFFLINE = 'OFFLINE',
-  PLAYING = 'PLAYING',
-  SPECTATING = 'SPECTATING',
 }
 
 export type GameStateType = {
@@ -28,7 +24,7 @@ export type GameStateType = {
 type SocketStateType = {
   socket: Socket | null;
   socketState: SocketState;
-  friendState: { [key: number]: FriendOnlineState };
+  friendState: { [key: string]: UserState };
   gameState: GameStateType | null;
   socketError: WarningDialogProps;
 };
@@ -36,7 +32,7 @@ type SocketStateType = {
 const initialSocketState: SocketStateType = {
   socket: null,
   socketState: SocketState.DISCONNECTED,
-  friendState: [],
+  friendState: {},
   gameState: null,
   socketError: { headerMessage: '', bodyMessage: '' },
 };
@@ -46,11 +42,12 @@ type SocketActionType =
   | { action: 'connect_failed' }
   | { action: 'connected' }
   | { action: 'disconnect' }
-  | { action: 'updateFriendState'; friendId: number; state: FriendOnlineState }
+  | { action: 'updateUserState'; friendId: string; state: UserState }
   | {
       action: 'setCustomGame';
       gameState: GameStateType | null;
     }
+  | { action: 'chat'; nickname: string; content: string }
   | {
       action: 'setSocketError';
       error: WarningDialogProps;
@@ -84,12 +81,13 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
     case 'connected':
       return { ...beforeState, socketState: SocketState.CONNECTED };
     case 'disconnect':
+      beforeState.socket?.disconnect();
       return {
         ...beforeState,
         socket: null,
         socketState: SocketState.DISCONNECTED,
       };
-    case 'updateFriendState':
+    case 'updateUserState':
       return {
         ...beforeState,
         friendState: {
@@ -110,6 +108,22 @@ function SocketReducer(beforeState: SocketStateType, action: SocketActionType) {
     default:
       return beforeState;
   }
+}
+
+function AddUpdateUserStateListener(
+  socket: Socket,
+  dispatch: React.Dispatch<SocketActionType>,
+) {
+  socket.on(
+    SocketEventName.STATE_UPDATE_USER_NOTIFY,
+    (data: StateUpdateUserNotify) => {
+      dispatch({
+        action: 'updateUserState',
+        friendId: data.id,
+        state: data.state,
+      });
+    },
+  );
 }
 
 function SocketProvider({
@@ -140,6 +154,11 @@ function SocketProvider({
     });
     socket.connect();
   }, [nickname]);
+  React.useEffect(() => {
+    if (state.socket && state.socketState === SocketState.CONNECTED)
+      AddUpdateUserStateListener(state.socket, dispatch);
+    else state.socket?.off(SocketEventName.STATE_UPDATE_USER_NOTIFY);
+  }, [state.socket, state.socketState, dispatch]);
 
   return (
     <SocketStateContext.Provider value={val}>
@@ -148,4 +167,4 @@ function SocketProvider({
   );
 }
 
-export { SocketProvider, useSocket, SocketState, FriendOnlineState };
+export { SocketProvider, useSocket, SocketState };

@@ -12,6 +12,7 @@ import { FriendService } from './friend.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/users/get.user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { FriendListDto } from './dto/friend.list.dto';
 
 @ApiTags('Friend')
 @Controller('friend')
@@ -23,7 +24,7 @@ export class FriendController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 400, description: '요청이 잘못됐을 때' })
   @Get()
-  findAllFriends(@GetUser() user: User): Promise<User[]> {
+  findAllFriends(@GetUser() user: User): Promise<FriendListDto[]> {
     return this.friendService.findAllFriends(user);
   }
 

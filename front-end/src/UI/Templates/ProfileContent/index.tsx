@@ -37,7 +37,7 @@ function ProfileContent(props: {
           userWins={userWins}
           userLosses={userLosses}
         />
-        <UserMatchHistory records={records} />
+        <UserMatchHistory records={records} userName={nickname} />
       </VStack>
     </Box>
   );

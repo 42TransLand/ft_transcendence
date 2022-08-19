@@ -25,13 +25,11 @@ export class DmService {
   }
 
   async createDM(
-    sender: string,
+    senderUser: User,
     receiver: string,
     content: string,
-  ): Promise<Dm> {
-    const senderUser = await this.userService.findByNickname(sender);
+  ): Promise<void> {
     const receiverUser = await this.userService.findByNickname(receiver);
-
     const friendShip = await this.friendService.getFriend(
       senderUser,
       receiverUser,
@@ -39,17 +37,7 @@ export class DmService {
     if (friendShip.block === true) {
       throw new NotFoundException('차단된 사용자입니다.');
     }
-    const dm = await this.dmRepository.createDM(
-      senderUser,
-      receiverUser,
-      content,
-    );
-    this.socketGateway.server
-      .to(receiverUser.id)
-      .emit('dm', JSON.stringify({ nickname: sender, content }));
-    this.socketGateway.server
-      .to(senderUser.id)
-      .emit('dm', JSON.stringify({ nickname: sender, content }));
-    return dm;
+    await this.dmRepository.createDM(senderUser, receiverUser, content);
+    this.socketGateway.handleSendDM(senderUser.id, receiverUser.id, content);
   }
 }

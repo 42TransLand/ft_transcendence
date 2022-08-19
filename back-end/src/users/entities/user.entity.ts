@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GameRecord } from 'src/game/entities/game.entity';
-import { Transform } from 'stream';
 import {
   BaseEntity,
   Column,
@@ -17,10 +16,9 @@ export class User extends BaseEntity {
   @Column({ primary: true })
   id: string;
 
-  @ApiProperty({
-    example: 'dcho',
-    description: '사용자의 닉네임',
-  })
+  @Column({ default: true })
+  isFirstLogin: boolean;
+
   @Column({ unique: true })
   nickname: string;
 
@@ -30,17 +28,11 @@ export class User extends BaseEntity {
   @Column({ default: DEFAULT_PROFILE_IMG })
   profileImg: string;
 
-  //@Column()
-  //status: string;
+  @Column({ nullable: true })
+  tfaSecret?: string;
 
-  //@Column()
-  //accessToken: string;
-
-  //@Column()
-  //twoFactorAuth: boolean;
-
-  //@Column()
-  //twoFactorAuthUri: string;
+  @Column({ default: false })
+  tfaEnabled: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

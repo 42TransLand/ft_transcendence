@@ -14,6 +14,7 @@ import { ChatModule } from './chat/chat.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { DmModule } from './dm/dm.module';
 import { AuthModule } from './auth/auth.module';
+import { TfaModule } from './tfa/tfa.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { AuthModule } from './auth/auth.module';
     ChatModule,
     DmModule,
     AuthModule,
+    TfaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

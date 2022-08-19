@@ -3,13 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { Flex, HStack, VStack } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import SearchBar from '../../Atoms/SearchBar';
-import FriendElement from '../../Molecules/FriendElement';
 import FriendSearch from '../../Templates/FriendSearch';
 import UserContextMenu from '../../Templates/UserContextMenu';
 import ElementList from '../ElementList';
 import PopoverButton from '../PopoverButton';
 import FRIEND_GET from '../../../Queries/Friends/All';
 import { useSocket } from '../../../Hooks/useSocket';
+import FriendElement from '../../Molecules/FriendElement';
+import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 
 function FriendTab() {
   const [pattern, setPattern] = React.useState('');
@@ -20,7 +21,7 @@ function FriendTab() {
     }
     return data;
   }, [data, isLoading, error]);
-  const socket = useSocket();
+  const { state } = useSocket();
 
   return (
     <VStack>
@@ -45,7 +46,8 @@ function FriendTab() {
               <FriendElement
                 userName={f.nickname}
                 userProfileImage={`${process.env.REACT_APP_API_HOST}/${f.profileImg}`}
-                connectionStatus={socket.state.friendState[f.id]}
+                connectionStatus={state.friendState[f.id] ?? UserState.OFFLINE}
+                isBlocked={f.isBlocked}
               />
             </UserContextMenu>
           ))}

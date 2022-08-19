@@ -10,10 +10,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { ConfigService } from '@nestjs/config';
 import { AuthJwtFactory } from 'src/auth/auth.jwt.factory';
+import { GameService } from 'src/game/game.service';
+import { GameRepository } from 'src/game/game.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    TypeOrmExModule.forCustomRepository([GameRepository]),
     TypeOrmExModule.forCustomRepository([UserRepository]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
@@ -22,6 +25,6 @@ import { AuthJwtFactory } from 'src/auth/auth.jwt.factory';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, JwtStrategy],
+  providers: [GameService, UsersService, JwtStrategy],
 })
 export class UsersModule {}

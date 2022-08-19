@@ -10,6 +10,8 @@ import { AlertService } from 'src/alert/alert.service';
 import { User } from 'src/users/entities/user.entity';
 import { Friend } from './entities/friend.entity';
 import { FriendStatus } from './constants/friend.enum';
+import { FriendListDto } from './dto/friend.list.dto';
+import { SocketStateService } from 'src/socket/socket-state.service';
 
 @Injectable()
 export class FriendService {
@@ -18,9 +20,10 @@ export class FriendService {
     private friendRepository: FriendRepository,
     private userService: UsersService,
     private alertService: AlertService,
+    private readonly socketStateService: SocketStateService,
   ) {}
 
-  async findAllFriends(user: User): Promise<User[]> {
+  async findAllFriends(user: User): Promise<FriendListDto[]> {
     return this.friendRepository.findAllFriends(user);
   }
 
@@ -43,6 +46,12 @@ export class FriendService {
     const opponentUser = await this.userService.findById(userId);
     await this.alertService.updateAlert(alertId);
     await this.friendRepository.acceptFriend(opponentUser, user);
+    const friends = await this.findAllFriends(user);
+    await this.socketStateService.retrieveState(
+      user.id,
+      friends.map((f) => f.id),
+    );
+    this.socketStateService.notifyOneByUserId(user.id, userId);
   }
 
   async rejectFriend(
@@ -69,7 +78,7 @@ export class FriendService {
   async getFriend(sender: User, receiver: User): Promise<Friend> {
     const friendShip = await this.friendRepository.findRow(receiver, sender);
     if (!friendShip || friendShip.status === FriendStatus.PENDDING) {
-      throw new NotFoundException('아무 관계가 아니다.');
+      throw new NotFoundException('아무 관계가 아닙니다.');
     }
     return friendShip;
   }

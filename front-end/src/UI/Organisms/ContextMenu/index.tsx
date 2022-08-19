@@ -25,15 +25,16 @@ import {
   PortalProps,
   MenuButtonProps,
   MenuProps,
+  EventListenerEnv,
 } from '@chakra-ui/react';
 
 export interface ContextMenuProps<T extends HTMLElement> {
-  renderMenu: () => JSX.Element | null;
+  renderMenu: (isRendered: boolean) => JSX.Element | null;
   children: (ref: MutableRefObject<T | null>) => JSX.Element | null;
-  eventType: 'contextmenu' | 'click';
   menuProps?: MenuProps;
   portalProps?: PortalProps;
   menuButtonProps?: MenuButtonProps;
+  env: EventListenerEnv;
 }
 
 export function ContextMenu<T extends HTMLElement = HTMLElement>(
@@ -62,7 +63,22 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
     }
   }, [isOpen]);
 
-  useEventListener(props.eventType, (e) => {
+  useEventListener(
+    'click',
+    (e) => {
+      if (
+        !targetRef.current?.contains(e.target as any) &&
+        e.target !== targetRef.current
+      ) {
+        if (isOpen) {
+          setIsOpen(false);
+        }
+      }
+    },
+    props.env,
+  );
+
+  useEventListener('contextmenu', (e) => {
     if (
       targetRef.current?.contains(e.target as any) ||
       e.target === targetRef.current
@@ -105,7 +121,7 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
               }}
               {...props.menuButtonProps}
             />
-            {props.renderMenu()}
+            {props.renderMenu(isDeferredOpen)}
           </Menu>
         </Portal>
       )}

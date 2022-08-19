@@ -112,9 +112,9 @@ export class ChatUserRepository extends Repository<ChatUser> {
       ) {
         validation = await bcrypt.compare(password, chatRoom.password);
       }
-      if (!validation) {
-        throw new NotFoundException('패스워드가 올바르지 않습니다.');
-      }
+    }
+    if (validation !== true) {
+      throw new NotFoundException('패스워드가 올바르지 않습니다.');
     }
     // 이미 채팅방에 있는 사용자인지 검사
     const alreadyUser = await this.findOne({

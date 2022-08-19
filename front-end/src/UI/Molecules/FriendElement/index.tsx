@@ -1,21 +1,42 @@
 import React from 'react';
-import { Text, HStack, Spacer, Avatar, AvatarBadge } from '@chakra-ui/react';
+import {
+  Text,
+  HStack,
+  Spacer,
+  Avatar,
+  AvatarBadge,
+  VStack,
+} from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-import { FriendOnlineState } from '../../../Hooks/useSocket';
+import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 
 function FriendElement(props: {
   userName: string;
   userProfileImage: string;
-  connectionStatus: FriendOnlineState;
+  connectionStatus: UserState;
+  isBlocked: boolean;
 }) {
-  const { userName, userProfileImage, connectionStatus } = props;
+  const { userName, userProfileImage, connectionStatus, isBlocked } = props;
   const StatusColors = {
     ONLINE: 'green.500',
     OFFLINE: 'red.500',
-    PLAYING: 'yellow.500',
-    SPECTATING: 'pink.500',
+    INGAME: 'yellow.500',
+    OBSERVE: 'blue.500',
   };
-  const statusColor = StatusColors[connectionStatus] ?? 'blackAlpha.900';
+  const statusText = React.useMemo(() => {
+    switch (connectionStatus) {
+      case UserState.ONLINE:
+        return '온라인';
+      case UserState.OFFLINE:
+        return '오프라인';
+      case UserState.INGAME:
+        return '게임중';
+      case UserState.OBSERVE:
+        return '관전중';
+      default:
+        return '오프라인';
+    }
+  }, [connectionStatus]);
 
   return (
     <HStack
@@ -28,11 +49,27 @@ function FriendElement(props: {
       padding={3}
       to={`/dm/${userName}`}
     >
-      <Avatar name={userName} src={userProfileImage} size="lg">
-        <AvatarBadge boxSize="1em" bgColor={statusColor} />
+      <Avatar
+        opacity={isBlocked ? '35%' : '100%'}
+        name={userName}
+        src={userProfileImage}
+        size="lg"
+      >
+        <AvatarBadge boxSize="1em" bgColor={StatusColors[connectionStatus]} />
       </Avatar>
       <Spacer />
-      <Text>{userName}</Text>
+      <VStack justifyContent="space-evenly">
+        <Text opacity={isBlocked ? '35%' : '100%'}>{userName}</Text>
+        <Text
+          w="full"
+          fontSize="xs"
+          fontWeight="bold"
+          textAlign="right"
+          textColor={StatusColors[connectionStatus]}
+        >
+          {statusText}
+        </Text>
+      </VStack>
     </HStack>
   );
 }
