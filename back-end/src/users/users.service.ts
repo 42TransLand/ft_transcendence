@@ -15,7 +15,7 @@ export class UsersService {
     private gameService: GameService,
   ) {}
 
-  async createUser(user: Auth42userDto): Promise<User> {
+  async createUser(user: Auth42userDto): Promise<void> {
     return this.userRepository.createUser(user);
   }
 

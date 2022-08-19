@@ -33,12 +33,11 @@ export class AuthController {
   @Get('/42/redirect')
   @UseGuards(AuthGuard('42'))
   async getRedirect42(@Req() req, @Res() res) {
-    let user: User;
     try {
-      user = await this.userService.findById(req.user.id);
+      await this.userService.findById(req.user.id);
     } catch (err) {
       if (err instanceof NotFoundException) {
-        user = await this.userService.createUser(req.user);
+        await this.userService.createUser(req.user);
       }
     }
     const token = await this.authService.generateAccessToken(req.user.id);

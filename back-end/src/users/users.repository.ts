@@ -14,7 +14,7 @@ import { UserRecordDto } from './dto/user.record.dto';
 
 @CustomRepository(User)
 export class UserRepository extends Repository<User> {
-  async createUser(user: Auth42userDto): Promise<User> {
+  async createUser(user: Auth42userDto): Promise<void> {
     const newUser = this.create({
       id: user.id,
       nickname: user.username,
