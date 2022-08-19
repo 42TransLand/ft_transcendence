@@ -13,6 +13,8 @@ services:
     build:
       context: ./back-end
       dockerfile: Dockerfile
+    volumes:
+      - back-end-files:/app/files
     env_file:
       - .env
     links:
@@ -56,3 +58,4 @@ services:
 
 volumes:
   db-data:
+  back-end-files:
