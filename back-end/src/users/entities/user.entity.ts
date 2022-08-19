@@ -17,10 +17,9 @@ export class User extends BaseEntity {
   @Column({ primary: true })
   id: string;
 
-  @ApiProperty({
-    example: 'dcho',
-    description: '사용자의 닉네임',
-  })
+  @Column({ default: true })
+  isFirstLogin: boolean;
+
   @Column({ unique: true })
   nickname: string;
 

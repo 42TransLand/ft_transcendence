@@ -14,10 +14,10 @@ import { UserRecordDto } from './dto/user.record.dto';
 
 @CustomRepository(User)
 export class UserRepository extends Repository<User> {
-  async createUser(user: Auth42userDto): Promise<void> {
+  async createUser(user: Auth42userDto, randomName: string): Promise<void> {
     const newUser = this.create({
       id: user.id,
-      nickname: user.username,
+      nickname: randomName,
       email: user.email,
     });
     try {
@@ -106,6 +106,7 @@ export class UserRepository extends Repository<User> {
         user.rankScore += score;
       }
     }
+    user.isFirstLogin = false;
     try {
       await this.save(user);
     } catch (error) {
@@ -147,7 +148,9 @@ export class UserRepository extends Repository<User> {
     });
     const result: UserProfileDto = {
       id: user.id,
+      isFirstLogin: user.isFirstLogin,
       nickname: user.nickname,
+      tfaEnabled: user.tfaEnabled,
       email: user.email,
       rankScore: user.rankScore,
       profileImg: user.profileImg,

@@ -24,9 +24,7 @@ export class AuthService {
       .then((res) => {
         user = {
           id: res.data.id,
-          username: res.data.login,
           email: res.data.email,
-          avatar: res.data.image_url,
         };
         return user;
       })
