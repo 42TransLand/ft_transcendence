@@ -3,22 +3,29 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { FormikHelpers } from 'formik';
 import axios from 'axios';
-import useToastedChat from '../../../Hooks/useToastedChat';
 import useMe from '../../../Hooks/useMe';
 import useMessage from '../../../Hooks/useMessage';
 import ChatModal from '../../Organisms/ChatModal';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 import USERS_PROFILE_GET from '../../../Queries/Users/Profile';
 import ChatMemberRole from '../../../Props/ChatMemberRole';
+import { useSocket } from '../../../Hooks/useSocket';
+import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
+import ChatMessageProps from '../../../WebSockets/dto/res/chat.message.notify.dto';
 
-export default function DMChat() {
+export default function DirectMessage() {
   const { dispatchRoomInfo, dispatchChat, displayDMHistory, insertRoomMember } =
     useMessage();
   const navigate = useNavigate();
   const { nickname } = useMe();
   const { userName } = useParams();
   const targetName: string = userName ?? '';
-  useToastedChat(nickname);
+  const { isLoading, error, data } = useQuery(USERS_PROFILE_GET(targetName));
+  const { setError, WarningDialogComponent } = useWarningDialog(() =>
+    navigate(-1),
+  );
+  const { state } = useSocket();
+
   const onSubmitHandler = useCallback(
     (
       values: { message: string },
@@ -26,22 +33,17 @@ export default function DMChat() {
     ) => {
       const { message } = values;
       if (message.length === 0) return;
-      axios
-        .post(`/dm/send/${targetName}`, { content: message })
-        .catch((err) => {
-          console.log(err);
-        });
-      dispatchChat(nickname, message);
+      axios.post(`/dm/send/${targetName}`, { content: message }).then(() => {
+        dispatchChat(nickname, message);
+      });
       helper.resetForm();
     },
     [dispatchChat, nickname, targetName],
   );
-  const { setError, WarningDialogComponent } = useWarningDialog(() =>
-    navigate(-1),
-  );
-  const { isLoading, error, data } = useQuery(USERS_PROFILE_GET(targetName));
+
   useEffect(() => {
-    if (!targetName || isLoading || error) {
+    if (isLoading) return;
+    if (!targetName || error) {
       setError({
         headerMessage: '오류 발생',
         bodyMessage: error
@@ -50,6 +52,14 @@ export default function DMChat() {
       });
       return;
     }
+    state.socket?.on(
+      SocketEventName.CHAT_MESSAGE_NOTIFY,
+      (dto: ChatMessageProps) => {
+        if (dto.nickname === targetName) {
+          dispatchChat(dto.nickname, dto.content);
+        }
+      },
+    );
     dispatchRoomInfo({
       roomType: 'private',
       channelName: targetName,
@@ -64,6 +74,8 @@ export default function DMChat() {
     });
     displayDMHistory(targetName);
   }, [
+    state.socket,
+    dispatchChat,
     isLoading,
     error,
     dispatchRoomInfo,
@@ -73,9 +85,6 @@ export default function DMChat() {
     displayDMHistory,
     data,
   ]);
-  if (isLoading) {
-    return <div>로딩중...</div>;
-  }
 
   return (
     <>
