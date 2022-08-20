@@ -5,6 +5,7 @@ import { IoIosChatbubbles } from 'react-icons/io';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 const FullSquare = styled(Square)`
@@ -21,12 +22,14 @@ function ChannelElement(props: {
   const { roomType, channelName, currentHeadCount, chatRoomId } = props;
   const { WarningDialogComponent, setError } = useWarningDialog();
   const navigate = useNavigate();
+  const queyrClient = useQueryClient();
 
   const onClickHandler = () => {
     if (roomType === 'PUBLIC') {
       axios
-        .post(`/chat/join/${chatRoomId}`, { password: '' })
+        .post(`/chat/join/${chatRoomId}`)
         .then(() => {
+          queyrClient.invalidateQueries(['channels']);
           navigate(`/chat/${chatRoomId}`);
         })
         .catch((err) => {
@@ -42,7 +45,6 @@ function ChannelElement(props: {
             });
           }
         });
-      console.log('hello');
     }
   };
 

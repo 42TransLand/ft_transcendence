@@ -13,6 +13,7 @@ import axios from 'axios';
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
+import { useQueryClient } from '@tanstack/react-query';
 import ChannelElement from '../ChannelElement';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
@@ -26,6 +27,7 @@ function PasswordValidation(props: { chatRoomId: string }) {
   const { chatRoomId } = props;
   const navigate = useNavigate();
   const { setError, WarningDialogComponent } = useWarningDialog();
+  const queryClient = useQueryClient();
 
   const onSubmitHandler = React.useCallback(
     (
@@ -35,7 +37,7 @@ function PasswordValidation(props: { chatRoomId: string }) {
       axios
         .post(`/chat/join/${chatRoomId}`, { password })
         .then(() => {
-          helper.setSubmitting(false);
+          queryClient.invalidateQueries(['channels']);
           navigate(`/chat/${chatRoomId}`);
         })
         .catch((err) => {
@@ -51,8 +53,10 @@ function PasswordValidation(props: { chatRoomId: string }) {
             });
           }
         });
+      helper.resetForm();
+      helper.setSubmitting(false);
     },
-    [chatRoomId, navigate, setError],
+    [chatRoomId, navigate, setError, queryClient],
   );
   return (
     <Formik
