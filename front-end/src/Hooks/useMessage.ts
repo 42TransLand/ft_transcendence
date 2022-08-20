@@ -24,6 +24,15 @@ export default function useMessage() {
     },
     [dispatch],
   );
+  const deleteRoomMember = React.useCallback(
+    (name: string) => {
+      dispatch({
+        action: 'deleteMember',
+        name,
+      });
+    },
+    [dispatch],
+  );
   const dispatchRoomInfo = React.useCallback(
     (chanInfoProps: ChatInfoProps) => {
       dispatch({
@@ -76,5 +85,6 @@ export default function useMessage() {
     dispatchChat,
     displayDMHistory,
     insertRoomMember,
+    deleteRoomMember,
   };
 }
