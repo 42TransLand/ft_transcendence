@@ -97,6 +97,18 @@ export class ChatUserRepository extends Repository<ChatUser> {
     return checkAllUsers[0];
   }
 
+  async findChatUserNickname(user: ChatUser): Promise<User> {
+    const chatUser = await this.findOne({
+      relations: {
+        user: true,
+      },
+      where: {
+        id: Equal(user.id),
+      },
+    });
+    return chatUser.user;
+  }
+
   async joinChatRoom(
     user: User,
     chatRoom: ChatRoom,
@@ -112,11 +124,7 @@ export class ChatUserRepository extends Repository<ChatUser> {
       ) {
         validation = await bcrypt.compare(password, chatRoom.password);
       }
-    }
-    if (chatRoom.type === 'PUBLIC') {
-      validation = true;
-    }
-
+    } else validation = true;
     if (validation !== true) {
       throw new NotFoundException('패스워드가 올바르지 않습니다.');
     }
