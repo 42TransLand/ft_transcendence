@@ -1,4 +1,4 @@
 export default interface ChatInfoProps {
-  roomType: 'private' | 'protected' | 'public';
+  roomType: 'PRIVATE' | 'PROTECT' | 'PUBLIC';
   channelName: string;
 }
