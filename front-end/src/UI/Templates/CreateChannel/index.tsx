@@ -7,6 +7,7 @@ import * as Yup from 'yup';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
+import ChannelType from '../../../Props/ChannelType';
 
 type CreateChannelProps = {
   name: string;
@@ -36,7 +37,7 @@ function CreateChannel() {
       axios
         .post('/chat/create', {
           name,
-          type: password.length ? 'PROTECT' : 'PUBLIC', // TODO
+          type: password.length ? ChannelType.PROTECT : ChannelType.PUBLIC,
           password: password ?? '',
         })
         .then((response) => {

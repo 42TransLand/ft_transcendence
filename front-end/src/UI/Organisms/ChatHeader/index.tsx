@@ -13,13 +13,14 @@ import { FiSend } from 'react-icons/fi';
 import { useChat } from '../../../Hooks/useChat';
 import ChangePasswordChannel from '../../Templates/ChangePasswordChannel';
 import PopoverButton from '../PopoverButton';
+import ChannelType from '../../../Props/ChannelType';
 
 export default function ChatHeader() {
   const [chat] = useChat();
   const iconType = React.useMemo(() => {
-    if (chat.chatInfo.roomType === 'PUBLIC')
+    if (chat.chatInfo.roomType === ChannelType.PUBLIC)
       return <Icon as={IoIosChatbubbles} boxSize="3em" />;
-    if (chat.chatInfo.roomType === 'PROTECT')
+    if (chat.chatInfo.roomType === ChannelType.PROTECT)
       return <Icon as={LockIcon} boxSize="3em" />;
     return <Icon as={FiSend} boxSize="3em" />;
   }, [chat.chatInfo.roomType]);

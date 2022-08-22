@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
+import ChannelType from '../../../Props/ChannelType';
 
 const FullSquare = styled(Square)`
   min-height: 100%;
@@ -14,7 +15,7 @@ const FullSquare = styled(Square)`
 `;
 
 function ChannelElement(props: {
-  roomType: 'PUBLIC' | 'PROTECT';
+  roomType: ChannelType.PUBLIC | ChannelType.PROTECT;
   channelName: string;
   currentHeadCount: number;
   chatRoomId: string;
@@ -25,7 +26,7 @@ function ChannelElement(props: {
   const queyrClient = useQueryClient();
 
   const onClickHandler = () => {
-    if (roomType === 'PUBLIC') {
+    if (roomType === ChannelType.PUBLIC) {
       axios
         .post(`/chat/join/${chatRoomId}`)
         .then(() => {
@@ -60,7 +61,7 @@ function ChannelElement(props: {
       <HStack h="full">
         <FullSquare centerContent minHeight="100%">
           <Icon
-            as={roomType === 'PROTECT' ? LockIcon : IoIosChatbubbles}
+            as={roomType === ChannelType.PROTECT ? LockIcon : IoIosChatbubbles}
             boxSize="1.75em"
           />
         </FullSquare>

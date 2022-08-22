@@ -16,6 +16,7 @@ import * as Yup from 'yup';
 import { useQueryClient } from '@tanstack/react-query';
 import ChannelElement from '../ChannelElement';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
+import ChannelType from '../../../Props/ChannelType';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -93,7 +94,7 @@ function PasswordValidation(props: { chatRoomId: string }) {
 }
 
 function ProtectedChannelElement(props: {
-  roomType: 'PUBLIC' | 'PROTECT';
+  roomType: ChannelType.PUBLIC | ChannelType.PROTECT;
   channelName: string;
   currentHeadCount: number;
   chatRoomId: string;

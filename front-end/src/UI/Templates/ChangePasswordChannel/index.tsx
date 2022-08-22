@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
+import ChannelType from '../../../Props/ChannelType';
 
 type ChangePasswordProps = {
   password: string;
@@ -30,7 +31,7 @@ function ChangePasswordChannel() {
       axios
         .patch(`chat/${id}`, {
           password,
-          type: password.length ? 'PROTECT' : 'PUBLIC',
+          type: password.length ? ChannelType.PROTECT : ChannelType.PUBLIC,
         })
         .then(() => {
           actions.resetForm();
