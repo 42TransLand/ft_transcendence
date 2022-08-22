@@ -3,7 +3,11 @@ name: Build Test Back-end
 on:
   push:
     branches:
-      - !master
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!master'   # excludes master
+      - '!release'   # excludes release
 
 jobs:
 

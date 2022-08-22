@@ -16,7 +16,8 @@ export class UsersService {
   ) {}
 
   async createUser(user: Auth42userDto): Promise<void> {
-    return this.userRepository.createUser(user);
+    const randomName = Math.random().toString(36).substring(2, 12);
+    return this.userRepository.createUser(user, randomName);
   }
 
   async findByNickname(nickname: string): Promise<User> {

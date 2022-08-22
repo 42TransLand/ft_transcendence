@@ -3,4 +3,5 @@ export default interface UserInfoProps {
   nickname: string;
   profileImg: string;
   rankScore: number;
+  tfaEnabled: boolean;
 }

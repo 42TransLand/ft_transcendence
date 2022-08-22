@@ -150,12 +150,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('sendDM')
-  handleSendDM(
-    senderId: string,
-    receiverId: string,
-    dmId: string,
-    content: string,
-  ) {
+  handleSendDM(senderId: string, receiverId: string, content: string) {
     try {
       const senderSocket = this.usersSocket.get(senderId);
       const senderContext = this.userContexts.get(senderSocket);
@@ -165,7 +160,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.socketService.handleSendDM(
           senderContext,
           receiverContext,
-          dmId,
           content,
         );
       }

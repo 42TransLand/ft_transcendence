@@ -70,8 +70,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: '닉네임 중복 조회 성공' })
   @ApiResponse({ status: 401, description: '쿠키 인증 실패' })
   @ApiResponse({ status: 404, description: '존재하지 않는 유저' })
-  @Get('/check/:nickname')
-  searchNickname(@Param('nickname') nickname: string): Promise<boolean> {
+  @Get('/check')
+  searchNickname(@Body() { nickname }: UserDto): Promise<boolean> {
     return this.usersService.checkNickname(nickname);
   }
 

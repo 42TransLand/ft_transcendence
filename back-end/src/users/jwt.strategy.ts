@@ -31,6 +31,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    if (user.tfaEnabled) {
+      if (!payload.isTfaAuthenticated) {
+        throw new UnauthorizedException('TFA not authenticated');
+      }
+    }
     return user;
   }
 }
