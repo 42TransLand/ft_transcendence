@@ -154,15 +154,20 @@ export class ChatService {
     if (chatUsers.length === 0) {
       // 채팅방에 유저가 없으면 삭제
       await this.chatRoomRepository.deleteChatRoom(chatRoom.id);
+      return;
     }
     await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
     // 나간 사람이 Owner여서 새로운 오너가 정해져야 하는 경우
     if (findChatUser.role === ChatRole.OWNER) {
       const newOwner = await this.chatUserRepository.findNewOwner(chatRoom);
+      const newOwnerUser = await this.chatUserRepository.findChatUserNickname(
+        newOwner,
+      );
+
       await this.chatUserRepository.updateOwnerRole(newOwner);
       this.socketGateway.handleUpdateChatUser(
         id,
-        newOwner.user.nickname,
+        newOwnerUser.nickname,
         ChatUserUpdateType.OWNER,
         true,
       );
@@ -180,6 +185,9 @@ export class ChatService {
     }
     if (findChatUser.role !== ChatRole.OWNER) {
       throw new UnauthorizedException(`권한이 없습니다.`);
+    }
+    if (user.nickname === nickname) {
+      throw new ConflictException(`자기 자신을 추방할 수 없습니다.`);
     }
     const kickUser = await this.userService.findByNickname(nickname);
     await this.chatUserRepository.leaveChatRoom(kickUser, chatRoom);
@@ -220,7 +228,9 @@ export class ChatService {
         `본인은 채팅방에 접속하지 않은 유저입니다.`,
       ]);
     }
-
+    if (user.nickname === nickname) {
+      throw new ConflictException(`자기 자신을 음소거 할 수 없습니다.`);
+    }
     const opponent = await this.userService.findByNickname(nickname);
     const chatUser = await this.chatUserRepository.findChatUser(
       opponent,
@@ -265,7 +275,7 @@ export class ChatService {
     }, muteMinutes * 60 * 1000);
 
     this.socketGateway.handleUpdateChatUser(
-      chatUser.chatRoom.id,
+      id,
       nickname,
       ChatUserUpdateType.MUTE,
       true,
@@ -308,7 +318,11 @@ export class ChatService {
     ) {
       throw new BadRequestException(`해당 유저에게 unMute를 할 수 없습니다.`);
     }
-
+    if (chatUser.unmutedAt === null) {
+      throw new BadRequestException(
+        `음소거 하지 않은 유저에게 음소개 해제를 할 수 없습니다.`,
+      );
+    }
     chatUser.unmutedAt = null;
     try {
       await this.chatUserRepository.save(chatUser);
@@ -316,7 +330,7 @@ export class ChatService {
       throw new InternalServerErrorException();
     }
     this.socketGateway.handleUpdateChatUser(
-      chatUser.chatRoom.id,
+      id,
       nickname,
       ChatUserUpdateType.MUTE,
       false,
