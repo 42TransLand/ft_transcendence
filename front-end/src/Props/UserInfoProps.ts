@@ -4,4 +4,5 @@ export default interface UserInfoProps {
   profileImg: string;
   rankScore: number;
   tfaEnabled: boolean;
+  isFirstLogin: boolean;
 }
