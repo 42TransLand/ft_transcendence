@@ -13,6 +13,7 @@ import { useSocket } from '../../../Hooks/useSocket';
 import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
 import ChatMessageProps from '../../../WebSockets/dto/res/chat.message.notify.dto';
 import { useDirectMessageTarget } from '../../../Hooks/useDirectMessageNotify';
+import ChannelType from '../../../Props/ChannelType';
 
 export default function DirectMessage() {
   const { dispatchRoomInfo, dispatchChat, displayDMHistory, insertRoomMember } =
@@ -75,7 +76,7 @@ export default function DirectMessage() {
       return;
     }
     dispatchRoomInfo({
-      roomType: 'PRIVATE',
+      roomType: ChannelType.PRIVATE,
       channelName: targetName,
     });
     insertRoomMember({

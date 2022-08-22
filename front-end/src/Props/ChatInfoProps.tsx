@@ -1,4 +1,6 @@
+import ChannelType from './ChannelType';
+
 export default interface ChatInfoProps {
-  roomType: 'PRIVATE' | 'PROTECT' | 'PUBLIC';
+  roomType: ChannelType;
   channelName: string;
 }
