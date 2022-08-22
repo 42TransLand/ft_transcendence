@@ -6,12 +6,12 @@ export default function RoutedModal({
   children,
   closeOnOverlayClick,
   baseUrl,
-  leaveChatRoomHandler,
+  leaveModalHandler,
 }: {
   children: React.ReactNode;
   closeOnOverlayClick?: boolean;
   baseUrl?: string;
-  leaveChatRoomHandler?: () => void;
+  leaveModalHandler?: () => void;
 }) {
   const [isOpen, onClose] = React.useState(true);
   const navigate = useNavigate();
@@ -24,8 +24,8 @@ export default function RoutedModal({
       isOpen={isOpen}
       onClose={() => {
         onClose(false);
-        if (leaveChatRoomHandler !== undefined) {
-          leaveChatRoomHandler();
+        if (leaveModalHandler !== undefined) {
+          leaveModalHandler();
         }
       }}
       onCloseComplete={(): void => navigate(baseUrl ?? '/', { replace: true })}
@@ -40,5 +40,5 @@ export default function RoutedModal({
 RoutedModal.defaultProps = {
   closeOnOverlayClick: true,
   baseUrl: '/',
-  leaveChatRoomHandler: undefined,
+  leaveModalHandler: undefined,
 };

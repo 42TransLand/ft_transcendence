@@ -65,7 +65,9 @@ function ChannelElement(props: {
           />
         </FullSquare>
         <Text fontSize="xl" marginX="0!important" noOfLines={1}>
-          {channelName}
+          {channelName.length > 14
+            ? channelName.substring(0, 14).concat('...')
+            : channelName}
         </Text>
       </HStack>
       <Text fontSize="xl" textAlign="center" paddingX="0.5em">

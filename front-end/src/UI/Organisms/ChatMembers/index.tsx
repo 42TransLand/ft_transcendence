@@ -22,7 +22,7 @@ export default function ChatMembers() {
             key={member.name}
             target={member.userId}
             targetName={member.name}
-            mode={chat.chatInfo.roomType === 'private' ? 'friend' : 'chat'}
+            mode={chat.chatInfo.roomType === 'PRIVATE' ? 'friend' : 'chat'}
           >
             <ChatMemberElement
               userId={member.userId}

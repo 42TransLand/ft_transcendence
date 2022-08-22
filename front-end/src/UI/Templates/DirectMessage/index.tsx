@@ -61,7 +61,7 @@ export default function DirectMessage() {
       },
     );
     dispatchRoomInfo({
-      roomType: 'private',
+      roomType: 'PRIVATE',
       channelName: targetName,
     });
     insertRoomMember({
