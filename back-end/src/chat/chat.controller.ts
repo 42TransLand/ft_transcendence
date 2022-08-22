@@ -100,7 +100,10 @@ export class ChatController {
   @ApiOperation({ summary: '채팅방 참석' })
   @ApiResponse({ status: 201, description: '성공' })
   @ApiResponse({ status: 401, description: '유저 권한이 잘못된 경우' })
-  @ApiResponse({ status: 404, description: '패스워드가 잘못된 경우' })
+  @ApiResponse({
+    status: 404,
+    description: '영구 추방, 패스워드가 잘못된 경우',
+  })
   @ApiResponse({ status: 409, description: '이미 채팅방에 접속한 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Post('/join/:id')
@@ -131,6 +134,19 @@ export class ChatController {
     @Param('nickname') nickname: string,
   ): Promise<void> {
     return this.chatService.kickChatUser(id, user, nickname);
+  }
+
+  @ApiOperation({ summary: '채팅방 영구 추방' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 401, description: '권한이 없는 경우' })
+  @ApiResponse({ status: 404, description: '채팅방, 유저 없는 경우' })
+  @Post('/ban/:id/:nickname')
+  banChatUser(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Param('nickname') nickname: string,
+  ): Promise<void> {
+    return this.chatService.banChatUser(id, user, nickname);
   }
 
   @ApiOperation({ summary: '채팅 보내기' })

@@ -3,4 +3,6 @@ export enum ChatUserUpdateType {
   MUTE = 'MUTE',
   ADMIN = 'ADMIN',
   OWNER = 'OWNER',
+  BAN = 'BAN',
+  LEAVE = 'LEAVE',
 }

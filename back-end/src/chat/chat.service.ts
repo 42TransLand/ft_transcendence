@@ -143,6 +143,10 @@ export class ChatService {
 
   async joinChatRoom(id: string, user: User, password: string): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
+    const isBannedUser = await this.chatRoomRepository.findBannedUser(id, user);
+    if (isBannedUser) {
+      throw new BadRequestException(`영구 추방된 유저입니다.`);
+    }
     if (chatRoom.type === ChatType.PROTECT && password !== undefined) {
       await this.chatUserRepository.joinChatRoom(user, chatRoom, password);
     } else {
@@ -162,7 +166,7 @@ export class ChatService {
       throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
     }
     await this.chatUserRepository.leaveChatRoom(user, chatRoom);
-    this.socketService.handleLeaveChatRoom(user.id, false);
+    this.socketService.handleLeaveChatRoom(user.id, ChatUserUpdateType.LEAVE);
     const chatUsers = await this.chatUserRepository.findChatRoomById(chatRoom);
     if (chatUsers.length === 0) {
       // 채팅방에 유저가 없으면 삭제
@@ -206,7 +210,32 @@ export class ChatService {
     const kickUser = await this.userService.findByNickname(nickname);
     await this.chatUserRepository.leaveChatRoom(kickUser, chatRoom);
     await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
-    this.socketService.handleLeaveChatRoom(kickUser.id, true);
+    this.socketService.handleLeaveChatRoom(
+      kickUser.id,
+      ChatUserUpdateType.KICK,
+    );
+  }
+
+  async banChatUser(id: string, user: User, nickname: string): Promise<void> {
+    const chatRoom = await this.findChatRoomById(id);
+    const findChatUser = await this.chatUserRepository.findChatUser(
+      user,
+      chatRoom,
+    );
+    if (!findChatUser) {
+      throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
+    }
+    if (findChatUser.role !== ChatRole.OWNER) {
+      throw new UnauthorizedException(`권한이 없습니다.`);
+    }
+    if (user.nickname === nickname) {
+      throw new ConflictException(`자기 자신을 추방할 수 없습니다.`);
+    }
+    const banUser = await this.userService.findByNickname(nickname);
+    await this.chatUserRepository.leaveChatRoom(banUser, chatRoom);
+    await this.chatRoomRepository.banChatRoom(chatRoom, banUser);
+    await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
+    this.socketService.handleLeaveChatRoom(banUser.id, ChatUserUpdateType.BAN);
   }
 
   async sendChat(id: string, user: User, content: string): Promise<void> {
@@ -293,7 +322,7 @@ export class ChatService {
         false,
       );
     }, muteMinutes * 60 * 1000);
-    
+
     this.socketService.handleUpdateChatUser(
       this.socketGateway.server,
       id,

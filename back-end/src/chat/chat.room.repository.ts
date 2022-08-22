@@ -9,6 +9,7 @@ import { UpdateChatPasswordDto } from './dto/update.chat.password.dto';
 import { ChatRoom } from './entities/chat.room.entity';
 import * as bcrypt from 'bcrypt';
 import { ChatType, CountType } from './constants/chat.type.enum';
+import { User } from 'src/users/entities/user.entity';
 
 @CustomRepository(ChatRoom)
 export class ChatRoomRepository extends Repository<ChatRoom> {
@@ -25,6 +26,7 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
       type,
       password: encryptPassword,
       count: 1,
+      bannedUsers: [],
     });
     try {
       await this.save(chatRoom);
@@ -63,6 +65,27 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
       where: { id },
     });
     return result;
+  }
+
+  async banChatRoom(chatRoom: ChatRoom, banUser: User): Promise<void> {
+    chatRoom.bannedUsers.push(banUser.id);
+    try {
+      await this.save(chatRoom);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async findBannedUser(id: string, user: User): Promise<boolean> {
+    const chatRoom = await this.findChatRoomById(id);
+    try {
+      if (chatRoom.bannedUsers.includes(user.id)) {
+        return true;
+      }
+    } catch (e) {
+      // ignore
+    }
+    return false;
   }
 
   async deleteChatRoom(id: string): Promise<void> {
