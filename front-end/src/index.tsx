@@ -14,7 +14,7 @@ root.render(
   <QueryClientProvider client={queryClient}>
     <ChakraProvider theme={theme}>
       <Box backgroundColor="#000">
-        <App />,
+        <App />
       </Box>
     </ChakraProvider>
   </QueryClientProvider>,
