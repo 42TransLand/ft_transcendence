@@ -56,9 +56,9 @@ export class ChatService {
     if (chatUser.role !== ChatRole.OWNER) {
       throw new BadRequestException(`권한이 없습니다.`);
     }
-    if (type !== chatRoom.type)
-      this.socketGateway.handleUpdateChatType(chatRoom.id, true);
-    else this.socketGateway.handleUpdateChatType(chatRoom.id, false);
+    if (type === ChatType.PROTECT && password) {
+      this.socketGateway.handleUpdateChatType(chatRoom.id, false);
+    } else this.socketGateway.handleUpdateChatType(chatRoom.id, true);
     await this.chatRoomRepository.updatePassword(chatRoom, password, type);
   }
 
