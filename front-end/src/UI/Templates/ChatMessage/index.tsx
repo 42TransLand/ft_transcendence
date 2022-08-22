@@ -17,6 +17,7 @@ import ChatMessageProps from '../../../WebSockets/dto/res/chat.message.notify.dt
 import ChatUserProps from '../../../Props/ChatUserProps';
 import ROOM_GET from '../../../Queries/Channels/Room';
 import ChatUpdateProtectionNotifyProps from '../../../WebSockets/dto/res/chat.update.protection.notify.dto';
+import ChannelType from '../../../Props/ChannelType';
 
 export default function ChatMessage() {
   const { dispatchRoomInfo, dispatchChat, insertRoomMember, deleteRoomMember } =
@@ -99,17 +100,6 @@ export default function ChatMessage() {
     }
   }, [chatRoomId, error, isLoading, roomInfoLoading, roomInfoError, setError]);
 
-  const checkRole = (role: string) => {
-    switch (role) {
-      case 'OWNER':
-        return ChatMemberRole.OWNER;
-      case 'ADMIN':
-        return ChatMemberRole.ADMIN;
-      default:
-        return ChatMemberRole.MEMBER;
-    }
-  };
-
   useEffect(() => {
     axios
       .get(`/chat/users/${chatRoomId}`)
@@ -120,7 +110,7 @@ export default function ChatMessage() {
             userId: member.user.id,
             name: member.user.nickname,
             profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
-            role: checkRole(member.role),
+            role: member.role,
             muted: false,
             blocked: false,
           });
@@ -130,7 +120,7 @@ export default function ChatMessage() {
 
   useEffect(() => {
     dispatchRoomInfo({
-      roomType: roomData?.type ?? 'PUBLIC',
+      roomType: roomData?.type ?? ChannelType.PUBLIC,
       channelName: roomData?.name ?? '',
     });
   }, [dispatchRoomInfo, roomData]);
@@ -155,7 +145,7 @@ export default function ChatMessage() {
                 userId: member.user.id,
                 name: member.user.nickname,
                 profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
-                role: checkRole(member.role),
+                role: member.role,
                 muted: false,
                 blocked: false,
               });
@@ -182,7 +172,7 @@ export default function ChatMessage() {
       SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY,
       (dto: ChatUpdateProtectionNotifyProps) => {
         dispatchRoomInfo({
-          roomType: dto.status ? 'PUBLIC' : 'PROTECT',
+          roomType: dto.status ? ChannelType.PUBLIC : ChannelType.PROTECT,
           channelName: roomData?.name ?? '',
         });
       },
