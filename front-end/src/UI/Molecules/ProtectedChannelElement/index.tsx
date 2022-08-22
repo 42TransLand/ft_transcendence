@@ -9,13 +9,10 @@ import {
   PopoverTrigger,
   Text,
 } from '@chakra-ui/react';
-import axios from 'axios';
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { useQueryClient } from '@tanstack/react-query';
 import ChannelElement from '../ChannelElement';
-import useWarningDialog from '../../../Hooks/useWarningDialog';
 import ChannelType from '../../../Props/ChannelType';
 
 const validationSchema = Yup.object().shape({
@@ -28,37 +25,18 @@ const validationSchema = Yup.object().shape({
 function PasswordValidation(props: { chatRoomId: string }) {
   const { chatRoomId } = props;
   const navigate = useNavigate();
-  const { setError, WarningDialogComponent } = useWarningDialog();
-  const queryClient = useQueryClient();
 
   const onSubmitHandler = React.useCallback(
     (
       { password }: { password: string },
       helper: FormikHelpers<{ password: string }>,
     ) => {
-      axios
-        .post(`/chat/join/${chatRoomId}`, { password })
-        .then(() => {
-          queryClient.invalidateQueries(['channels']);
-          navigate(`/chat/${chatRoomId}`);
-        })
-        .catch((err) => {
-          if (err.response) {
-            setError({
-              headerMessage: '채팅 입장 실패',
-              bodyMessage: err.response.data.message,
-            });
-          } else {
-            setError({
-              headerMessage: '채팅 입장 실패',
-              bodyMessage: err.message,
-            });
-          }
-        });
+      localStorage.setItem(chatRoomId, password);
+      navigate(`/chat/${chatRoomId}`);
       helper.resetForm();
       helper.setSubmitting(false);
     },
-    [chatRoomId, navigate, setError, queryClient],
+    [chatRoomId, navigate],
   );
   return (
     <Formik
@@ -78,7 +56,6 @@ function PasswordValidation(props: { chatRoomId: string }) {
           <Text fontSize="xs" textColor="red.500">
             <ErrorMessage name="password" />
           </Text>
-          {WarningDialogComponent}
           <Button
             type="submit"
             colorScheme="gray"

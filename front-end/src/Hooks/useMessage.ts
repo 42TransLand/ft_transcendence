@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useChat } from './useChat';
 import ChatMemberProps from '../Props/ChatMemberProps';
 import ChatInfoProps from '../Props/ChatInfoProps';
+import ChannelType from '../Props/ChannelType';
 
 interface ChatMessageProps {
   senderNickName: string;
@@ -10,7 +11,7 @@ interface ChatMessageProps {
 }
 
 export default function useMessage() {
-  const [, dispatch] = useChat();
+  const [state, dispatch] = useChat();
 
   const insertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
@@ -29,6 +30,15 @@ export default function useMessage() {
       });
     },
     [dispatch],
+  );
+  const dispatchRoomProtection = React.useCallback(
+    (roomType: ChannelType) => {
+      dispatch({
+        action: 'updateInfo',
+        chatInfo: { roomType, channelName: state.chatInfo.channelName },
+      });
+    },
+    [state.chatInfo.channelName, dispatch],
   );
   const dispatchRoomInfo = React.useCallback(
     (chanInfoProps: ChatInfoProps) => {
@@ -71,5 +81,6 @@ export default function useMessage() {
     displayDMHistory,
     insertRoomMember,
     deleteRoomMember,
+    dispatchRoomProtection,
   };
 }

@@ -4,9 +4,6 @@ import { LockIcon } from '@chakra-ui/icons';
 import { IoIosChatbubbles } from 'react-icons/io';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useQueryClient } from '@tanstack/react-query';
-import useWarningDialog from '../../../Hooks/useWarningDialog';
 import ChannelType from '../../../Props/ChannelType';
 
 const FullSquare = styled(Square)`
@@ -21,33 +18,7 @@ function ChannelElement(props: {
   chatRoomId: string;
 }) {
   const { roomType, channelName, currentHeadCount, chatRoomId } = props;
-  const { WarningDialogComponent, setError } = useWarningDialog();
   const navigate = useNavigate();
-  const queyrClient = useQueryClient();
-
-  const onClickHandler = () => {
-    if (roomType === ChannelType.PUBLIC) {
-      axios
-        .post(`/chat/join/${chatRoomId}`)
-        .then(() => {
-          queyrClient.invalidateQueries(['channels']);
-          navigate(`/chat/${chatRoomId}`);
-        })
-        .catch((err) => {
-          if (err.response) {
-            setError({
-              headerMessage: '채팅방 입장 실패',
-              bodyMessage: err.response.data.message,
-            });
-          } else {
-            setError({
-              headerMessage: '채팅방 입장 실패',
-              bodyMessage: err.message,
-            });
-          }
-        });
-    }
-  };
 
   return (
     <HStack
@@ -56,7 +27,12 @@ function ChannelElement(props: {
       h="4em"
       w="full"
       justifyContent="space-between"
-      onClick={onClickHandler}
+      onClick={
+        roomType === ChannelType.PUBLIC
+          ? () => navigate(`/chat/${chatRoomId}`)
+          : undefined
+      }
+      cursor="pointer"
     >
       <HStack h="full">
         <FullSquare centerContent minHeight="100%">
@@ -74,7 +50,6 @@ function ChannelElement(props: {
       <Text fontSize="xl" textAlign="center" paddingX="0.5em">
         {`${currentHeadCount}명`}
       </Text>
-      {WarningDialogComponent}
     </HStack>
   );
 }
