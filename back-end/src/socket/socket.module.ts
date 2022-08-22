@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AlertRepository } from 'src/alert/alert.Repository';
 import { AlertService } from 'src/alert/alert.service';
 import { ChatRoomRepository } from 'src/chat/chat.room.repository';
-import { ChatService } from 'src/chat/chat.service';
 import { ChatUserRepository } from 'src/chat/chat.user.repository';
 import { TypeOrmExModule } from 'src/custom/typeorm.module';
 import { FriendRepository } from 'src/friend/friend.repository';
@@ -13,6 +12,7 @@ import { UserRepository } from 'src/users/users.repository';
 import { UsersService } from 'src/users/users.service';
 import { SocketGameService } from './game/socket-game.service';
 import { SocketStateService } from './socket-state.service';
+import { SocketStorageService } from './socket-storage.service';
 import { SocketGateway } from './socket.gateway';
 import { SocketService } from './socket.service';
 
@@ -31,12 +31,12 @@ import { SocketService } from './socket.service';
     SocketService,
     SocketGameService,
     SocketStateService,
+    SocketStorageService,
     UsersService,
     GameService,
-    ChatService,
     FriendService,
     AlertService,
   ],
-  exports: [SocketGateway, SocketStateService],
+  exports: [SocketGateway, SocketStateService, SocketService],
 })
 export class SocketModule {}
