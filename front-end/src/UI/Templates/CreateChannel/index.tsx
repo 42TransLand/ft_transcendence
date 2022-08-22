@@ -46,13 +46,18 @@ function CreateChannel() {
           navigate(`/chat/${response.data}`);
         })
         .catch((err) => {
-          if (err.response.status === 500) {
+          if (err.response) {
             setError({
               headerMessage: '채널 생성 실패',
-              bodyMessage: '채널 생성에 실패했습니다.',
+              bodyMessage: err.response.data.message,
             });
-            actions.setSubmitting(false);
+          } else {
+            setError({
+              headerMessage: '채널 생성 실패',
+              bodyMessage: err.message,
+            });
           }
+          actions.setSubmitting(false);
         });
     },
     [setError, navigate, queryClient],

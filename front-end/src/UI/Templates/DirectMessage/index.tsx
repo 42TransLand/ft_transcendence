@@ -12,12 +12,14 @@ import ChatMemberRole from '../../../Props/ChatMemberRole';
 import { useSocket } from '../../../Hooks/useSocket';
 import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
 import ChatMessageProps from '../../../WebSockets/dto/res/chat.message.notify.dto';
+import { useDirectMessageTarget } from '../../../Hooks/useDirectMessageNotify';
+import ChannelType from '../../../Props/ChannelType';
 
 export default function DirectMessage() {
   const { dispatchRoomInfo, dispatchChat, displayDMHistory, insertRoomMember } =
     useMessage();
   const navigate = useNavigate();
-  const { nickname } = useMe();
+  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
   const { userName } = useParams();
   const targetName: string = userName ?? '';
   const { isLoading, error, data } = useQuery(USERS_PROFILE_GET(targetName));
@@ -34,15 +36,36 @@ export default function DirectMessage() {
       const { message } = values;
       if (message.length === 0) return;
       axios.post(`/dm/send/${targetName}`, { content: message }).then(() => {
-        dispatchChat(nickname, message);
+        dispatchChat(myName, message);
       });
       helper.resetForm();
     },
-    [dispatchChat, nickname, targetName],
+    [dispatchChat, myName, targetName],
+  );
+  const onChatNotify = React.useCallback(
+    (dto: ChatMessageProps) => {
+      if (dto.nickname === targetName) {
+        dispatchChat(dto.nickname, dto.content);
+      }
+    },
+    [dispatchChat, targetName],
   );
 
+  const [, setTargetName] = useDirectMessageTarget();
   useEffect(() => {
-    if (isLoading) return;
+    setTargetName(targetName);
+  }, [targetName, setTargetName]);
+  useEffect(() => {
+    displayDMHistory(targetName);
+  }, [displayDMHistory, targetName]);
+  useEffect(() => {
+    state.socket?.on(SocketEventName.CHAT_MESSAGE_NOTIFY, onChatNotify);
+    return () => {
+      state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY, onChatNotify);
+    };
+  }, [onChatNotify, state.socket]);
+  useEffect(() => {
+    if (isLoading || myId === '0') return;
     if (!targetName || error) {
       setError({
         headerMessage: '오류 발생',
@@ -52,17 +75,17 @@ export default function DirectMessage() {
       });
       return;
     }
-    state.socket?.on(
-      SocketEventName.CHAT_MESSAGE_NOTIFY,
-      (dto: ChatMessageProps) => {
-        if (dto.nickname === targetName) {
-          dispatchChat(dto.nickname, dto.content);
-        }
-      },
-    );
     dispatchRoomInfo({
-      roomType: 'private',
+      roomType: ChannelType.PRIVATE,
       channelName: targetName,
+    });
+    insertRoomMember({
+      userId: myId,
+      name: myName,
+      profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
+      role: ChatMemberRole.MEMBER,
+      muted: false,
+      blocked: false,
     });
     insertRoomMember({
       userId: data.id,
@@ -72,18 +95,17 @@ export default function DirectMessage() {
       muted: false,
       blocked: false,
     });
-    displayDMHistory(targetName);
   }, [
-    state.socket,
-    dispatchChat,
     isLoading,
     error,
     dispatchRoomInfo,
     targetName,
     setError,
     insertRoomMember,
-    displayDMHistory,
     data,
+    myId,
+    myName,
+    myProfileImg,
   ]);
 
   return (
