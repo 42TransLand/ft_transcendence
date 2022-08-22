@@ -17,7 +17,7 @@ export default function DirectMessage() {
   const { dispatchRoomInfo, dispatchChat, displayDMHistory, insertRoomMember } =
     useMessage();
   const navigate = useNavigate();
-  const { nickname } = useMe();
+  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
   const { userName } = useParams();
   const targetName: string = userName ?? '';
   const { isLoading, error, data } = useQuery(USERS_PROFILE_GET(targetName));
@@ -34,15 +34,15 @@ export default function DirectMessage() {
       const { message } = values;
       if (message.length === 0) return;
       axios.post(`/dm/send/${targetName}`, { content: message }).then(() => {
-        dispatchChat(nickname, message);
+        dispatchChat(myName, message);
       });
       helper.resetForm();
     },
-    [dispatchChat, nickname, targetName],
+    [dispatchChat, myName, targetName],
   );
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || myId === '0') return;
     if (!targetName || error) {
       setError({
         headerMessage: '오류 발생',
@@ -65,6 +65,14 @@ export default function DirectMessage() {
       channelName: targetName,
     });
     insertRoomMember({
+      userId: myId,
+      name: myName,
+      profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
+      role: ChatMemberRole.MEMBER,
+      muted: false,
+      blocked: false,
+    });
+    insertRoomMember({
       userId: data.id,
       name: data.nickname,
       profileImg: `${process.env.REACT_APP_API_HOST}/${data.profileImg}`,
@@ -84,6 +92,9 @@ export default function DirectMessage() {
     insertRoomMember,
     displayDMHistory,
     data,
+    myId,
+    myName,
+    myProfileImg,
   ]);
 
   return (

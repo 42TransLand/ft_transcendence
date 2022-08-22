@@ -13,10 +13,9 @@ type ChangePasswordProps = {
 };
 
 const ChangePasswordChannelScheme = Yup.object().shape({
-  password: Yup.string().max(
-    100,
-    '입장 비밀번호는 100자를 초과할 수 없습니다.',
-  ),
+  password: Yup.string()
+    .min(3, '입장 비밀번호는 3자 이상이어야 합니다.')
+    .max(10, '입장 비밀번호는 10자를 초과할 수 없습니다.'),
 });
 
 function ChangePasswordChannel() {

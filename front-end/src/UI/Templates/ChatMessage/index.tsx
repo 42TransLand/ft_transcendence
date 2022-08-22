@@ -14,6 +14,9 @@ import ChatJoinNotifyProps from '../../../WebSockets/dto/res/chat.join.notify.dt
 import ChatMemberRole from '../../../Props/ChatMemberRole';
 import ChatLeaveNotifyProps from '../../../WebSockets/dto/res/chat.leave.notify.dto';
 import ChatMessageProps from '../../../WebSockets/dto/res/chat.message.notify.dto';
+import ChatUserProps from '../../../Props/ChatUserProps';
+import ROOM_GET from '../../../Queries/Channels/Room';
+import ChatUpdateProtectionNotifyProps from '../../../WebSockets/dto/res/chat.update.protection.notify.dto';
 
 export default function ChatMessage() {
   const { dispatchRoomInfo, dispatchChat, insertRoomMember, deleteRoomMember } =
@@ -28,6 +31,11 @@ export default function ChatMessage() {
   );
   const { state } = useSocket();
   const queryClient = useQueryClient();
+  const {
+    error: roomInfoError,
+    isLoading: roomInfoLoading,
+    data: roomData,
+  } = useQuery(ROOM_GET(chatRoomId));
 
   const onSubmitHandler = useCallback(
     (
@@ -80,8 +88,8 @@ export default function ChatMessage() {
   };
 
   useEffect(() => {
-    if (isLoading) return;
-    if (!chatRoomId || error) {
+    if (isLoading || roomInfoLoading) return;
+    if (!chatRoomId || error || roomInfoError) {
       setError({
         headerMessage: '오류 발생',
         bodyMessage: error
@@ -89,28 +97,74 @@ export default function ChatMessage() {
           : '정상적인 접근이 아닙니다.',
       });
     }
-  }, [chatRoomId, error, isLoading, setError]);
+  }, [chatRoomId, error, isLoading, roomInfoLoading, roomInfoError, setError]);
 
   /** 채팅방에 입장할 경우 get으로 받아와서 한번 유저를 그리고 그 다음 소켓으로 온 정보로 또 그려서 2명이 그려지는 현상을 어떻게 해결해야 할 지 모르겠습니다. */
+  const checkRole = (role: string) => {
+    switch (role) {
+      case 'OWNER':
+        return ChatMemberRole.OWNER;
+      case 'ADMIN':
+        return ChatMemberRole.ADMIN;
+      default:
+        return ChatMemberRole.MEMBER;
+    }
+  };
+
+  const checkType = (type: string | undefined) => {
+    switch (type) {
+      case 'PUBLIC':
+        return 'public';
+      default:
+        return 'protected';
+    }
+  };
+
+  const reverseCurrentRoomType = (
+    success: boolean | undefined,
+    type: string | undefined,
+  ) => {
+    if (success) {
+      switch (type) {
+        case 'PUBLIC':
+          return 'protected';
+        default:
+          return 'public';
+      }
+    } else {
+      switch (type) {
+        case 'PUBLIC':
+          return 'public';
+        default:
+          return 'protected';
+      }
+    }
+  };
+
   useEffect(() => {
-    data
-      ?.filter((m) => m.user.nickname !== nickname)
-      .forEach((member) => {
-        insertRoomMember({
-          userId: member.user.id,
-          name: member.user.nickname,
-          profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
-          role:
-            member.role === 'OWNER'
-              ? ChatMemberRole.OWNER
-              : member.role === 'ADMIN'
-              ? ChatMemberRole.ADMIN
-              : ChatMemberRole.MEMBER,
-          muted: false,
-          blocked: false,
+    axios
+      .get(`/chat/users/${chatRoomId}`)
+      .then((response: { data: ChatUserProps[] }) => {
+        const result = response.data;
+        result.forEach((member) => {
+          insertRoomMember({
+            userId: member.user.id,
+            name: member.user.nickname,
+            profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
+            role: checkRole(member.role),
+            muted: false,
+            blocked: false,
+          });
         });
       });
-  }, [data, insertRoomMember]);
+  }, [insertRoomMember, chatRoomId, nickname]);
+
+  useEffect(() => {
+    dispatchRoomInfo({
+      roomType: checkType(roomData?.type),
+      channelName: roomData?.name ?? '',
+    });
+  }, [dispatchRoomInfo, roomData]);
 
   useEffect(() => {
     state.socket?.on(
@@ -124,6 +178,20 @@ export default function ChatMessage() {
           muted: false,
           blocked: false,
         });
+        if (dto.nickname === nickname) {
+          data
+            ?.filter((m) => m.user.nickname !== nickname)
+            .forEach((member) => {
+              insertRoomMember({
+                userId: member.user.id,
+                name: member.user.nickname,
+                profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
+                role: checkRole(member.role),
+                muted: false,
+                blocked: false,
+              });
+            });
+        }
       },
     );
     state.socket?.on(
@@ -140,12 +208,35 @@ export default function ChatMessage() {
         }
       },
     );
+
+    state.socket?.on(
+      SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY,
+      (dto: ChatUpdateProtectionNotifyProps) => {
+        queryClient.invalidateQueries(['channel']);
+        // console.log(reverseCurrentRoomType(dto.status, roomData?.type));
+        dispatchRoomInfo({
+          roomType: reverseCurrentRoomType(dto.status, roomData?.type),
+          channelName: roomData?.name ?? '',
+        });
+      },
+    );
     return () => {
       state.socket?.off(SocketEventName.CHAT_JOIN_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_LEAVE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY);
+      state.socket?.off(SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY);
     };
-  }, [state.socket, insertRoomMember, deleteRoomMember, dispatchChat]);
+  }, [
+    data,
+    nickname,
+    state.socket,
+    insertRoomMember,
+    deleteRoomMember,
+    dispatchChat,
+    dispatchRoomInfo,
+    roomData,
+    queryClient,
+  ]);
 
   return (
     <>

@@ -20,7 +20,8 @@ import useWarningDialog from '../../../Hooks/useWarningDialog';
 const validationSchema = Yup.object().shape({
   password: Yup.string()
     .required('비밀번호를 입력해주세요.')
-    .max(100, '입장 비밀번호는 100자를 초과할 수 없습니다.'),
+    .min(3, '입장 비밀번호는 3자 이상이어야 합니다.')
+    .max(10, '입장 비밀번호는 10자를 초과할 수 없습니다.'),
 });
 
 function PasswordValidation(props: { chatRoomId: string }) {

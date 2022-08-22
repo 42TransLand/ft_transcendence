@@ -1,8 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import { useChat } from './useChat';
-import useMe from './useMe';
-import ChatMemberRole from '../Props/ChatMemberRole';
 import ChatMemberProps from '../Props/ChatMemberProps';
 import ChatInfoProps from '../Props/ChatInfoProps';
 
@@ -13,7 +11,6 @@ interface ChatMessageProps {
 
 export default function useMessage() {
   const [, dispatch] = useChat();
-  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
 
   const insertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
@@ -67,18 +64,6 @@ export default function useMessage() {
     },
     [dispatch],
   );
-
-  React.useEffect(() => {
-    if (myId === '0') return;
-    insertRoomMember({
-      userId: myId,
-      name: myName,
-      profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
-      role: ChatMemberRole.MEMBER,
-      muted: false,
-      blocked: false,
-    });
-  }, [insertRoomMember, dispatch, myId, myName, myProfileImg]);
 
   return {
     dispatchRoomInfo,
