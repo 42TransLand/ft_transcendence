@@ -30,6 +30,8 @@ import LogoutMenu from '../../Molecules/LogoutMenu';
 import useFriends from '../../../Hooks/useFriends';
 import { useSocket } from '../../../Hooks/useSocket';
 import UserState from '../../../WebSockets/dto/constants/user.state.enum';
+import ChatMemberProps from '../../../Props/ChatMemberProps';
+import ChatMemberRole from '../../../Props/ChatMemberRole';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -51,7 +53,6 @@ enum UserContextMenuFlag {
   FRIEND = FRIEND_ADD | BLOCK_ADD | BLOCK_REMOVE,
   GAME = GAME_INVITE | GAME_SPECTATE,
   CHAT = CHAT_BAN | CHAT_MUTE | CHAT_UNMUTE | ADMIN_APPROVE | ADMIN_UNAPPROVE,
-  ALL = PROFILE | OTP_SETTING | FRIEND | GAME | CHAT | LOGOUT,
 }
 
 const ChildView = styled.div`
@@ -72,30 +73,58 @@ function UserContextMenuItem({
 }
 
 export default function UserContextMenu({
-  target,
-  targetName,
+  userId,
+  name,
+  role,
+  muted,
   mode,
   children,
   env,
+  me,
 }: {
-  target: string;
-  targetName: string;
+  userId: string;
+  name: string;
+  role?: ChatMemberRole;
+  muted?: boolean;
   mode: UserContextMenuType;
   children: React.ReactNode;
   env?: EventListenerEnv;
+  me?: ChatMemberProps | undefined;
 }) {
   const { state } = useSocket();
   const friends = useFriends();
-  const friendState = state.friendState[target];
+  const friendState = state.friendState[userId];
   const menuFlag = React.useMemo(() => {
     let flag = UserContextMenuFlag.PROFILE;
     if (mode === 'self') {
       flag |= UserContextMenuFlag.OTP_SETTING;
       flag |= UserContextMenuFlag.LOGOUT;
     } else {
-      const isFriend = friends.filter((f) => f.id === target).length > 0;
+      const isFriend = friends.filter((f) => f.id === userId).length > 0;
       const isBlocked =
-        friends.filter((f) => f.id === target && f.isBlocked).length > 0;
+        friends.filter((f) => f.id === userId && f.isBlocked).length > 0;
+      if (mode === 'chat') {
+        if (name === me?.name) return flag;
+        if (
+          me?.role === ChatMemberRole.OWNER ||
+          (me?.role === ChatMemberRole.ADMIN && role === ChatMemberRole.MEMBER)
+        ) {
+          flag |= UserContextMenuFlag.CHAT_BAN;
+          if (muted) {
+            flag |= UserContextMenuFlag.CHAT_UNMUTE;
+          } else {
+            flag |= UserContextMenuFlag.CHAT_MUTE;
+          }
+        }
+        if (me?.role === ChatMemberRole.OWNER) {
+          if (role === ChatMemberRole.ADMIN) {
+            flag |= UserContextMenuFlag.ADMIN_UNAPPROVE;
+          } else {
+            flag |= UserContextMenuFlag.ADMIN_APPROVE;
+          }
+        }
+        flag |= UserContextMenuFlag.GAME_INVITE;
+      }
       if (!isFriend) {
         flag |= UserContextMenuFlag.FRIEND_ADD;
       }
@@ -110,30 +139,34 @@ export default function UserContextMenu({
       if (friendState === UserState.INGAME) {
         flag |= UserContextMenuFlag.GAME_SPECTATE;
       }
-      if (mode === 'chat') {
-        flag |= UserContextMenuFlag.CHAT;
-        flag |= UserContextMenuFlag.GAME_INVITE;
-      }
-      // TODO: 추후 유저 온라인 상태가 구현되면 삭제
-      flag |= UserContextMenuFlag.GAME;
     }
     return flag;
-  }, [mode, friends, target, friendState]);
+  }, [
+    mode,
+    friends,
+    friendState,
+    userId,
+    name,
+    me?.name,
+    me?.role,
+    role,
+    muted,
+  ]);
 
   return (
     <flagContext.Provider value={menuFlag}>
-      <TargetUserProvider userId={target} userName={targetName}>
+      <TargetUserProvider userId={userId} userName={name}>
         <ContextMenu
           env={env ?? document}
           renderMenu={(isRendered: boolean) => (
             <MenuList>
               <UserContextMenuItem flag={UserContextMenuFlag.PROFILE}>
-                <Link to={`user/${targetName}`}>
+                <Link to={`user/${name}`}>
                   <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
                 </Link>
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.OTP_SETTING}>
-                <Link to={`/otp/${targetName}`}>
+                <Link to={`/otp/${name}`}>
                   <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
                 </Link>
               </UserContextMenuItem>
@@ -147,14 +180,14 @@ export default function UserContextMenu({
                 <BlockMenu
                   icon={FaUserSlash}
                   label="차단하기"
-                  targetName={targetName}
+                  targetName={name}
                 />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.BLOCK_REMOVE}>
                 <BlockMenu
                   icon={FaUserSlash}
                   label="차단해제"
-                  targetName={targetName}
+                  targetName={name}
                 />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME}>
@@ -164,7 +197,7 @@ export default function UserContextMenu({
                 <InviteGameMenu isRendered={isRendered} />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_SPECTATE}>
-                <SpectateMenu targetName={targetName} />
+                <SpectateMenu targetName={name} />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT}>
                 <MenuDivider />
@@ -207,4 +240,7 @@ export default function UserContextMenu({
 
 UserContextMenu.defaultProps = {
   env: document,
+  role: ChatMemberRole.MEMBER,
+  muted: false,
+  me: undefined,
 };
