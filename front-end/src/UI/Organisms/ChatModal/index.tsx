@@ -20,20 +20,20 @@ import InputMessageProps from './InputMessageProps';
 
 export default function ChatModal({
   onSubmitHandler,
-  leaveChatRoomHandler,
+  leaveModalHandler,
 }: {
   onSubmitHandler: (
     values: InputMessageProps,
     helper: FormikHelpers<InputMessageProps>,
   ) => void;
-  leaveChatRoomHandler?: () => void;
+  leaveModalHandler?: () => void;
 }) {
   const ref = React.useRef<HTMLDivElement>(null);
 
   return (
     <RoutedModal
       closeOnOverlayClick={false}
-      leaveChatRoomHandler={leaveChatRoomHandler}
+      leaveModalHandler={leaveModalHandler}
     >
       <ModalHeader display={{ base: 'none', lg: 'flex' }}>
         <ChatHeader />
@@ -79,5 +79,5 @@ export default function ChatModal({
 }
 
 ChatModal.defaultProps = {
-  leaveChatRoomHandler: undefined,
+  leaveModalHandler: undefined,
 };

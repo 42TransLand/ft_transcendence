@@ -67,7 +67,7 @@ export default function ChatMessage() {
     [chatRoomId, dispatchChat, nickname, setError],
   );
 
-  const leaveChatRoomHandler = () => {
+  const leaveModalHandler = () => {
     if (chatRoomId === '') return;
     axios
       .delete(`/chat/leave/${chatRoomId}`)
@@ -99,7 +99,6 @@ export default function ChatMessage() {
     }
   }, [chatRoomId, error, isLoading, roomInfoLoading, roomInfoError, setError]);
 
-  /** 채팅방에 입장할 경우 get으로 받아와서 한번 유저를 그리고 그 다음 소켓으로 온 정보로 또 그려서 2명이 그려지는 현상을 어떻게 해결해야 할 지 모르겠습니다. */
   const checkRole = (role: string) => {
     switch (role) {
       case 'OWNER':
@@ -108,36 +107,6 @@ export default function ChatMessage() {
         return ChatMemberRole.ADMIN;
       default:
         return ChatMemberRole.MEMBER;
-    }
-  };
-
-  const checkType = (type: string | undefined) => {
-    switch (type) {
-      case 'PUBLIC':
-        return 'public';
-      default:
-        return 'protected';
-    }
-  };
-
-  const reverseCurrentRoomType = (
-    success: boolean | undefined,
-    type: string | undefined,
-  ) => {
-    if (success) {
-      switch (type) {
-        case 'PUBLIC':
-          return 'protected';
-        default:
-          return 'public';
-      }
-    } else {
-      switch (type) {
-        case 'PUBLIC':
-          return 'public';
-        default:
-          return 'protected';
-      }
     }
   };
 
@@ -161,7 +130,7 @@ export default function ChatMessage() {
 
   useEffect(() => {
     dispatchRoomInfo({
-      roomType: checkType(roomData?.type),
+      roomType: roomData?.type ?? 'PUBLIC',
       channelName: roomData?.name ?? '',
     });
   }, [dispatchRoomInfo, roomData]);
@@ -212,10 +181,8 @@ export default function ChatMessage() {
     state.socket?.on(
       SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY,
       (dto: ChatUpdateProtectionNotifyProps) => {
-        queryClient.invalidateQueries(['channel']);
-        // console.log(reverseCurrentRoomType(dto.status, roomData?.type));
         dispatchRoomInfo({
-          roomType: reverseCurrentRoomType(dto.status, roomData?.type),
+          roomType: dto.status ? 'PUBLIC' : 'PROTECT',
           channelName: roomData?.name ?? '',
         });
       },
@@ -234,15 +201,14 @@ export default function ChatMessage() {
     deleteRoomMember,
     dispatchChat,
     dispatchRoomInfo,
-    roomData,
-    queryClient,
+    roomData?.name,
   ]);
 
   return (
     <>
       <ChatModal
         onSubmitHandler={onSubmitHandler}
-        leaveChatRoomHandler={leaveChatRoomHandler}
+        leaveModalHandler={leaveModalHandler}
       />
       {WarningDialogComponent}
     </>

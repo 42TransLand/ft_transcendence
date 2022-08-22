@@ -86,7 +86,7 @@ function useChat(): [ChatStateType, React.Dispatch<ChatActionType>] {
 function ChatProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(ChatReducer, {
     chatInfo: {
-      roomType: 'private',
+      roomType: 'PRIVATE',
       channelName: '채팅방',
     },
     chatMembers: [],
