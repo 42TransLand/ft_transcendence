@@ -130,11 +130,15 @@ export class Room {
     const player = this.players.get(user.id);
     if (player) {
       player.pos = { x: move.x, y: move.y };
-      this.broadcast(SocketEventName.PLAYER_MOVE_NOTIFY, <PlayerMoveResDto>{
-        playerIndex: player.index,
-        x: move.x,
-        y: move.y,
-      });
+      this.broadcast(
+        SocketEventName.PLAYER_MOVE_NOTIFY,
+        <PlayerMoveResDto>{
+          playerIndex: player.index,
+          x: move.x,
+          y: move.y,
+        },
+        user,
+      );
     }
   }
 
