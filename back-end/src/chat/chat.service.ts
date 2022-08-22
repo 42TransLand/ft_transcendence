@@ -16,10 +16,11 @@ import { ChatUserRepository } from './chat.user.repository';
 import { ChatRole } from './constants/chat.role.enum';
 import { UpdateRoleDto } from './dto/update.role.dto';
 import { ChatUser } from './entities/chat.user.entity';
-import { SocketGateway } from 'src/socket/socket.gateway';
 import { User } from 'src/users/entities/user.entity';
 import { ChatInfoDto } from './dto/chat.info.dto';
 import { ChatUserUpdateType } from 'src/socket/chat/constants/chat.user.update.type.enum';
+import { SocketService } from 'src/socket/socket.service';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Injectable()
 export class ChatService {
@@ -30,6 +31,7 @@ export class ChatService {
     private readonly chatUserRepository: ChatUserRepository,
     private readonly userService: UsersService,
     private readonly socketGateway: SocketGateway,
+    private readonly socketService: SocketService,
   ) {}
 
   async createChatRoom(
@@ -38,7 +40,7 @@ export class ChatService {
   ): Promise<string> {
     const room = await this.chatRoomRepository.createChatRoom(chatRoomDto);
     this.chatUserRepository.createRoomOwner(user, room);
-    this.socketGateway.handleJoinChatRoom(room.id, user.id);
+    this.socketService.handleJoinChatRoom(room.id, user.id);
     return room.id;
   }
 
@@ -57,8 +59,17 @@ export class ChatService {
       throw new BadRequestException(`권한이 없습니다.`);
     }
     if (type !== chatRoom.type)
-      this.socketGateway.handleUpdateChatType(chatRoom.id, true);
-    else this.socketGateway.handleUpdateChatType(chatRoom.id, false);
+      this.socketService.handleUpdateChatType(
+        this.socketGateway.server,
+        chatRoom.id,
+        true,
+      );
+    else
+      this.socketService.handleUpdateChatType(
+        this.socketGateway.server,
+        chatRoom.id,
+        false,
+      );
     await this.chatRoomRepository.updatePassword(chatRoom, password, type);
   }
 
@@ -120,7 +131,8 @@ export class ChatService {
     }
 
     this.chatUserRepository.updateAdminRole(newAdmin, oldAdmin);
-    this.socketGateway.handleUpdateChatUser(
+    this.socketService.handleUpdateChatUser(
+      this.socketGateway.server,
       id,
       newAdmin.user.nickname,
       ChatUserUpdateType.ADMIN,
@@ -136,7 +148,7 @@ export class ChatService {
       await this.chatUserRepository.joinChatRoom(user, chatRoom);
     }
     await this.chatRoomRepository.updateCount(chatRoom, CountType.JOIN);
-    this.socketGateway.handleJoinChatRoom(chatRoom.id, user.id);
+    this.socketService.handleJoinChatRoom(chatRoom.id, user.id);
   }
 
   async leaveChatRoom(id: string, user: User): Promise<void> {
@@ -149,7 +161,7 @@ export class ChatService {
       throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
     }
     await this.chatUserRepository.leaveChatRoom(user, chatRoom);
-    this.socketGateway.handleLeaveChatRoom(chatRoom.id, user.id, false);
+    this.socketService.handleLeaveChatRoom(user.id, false);
     const chatUsers = await this.chatUserRepository.findChatRoomById(chatRoom);
     if (chatUsers.length === 0) {
       // 채팅방에 유저가 없으면 삭제
@@ -160,7 +172,8 @@ export class ChatService {
     if (findChatUser.role === ChatRole.OWNER) {
       const newOwner = await this.chatUserRepository.findNewOwner(chatRoom);
       await this.chatUserRepository.updateOwnerRole(newOwner);
-      this.socketGateway.handleUpdateChatUser(
+      this.socketService.handleUpdateChatUser(
+        this.socketGateway.server,
         id,
         newOwner.user.nickname,
         ChatUserUpdateType.OWNER,
@@ -184,7 +197,7 @@ export class ChatService {
     const kickUser = await this.userService.findByNickname(nickname);
     await this.chatUserRepository.leaveChatRoom(kickUser, chatRoom);
     await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
-    this.socketGateway.handleLeaveChatRoom(chatRoom.id, kickUser.id, true);
+    this.socketService.handleLeaveChatRoom(kickUser.id, true);
   }
 
   async sendChat(id: string, user: User, content: string): Promise<void> {
@@ -202,7 +215,12 @@ export class ChatService {
         ]);
       }
     }
-    this.socketGateway.handleChatMessage(user.nickname, chatRoom.id, content);
+    this.socketService.handleChatMessage(
+      this.socketGateway.server,
+      user.nickname,
+      chatRoom.id,
+      content,
+    );
   }
 
   async updateChatMute(
@@ -256,7 +274,8 @@ export class ChatService {
     setTimeout(async () => {
       chatUser.unmutedAt = null;
       await this.chatUserRepository.save(chatUser);
-      this.socketGateway.handleUpdateChatUser(
+      this.socketService.handleUpdateChatUser(
+        this.socketGateway.server,
         chatUser.chatRoom.id,
         nickname,
         ChatUserUpdateType.MUTE,
@@ -264,7 +283,8 @@ export class ChatService {
       );
     }, muteMinutes * 60 * 1000);
 
-    this.socketGateway.handleUpdateChatUser(
+    this.socketService.handleUpdateChatUser(
+      this.socketGateway.server,
       chatUser.chatRoom.id,
       nickname,
       ChatUserUpdateType.MUTE,
@@ -315,7 +335,8 @@ export class ChatService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
-    this.socketGateway.handleUpdateChatUser(
+    this.socketService.handleUpdateChatUser(
+      this.socketGateway.server,
       chatUser.chatRoom.id,
       nickname,
       ChatUserUpdateType.MUTE,
