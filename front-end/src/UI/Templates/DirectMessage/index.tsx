@@ -12,6 +12,7 @@ import ChatMemberRole from '../../../Props/ChatMemberRole';
 import { useSocket } from '../../../Hooks/useSocket';
 import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
 import ChatMessageProps from '../../../WebSockets/dto/res/chat.message.notify.dto';
+import { useDirectMessageTarget } from '../../../Hooks/useDirectMessageNotify';
 
 export default function DirectMessage() {
   const { dispatchRoomInfo, dispatchChat, displayDMHistory, insertRoomMember } =
@@ -40,7 +41,28 @@ export default function DirectMessage() {
     },
     [dispatchChat, nickname, targetName],
   );
+  const onChatNotify = React.useCallback(
+    (dto: ChatMessageProps) => {
+      if (dto.nickname === targetName) {
+        dispatchChat(dto.nickname, dto.content);
+      }
+    },
+    [dispatchChat, targetName],
+  );
 
+  const [, setTargetName] = useDirectMessageTarget();
+  useEffect(() => {
+    setTargetName(targetName);
+  }, [targetName, setTargetName]);
+  useEffect(() => {
+    displayDMHistory(targetName);
+  }, [displayDMHistory, targetName]);
+  useEffect(() => {
+    state.socket?.on(SocketEventName.CHAT_MESSAGE_NOTIFY, onChatNotify);
+    return () => {
+      state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY, onChatNotify);
+    };
+  }, [onChatNotify, state.socket]);
   useEffect(() => {
     if (isLoading) return;
     if (!targetName || error) {
@@ -52,14 +74,6 @@ export default function DirectMessage() {
       });
       return;
     }
-    state.socket?.on(
-      SocketEventName.CHAT_MESSAGE_NOTIFY,
-      (dto: ChatMessageProps) => {
-        if (dto.nickname === targetName) {
-          dispatchChat(dto.nickname, dto.content);
-        }
-      },
-    );
     dispatchRoomInfo({
       roomType: 'private',
       channelName: targetName,
@@ -72,17 +86,13 @@ export default function DirectMessage() {
       muted: false,
       blocked: false,
     });
-    displayDMHistory(targetName);
   }, [
-    state.socket,
-    dispatchChat,
     isLoading,
     error,
     dispatchRoomInfo,
     targetName,
     setError,
     insertRoomMember,
-    displayDMHistory,
     data,
   ]);
 
