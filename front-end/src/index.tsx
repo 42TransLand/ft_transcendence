@@ -17,5 +17,5 @@ root.render(
         <App />
       </Box>
     </ChakraProvider>
-  </QueryClientProvider>,
+  </QueryClientProvider>
 );
