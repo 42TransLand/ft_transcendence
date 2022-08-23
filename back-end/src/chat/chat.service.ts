@@ -185,6 +185,7 @@ export class ChatService {
       this.socketService.handleUpdateChatUser(
         this.socketGateway.server,
         id,
+        user.id,
         newOwnerUser.nickname,
         ChatUserUpdateType.OWNER,
         true,
@@ -294,6 +295,7 @@ export class ChatService {
       this.socketService.handleUpdateChatUser(
         this.socketGateway.server,
         chatUser.chatRoom.id,
+        chatUser.user.id,
         nickname,
         ChatUserUpdateType.MUTE,
         false,
@@ -303,6 +305,7 @@ export class ChatService {
     this.socketService.handleUpdateChatUser(
       this.socketGateway.server,
       id,
+      chatUser.user.id,
       nickname,
       ChatUserUpdateType.MUTE,
       true,
@@ -344,6 +347,7 @@ export class ChatService {
     this.socketService.handleUpdateChatUser(
       this.socketGateway.server,
       id,
+      chatUser.user.id,
       nickname,
       ChatUserUpdateType.MUTE,
       false,

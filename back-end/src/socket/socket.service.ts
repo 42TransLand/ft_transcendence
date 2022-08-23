@@ -149,6 +149,7 @@ export class SocketService {
             .emit(SocketEventName.CHAT_UPDATE_USER_NOTIFY, <
               ChatUpdateUserNotifyDto
             >{
+              id: userContext.user.id,
               nickname: userContext.user.nickname,
               type: ChatUserUpdateType.KICK,
               status: true,
@@ -223,6 +224,7 @@ export class SocketService {
   handleUpdateChatUser(
     server: Server,
     chatRoomId: string,
+    userId: string,
     nickname: string,
     type: ChatUserUpdateType,
     status: boolean,
@@ -230,6 +232,7 @@ export class SocketService {
     server.to(chatRoomId).emit(SocketEventName.CHAT_UPDATE_USER_NOTIFY, <
       ChatUpdateUserNotifyDto
     >{
+      id: userId,
       nickname,
       type,
       status,
