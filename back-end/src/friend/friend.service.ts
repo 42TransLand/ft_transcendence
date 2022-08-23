@@ -12,6 +12,7 @@ import { Friend } from './entities/friend.entity';
 import { FriendStatus } from './constants/friend.enum';
 import { FriendListDto } from './dto/friend.list.dto';
 import { SocketStateService } from 'src/socket/socket-state.service';
+import { BlockListDto } from './dto/friend.block.list.dto';
 
 @Injectable()
 export class FriendService {
@@ -74,12 +75,16 @@ export class FriendService {
     await this.friendRepository.unblockFriend(user, opponentUser);
   }
 
-  // 받는 사람이 차단했는지 확일 할 때
+  // 받는 사람이 차단했는지 확인 할 때
   async getFriend(sender: User, receiver: User): Promise<Friend> {
     const friendShip = await this.friendRepository.findRow(receiver, sender);
     if (!friendShip || friendShip.status === FriendStatus.PENDDING) {
       throw new NotFoundException('아무 관계가 아닙니다.');
     }
     return friendShip;
+  }
+
+  async blockList(user: User): Promise<BlockListDto[]> {
+    return this.friendRepository.blockList(user);
   }
 }
