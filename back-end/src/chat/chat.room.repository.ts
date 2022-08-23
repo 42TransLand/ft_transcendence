@@ -78,12 +78,8 @@ export class ChatRoomRepository extends Repository<ChatRoom> {
 
   async findBannedUser(id: string, user: User): Promise<boolean> {
     const chatRoom = await this.findChatRoomById(id);
-    try {
-      if (chatRoom.bannedUsers.includes(user.id)) {
-        return true;
-      }
-    } catch (e) {
-      // ignore
+    if (chatRoom.bannedUsers.includes(user.id)) {
+      return true;
     }
     return false;
   }

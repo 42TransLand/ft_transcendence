@@ -140,6 +140,10 @@ export class ChatController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 401, description: '권한이 없는 경우' })
   @ApiResponse({ status: 404, description: '채팅방, 유저 없는 경우' })
+  @ApiResponse({
+    status: 409,
+    description: '자기 자신 추방 및 이미 추방된 경우',
+  })
   @Post('/ban/:id/:nickname')
   banChatUser(
     @GetUser() user: User,

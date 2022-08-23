@@ -146,7 +146,6 @@ export class SocketService {
               status: true,
             });
         } else if (type === ChatUserUpdateType.LEAVE) {
-          // 그냥 나가는 경우
           userContext.server
             .to(userContext.chatRoom)
             .emit(SocketEventName.CHAT_LEAVE_NOTIFY, <ChatLeaveNotifyDto>{

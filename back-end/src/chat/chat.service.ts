@@ -222,6 +222,7 @@ export class ChatService {
       user,
       chatRoom,
     );
+    const banUser = await this.userService.findByNickname(nickname);
     if (!findChatUser) {
       throw new NotFoundException([`채팅방에 없는 유저입니다.`]);
     }
@@ -231,7 +232,9 @@ export class ChatService {
     if (user.nickname === nickname) {
       throw new ConflictException(`자기 자신을 추방할 수 없습니다.`);
     }
-    const banUser = await this.userService.findByNickname(nickname);
+    if (await this.chatRoomRepository.findBannedUser(id, banUser)) {
+      throw new ConflictException(`이미 추방된 유저입니다.`);
+    }
     await this.chatUserRepository.leaveChatRoom(banUser, chatRoom);
     await this.chatRoomRepository.banChatRoom(chatRoom, banUser);
     await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
