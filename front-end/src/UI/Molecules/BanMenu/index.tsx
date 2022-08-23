@@ -19,7 +19,6 @@ function BanMenu({ icon, label }: { icon: IconType; label: string }) {
     axios
       .post(`/chat/ban/${id}/${userName}`)
       .then(() => {
-        console.log('hello');
       })
       .catch((err) => {
         if (err.response) {
