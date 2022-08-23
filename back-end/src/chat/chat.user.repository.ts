@@ -56,24 +56,27 @@ export class ChatUserRepository extends Repository<ChatUser> {
     return chatUser;
   }
 
-  async updateAdminRole(
-    newAdmin: ChatUser,
-    oldAdmin?: ChatUser | null,
-  ): Promise<void> {
-    newAdmin.role = ChatRole.ADMIN;
-    if (oldAdmin !== null) {
-      oldAdmin.role = ChatRole.PARTICIPANT;
-      try {
-        await this.save(oldAdmin);
-      } catch (error) {
-        throw new InternalServerErrorException();
-      }
+  async updateAdminRole(newAdmin: ChatUser, chatRoom: ChatRoom): Promise<void> {
+    const chatUser = await this.findOne({
+      where: {
+        chatRoom: { id: Equal(chatRoom.id) },
+        role: ChatRole.ADMIN,
+      },
+    });
+    if (chatUser) {
+      await this.update(chatUser.id, { role: ChatRole.PARTICIPANT });
     }
-    try {
-      await this.save(newAdmin);
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
+    await this.update(newAdmin.id, { role: ChatRole.ADMIN });
+  }
+
+  async deleteAdminRole(chatRoom: ChatRoom): Promise<void> {
+    await this.update(
+      {
+        chatRoom: { id: Equal(chatRoom.id) },
+        role: ChatRole.ADMIN,
+      },
+      { role: ChatRole.PARTICIPANT },
+    );
   }
 
   async updateOwnerRole(user: ChatUser): Promise<void> {

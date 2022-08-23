@@ -11,6 +11,7 @@ import useChatNotify from '../../../Hooks/useChatNotify';
 import useChatRoomInfo from '../../../Hooks/useChatRoomInfo';
 import CHAT_USERS_GET from '../../../Queries/ChatUsers/All';
 
+
 export default function ChatMessageContent({
   setError,
 }: {
@@ -67,6 +68,7 @@ export default function ChatMessageContent({
         bodyMessage: '잘못된 접근 입니다.',
       });
   }, [chatRoomId, setError]);
+
 
   return <ChatModal onSubmitHandler={onSubmitHandler} />;
 }
