@@ -13,14 +13,24 @@ interface ChatMessageProps {
 export default function useMessage() {
   const [state, dispatch] = useChat();
 
-  const insertRoomMember = React.useCallback(
+  const upsertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
-      dispatch({
-        action: 'insertMember',
-        chatMember,
-      });
+      const idx = state.chatMembers.findIndex(
+        (c) => c.userId === chatMember.userId,
+      );
+      if (idx === -1) {
+        dispatch({
+          action: 'insertMember',
+          chatMember,
+        });
+      } else {
+        dispatch({
+          action: 'updateMember',
+          chatMember,
+        });
+      }
     },
-    [dispatch],
+    [dispatch, state.chatMembers],
   );
   const deleteRoomMember = React.useCallback(
     (name: string) => {
@@ -79,7 +89,7 @@ export default function useMessage() {
     dispatchRoomInfo,
     dispatchChat,
     displayDMHistory,
-    insertRoomMember,
+    upsertRoomMember,
     deleteRoomMember,
     dispatchRoomProtection,
   };

@@ -27,7 +27,7 @@ export default function ChatMessageContent({
   const {
     dispatchRoomInfo,
     dispatchChat,
-    insertRoomMember,
+    upsertRoomMember,
     deleteRoomMember,
     dispatchRoomProtection,
   } = useMessage();
@@ -106,7 +106,7 @@ export default function ChatMessageContent({
       .then((response: { data: ChatUserProps[] }) => {
         const result = response.data;
         result.forEach((member) => {
-          insertRoomMember({
+          upsertRoomMember({
             userId: member.user.id,
             name: member.user.nickname,
             profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
@@ -116,7 +116,7 @@ export default function ChatMessageContent({
           });
         });
       });
-  }, [insertRoomMember, chatRoomId, nickname]);
+  }, [upsertRoomMember, chatRoomId, nickname]);
 
   useEffect(() => {
     if (isLoading || roomInfoLoading) return;
@@ -139,7 +139,7 @@ export default function ChatMessageContent({
     state.socket?.on(
       SocketEventName.CHAT_JOIN_NOTIFY,
       (dto: ChatJoinNotifyProps) => {
-        insertRoomMember({
+        upsertRoomMember({
           profileImg: `${process.env.REACT_APP_API_HOST}/${dto.profileImg}`,
           userId: dto.id,
           name: dto.nickname,
@@ -151,7 +151,7 @@ export default function ChatMessageContent({
           data
             ?.filter((m) => m.user.nickname !== nickname)
             .forEach((member) => {
-              insertRoomMember({
+              upsertRoomMember({
                 userId: member.user.id,
                 name: member.user.nickname,
                 profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
@@ -195,7 +195,7 @@ export default function ChatMessageContent({
     data,
     nickname,
     state.socket,
-    insertRoomMember,
+    upsertRoomMember,
     deleteRoomMember,
     dispatchChat,
     dispatchRoomInfo,

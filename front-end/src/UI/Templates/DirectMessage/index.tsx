@@ -16,7 +16,7 @@ import { useDirectMessage } from '../../../Hooks/useDirectMessageNotify';
 import ChannelType from '../../../Props/ChannelType';
 
 export default function DirectMessage() {
-  const { dispatchRoomInfo, dispatchChat, displayDMHistory, insertRoomMember } =
+  const { dispatchRoomInfo, dispatchChat, displayDMHistory, upsertRoomMember } =
     useMessage();
   const navigate = useNavigate();
   const { setError, WarningDialogComponent } = useWarningDialog(() =>
@@ -25,22 +25,31 @@ export default function DirectMessage() {
   const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
   const { userName } = useParams();
   const targetName: string = userName ?? '';
+  useEffect(() => {
+    dispatchRoomInfo({
+      roomType: ChannelType.PRIVATE,
+      channelName: targetName,
+    });
+    upsertRoomMember({
+      userId: myId,
+      name: myName,
+      profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
+      role: ChatMemberRole.MEMBER,
+      muted: false,
+      blocked: false,
+    });
+  }, [
+    dispatchRoomInfo,
+    myId,
+    myName,
+    myProfileImg,
+    targetName,
+    upsertRoomMember,
+  ]);
   useQuery({
     ...USERS_PROFILE_GET(targetName),
     onSuccess: (res) => {
-      dispatchRoomInfo({
-        roomType: ChannelType.PRIVATE,
-        channelName: targetName,
-      });
-      insertRoomMember({
-        userId: myId,
-        name: myName,
-        profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
-        role: ChatMemberRole.MEMBER,
-        muted: false,
-        blocked: false,
-      });
-      insertRoomMember({
+      upsertRoomMember({
         userId: res.id,
         name: res.nickname,
         profileImg: `${process.env.REACT_APP_API_HOST}/${res.profileImg}`,
@@ -84,6 +93,7 @@ export default function DirectMessage() {
   const [, setTargetName] = useDirectMessage();
   useEffect(() => {
     setTargetName(targetName);
+    return () => setTargetName('');
   }, [targetName, setTargetName]);
   useEffect(() => {
     displayDMHistory(targetName);
