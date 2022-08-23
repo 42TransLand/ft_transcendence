@@ -4,6 +4,7 @@ import { useChat } from './useChat';
 import ChatMemberProps from '../Props/ChatMemberProps';
 import ChatInfoProps from '../Props/ChatInfoProps';
 import ChannelType from '../Props/ChannelType';
+import ChatMemberRole from '../Props/ChatMemberRole';
 
 interface ChatMessageProps {
   senderNickName: string;
@@ -43,6 +44,21 @@ export default function useMessage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch],
   );
+  const updateMemberRole = React.useCallback(
+    (memberNickname: string) => {
+      const found = state.chatMembers.find((u) => u.userId === memberNickname);
+      if (!found) return;
+      dispatch({
+        action: 'updateMember',
+        chatMember: {
+          ...found,
+          role: ChatMemberRole.ADMIN,
+        },
+      });
+    },
+    [dispatch, state.chatMembers],
+  );
+
   const upsertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
       const found = state.chatMembers.find(
@@ -119,5 +135,6 @@ export default function useMessage() {
     upsertRoomMember,
     deleteRoomMember,
     dispatchRoomProtection,
+    updateMemberRole,
   };
 }
