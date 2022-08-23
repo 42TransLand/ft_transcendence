@@ -2,7 +2,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { FormikHelpers } from 'formik';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import useMe from '../../../Hooks/useMe';
 import useMessage from '../../../Hooks/useMessage';
 import ChatModal from '../../Organisms/ChatModal';
@@ -12,20 +12,59 @@ import ChatMemberRole from '../../../Props/ChatMemberRole';
 import { useSocket } from '../../../Hooks/useSocket';
 import SocketEventName from '../../../WebSockets/dto/constants/socket.events.enum';
 import ChatMessageProps from '../../../WebSockets/dto/res/chat.message.notify.dto';
-import { useDirectMessageTarget } from '../../../Hooks/useDirectMessageNotify';
+import { useDirectMessage } from '../../../Hooks/useDirectMessageNotify';
 import ChannelType from '../../../Props/ChannelType';
 
 export default function DirectMessage() {
-  const { dispatchRoomInfo, dispatchChat, displayDMHistory, insertRoomMember } =
+  const { dispatchRoomInfo, dispatchChat, displayDMHistory, upsertRoomMember } =
     useMessage();
   const navigate = useNavigate();
-  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
-  const { userName } = useParams();
-  const targetName: string = userName ?? '';
-  const { isLoading, error, data } = useQuery(USERS_PROFILE_GET(targetName));
   const { setError, WarningDialogComponent } = useWarningDialog(() =>
     navigate(-1),
   );
+  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
+  const { userName } = useParams();
+  const targetName: string = userName ?? '';
+  useEffect(() => {
+    dispatchRoomInfo({
+      roomType: ChannelType.PRIVATE,
+      channelName: targetName,
+    });
+    upsertRoomMember({
+      userId: myId,
+      name: myName,
+      profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
+      role: ChatMemberRole.MEMBER,
+      muted: false,
+      blocked: false,
+    });
+  }, [
+    dispatchRoomInfo,
+    myId,
+    myName,
+    myProfileImg,
+    targetName,
+    upsertRoomMember,
+  ]);
+  useQuery({
+    ...USERS_PROFILE_GET(targetName),
+    onSuccess: (res) => {
+      upsertRoomMember({
+        userId: res.id,
+        name: res.nickname,
+        profileImg: `${process.env.REACT_APP_API_HOST}/${res.profileImg}`,
+        role: ChatMemberRole.MEMBER,
+        muted: false,
+        blocked: false,
+      });
+    },
+    onError(err: AxiosError<any, any>) {
+      setError({
+        headerMessage: '오류 발생',
+        bodyMessage: err?.response?.data?.message ?? err.message,
+      });
+    },
+  });
   const { state } = useSocket();
 
   const onSubmitHandler = useCallback(
@@ -51,9 +90,10 @@ export default function DirectMessage() {
     [dispatchChat, targetName],
   );
 
-  const [, setTargetName] = useDirectMessageTarget();
+  const [, setTargetName] = useDirectMessage();
   useEffect(() => {
     setTargetName(targetName);
+    return () => setTargetName('');
   }, [targetName, setTargetName]);
   useEffect(() => {
     displayDMHistory(targetName);
@@ -64,49 +104,6 @@ export default function DirectMessage() {
       state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY, onChatNotify);
     };
   }, [onChatNotify, state.socket]);
-  useEffect(() => {
-    if (isLoading || myId === '0') return;
-    if (!targetName || error) {
-      setError({
-        headerMessage: '오류 발생',
-        bodyMessage: error
-          ? '서버와의 통신에 실패했습니다.'
-          : '정상적인 접근이 아닙니다.',
-      });
-      return;
-    }
-    dispatchRoomInfo({
-      roomType: ChannelType.PRIVATE,
-      channelName: targetName,
-    });
-    insertRoomMember({
-      userId: myId,
-      name: myName,
-      profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
-      role: ChatMemberRole.MEMBER,
-      muted: false,
-      blocked: false,
-    });
-    insertRoomMember({
-      userId: data.id,
-      name: data.nickname,
-      profileImg: `${process.env.REACT_APP_API_HOST}/${data.profileImg}`,
-      role: ChatMemberRole.MEMBER,
-      muted: false,
-      blocked: false,
-    });
-  }, [
-    isLoading,
-    error,
-    dispatchRoomInfo,
-    targetName,
-    setError,
-    insertRoomMember,
-    data,
-    myId,
-    myName,
-    myProfileImg,
-  ]);
 
   return (
     <>

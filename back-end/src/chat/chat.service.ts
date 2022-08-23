@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -30,7 +32,11 @@ export class ChatService {
     @InjectRepository(ChatUserRepository)
     private readonly chatUserRepository: ChatUserRepository,
     private readonly userService: UsersService,
+
+    @Inject(forwardRef(() => SocketGateway))
     private readonly socketGateway: SocketGateway,
+
+    @Inject(forwardRef(() => SocketService))
     private readonly socketService: SocketService,
   ) {}
 
