@@ -18,6 +18,7 @@ import ChatUserProps from '../../../Props/ChatUserProps';
 import ROOM_GET from '../../../Queries/Channels/Room';
 import ChatUpdateProtectionNotifyProps from '../../../WebSockets/dto/res/chat.update.protection.notify.dto';
 import ChannelType from '../../../Props/ChannelType';
+// import ChatUpdateUserNotifyProps from '../../../WebSockets/dto/res/chat.update.user.notify.dto';
 
 export default function ChatMessage() {
   const { dispatchRoomInfo, dispatchChat, insertRoomMember, deleteRoomMember } =
@@ -177,11 +178,22 @@ export default function ChatMessage() {
         });
       },
     );
+
+    // state.socket?.on(
+    //   SocketEventName.CHAT_UPDATE_USER_NOTIFY,
+    //   (dto: ChatUpdateUserNotifyProps) => {
+    //     deleteRoomMember(dto.nickname);
+    //     if (dto.nickname === nickname) {
+    //       navigate(-1);
+    //     }
+    //   },
+    // );
     return () => {
       state.socket?.off(SocketEventName.CHAT_JOIN_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_LEAVE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY);
+      // state.socket?.off(SocketEventName.CHAT_UPDATE_USER_NOTIFY);
     };
   }, [
     data,
@@ -192,6 +204,7 @@ export default function ChatMessage() {
     dispatchChat,
     dispatchRoomInfo,
     roomData?.name,
+    // navigate,
   ]);
 
   return (
