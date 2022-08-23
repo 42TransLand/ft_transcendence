@@ -44,10 +44,10 @@ export class GameService {
         winUser: true,
         loseUser: true,
       },
-      where: {
-        winUser: { id: Equal(user.id) },
-        loseUser: { id: Equal(user.id) },
-      },
+      where: [
+        { winUser: { id: Equal(user.id) } },
+        { loseUser: { id: Equal(user.id) } },
+      ],
     });
     return games;
   }

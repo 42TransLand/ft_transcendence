@@ -133,8 +133,10 @@ export class SocketGameService {
     await this.gameService.updateGame(gameResult);
     const winner = await this.userService.findById(winnerId);
     const loser = await this.userService.findById(loserId);
-    await this.userService.updateUser(winner, null, null, 100);
-    await this.userService.updateUser(loser, null, null, -100);
+    if (gameResult.isLadder) {
+      await this.userService.updateUser(winner, null, null, 100);
+      await this.userService.updateUser(loser, null, null, -100);
+    }
   }
 
   @Interval(GAME_TIME_INTERVAL)
