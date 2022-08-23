@@ -10,27 +10,52 @@ interface ChatMessageProps {
   content: string;
 }
 
+type UpdateChatMemberProps = {
+  userId: string;
+} & Partial<ChatMemberProps>;
+
 export default function useMessage() {
   const [state, dispatch] = useChat();
 
+  const insertRoomMember = React.useCallback(
+    (chatMember: ChatMemberProps) => {
+      dispatch({
+        action: 'insertMember',
+        chatMember,
+      });
+    },
+    [dispatch],
+  );
+  const updateRoomMember = React.useCallback(
+    (chatMember: UpdateChatMemberProps) => {
+      const found = state.chatMembers.find(
+        (u) => u.userId === chatMember.userId,
+      );
+      if (!found) return;
+      dispatch({
+        action: 'updateMember',
+        chatMember: {
+          ...found,
+          ...chatMember,
+        },
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dispatch],
+  );
   const upsertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
-      const idx = state.chatMembers.findIndex(
-        (c) => c.userId === chatMember.userId,
+      const found = state.chatMembers.find(
+        (u) => u.userId === chatMember.userId,
       );
-      if (idx === -1) {
-        dispatch({
-          action: 'insertMember',
-          chatMember,
-        });
+      if (found) {
+        updateRoomMember(chatMember);
       } else {
-        dispatch({
-          action: 'updateMember',
-          chatMember,
-        });
+        insertRoomMember(chatMember);
       }
     },
-    [dispatch, state.chatMembers],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.chatMembers],
   );
   const deleteRoomMember = React.useCallback(
     (name: string) => {
@@ -89,6 +114,8 @@ export default function useMessage() {
     dispatchRoomInfo,
     dispatchChat,
     displayDMHistory,
+    insertRoomMember,
+    updateRoomMember,
     upsertRoomMember,
     deleteRoomMember,
     dispatchRoomProtection,
