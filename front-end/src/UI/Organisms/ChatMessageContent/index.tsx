@@ -65,25 +65,28 @@ export default function ChatMessageContent({
     },
     [chatRoomId, dispatchChat, nickname, setError],
   );
-  const leaveModalHandler = () => {
-    if (chatRoomId === '') return;
-    axios
-      .delete(`/chat/leave/${chatRoomId}`)
-      .then(() => queryClient.invalidateQueries(['channels']))
-      .catch((err) => {
-        if (err.response) {
-          setError({
-            headerMessage: '오류 발생',
-            bodyMessage: err.response.data.message,
-          });
-        } else {
-          setError({
-            headerMessage: '오류 발생',
-            bodyMessage: err.message,
-          });
-        }
-      });
-  };
+  useEffect(
+    () => () => {
+      if (chatRoomId === '') return;
+      axios
+        .delete(`/chat/leave/${chatRoomId}`)
+        .then(() => queryClient.invalidateQueries(['channels']))
+        .catch((err) => {
+          if (err.response) {
+            setError({
+              headerMessage: '오류 발생',
+              bodyMessage: err.response.data.message,
+            });
+          } else {
+            setError({
+              headerMessage: '오류 발생',
+              bodyMessage: err.message,
+            });
+          }
+        });
+    },
+    [chatRoomId, queryClient, setError],
+  );
   const { isLoading, error, data } = useQuery(CHAT_USERS_GET(chatRoomId));
   const {
     error: roomInfoError,
@@ -117,12 +120,17 @@ export default function ChatMessageContent({
 
   useEffect(() => {
     if (isLoading || roomInfoLoading) return;
-    if (!chatRoomId || error || roomInfoError) {
+    if (!chatRoomId) {
+      setError({
+        headerMessage: '오류 발생',
+        bodyMessage: '정상적인 접근이 아닙니다.',
+      });
+    } else if (error || roomInfoError) {
       setError({
         headerMessage: '오류 발생',
         bodyMessage: error
-          ? '서버와의 통신에 실패했습니다.'
-          : '정상적인 접근이 아닙니다.',
+          ? error.message
+          : roomInfoError?.message ?? '알 수 없는 오류입니다.',
       });
     }
   }, [chatRoomId, error, isLoading, roomInfoLoading, roomInfoError, setError]);
@@ -194,10 +202,5 @@ export default function ChatMessageContent({
     dispatchRoomProtection,
   ]);
 
-  return (
-    <ChatModal
-      onSubmitHandler={onSubmitHandler}
-      leaveModalHandler={leaveModalHandler}
-    />
-  );
+  return <ChatModal onSubmitHandler={onSubmitHandler} />;
 }

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatJoinNotifyDto } from 'src/socket/chat/dto/chat.join.notify.dto';
@@ -23,6 +23,7 @@ import GameCreateResDto from './game/dto/res/game.create.res.dto';
 import GameReservation from './class/game.reservation.class';
 import { GameMode } from 'src/game/constants/game.mode.enum';
 import PlayerMoveReqDto from './game/dto/req/player.move.req.dto';
+import { ChatService } from 'src/chat/chat.service';
 
 @Injectable()
 export class SocketService {
@@ -34,6 +35,9 @@ export class SocketService {
     private readonly socketStateService: SocketStateService,
     private readonly socketGameService: SocketGameService,
     private readonly socketStorageService: SocketStorageService,
+
+    @Inject(forwardRef(() => ChatService))
+    private readonly chatService: ChatService,
   ) {}
 
   private async getFriends(user: UserContext) {
@@ -96,7 +100,11 @@ export class SocketService {
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
-          this.handleLeaveChatRoom(userContext.user.id, false);
+          await this.chatService.leaveChatRoom(
+            userContext.chatRoom,
+            userContext.user,
+          );
+          //this.handleLeaveChatRoom(userContext.user.id, false);
         }
         this.socketStorageService.removeUserSocket(userContext.user.id);
         this.socketStorageService.removeUserContext(client.id);

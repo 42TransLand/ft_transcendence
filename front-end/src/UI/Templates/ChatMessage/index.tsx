@@ -1,10 +1,14 @@
 import React from 'react';
-import axios from 'axios';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 import ChatMessageContent from '../../Organisms/ChatMessageContent';
-import useMe from '../../../Hooks/useMe';
+import {
+  ChatStateRequestType,
+  useChatState,
+} from '../../../Hooks/useChatState';
+import CHANNEL_JOIN from '../../../Queries/Channels/Join';
+import { SocketState, useSocket } from '../../../Hooks/useSocket';
 
 export default function ChatMessage() {
   const { id } = useParams();
@@ -14,42 +18,64 @@ export default function ChatMessage() {
   const { setError, WarningDialogComponent } = useWarningDialog(() => {
     navigate(-1);
   });
+  const { state } = useSocket();
   const [isSuccess, setSuccess] = React.useState(false);
-  const { id: myId } = useMe();
+  const { request, setRequest } = useChatState();
 
-  const password = React.useMemo(() => {
-    const localPassword = localStorage.getItem(roomId);
-    if (localPassword) return { password: localPassword };
-    return undefined;
-  }, [roomId]);
+  const mutation = useMutation(
+    CHANNEL_JOIN(
+      roomId,
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries(['channels']);
+          setSuccess(true);
+          setRequest({ type: ChatStateRequestType.JOIN });
+        },
+        onError: (err) => {
+          if (err.response) {
+            setError({
+              headerMessage: '채팅 입장 실패',
+              bodyMessage: err.response.data.message,
+            });
+          } else {
+            setError({
+              headerMessage: '채팅 입장 실패',
+              bodyMessage: err.message,
+            });
+          }
+        },
+        retry: 10,
+        retryDelay: 100,
+      },
+      request?.password,
+    ),
+  );
+
   React.useEffect(() => {
     if (!roomId) {
       setError({
         headerMessage: '채팅 입장 실패',
         bodyMessage: '잘못된 접근 입니다.',
       });
-      return;
     }
-    axios
-      .post(`/chat/join/${roomId}`, password)
-      .then(() => {
-        queryClient.invalidateQueries(['channels']);
-        setSuccess(true);
-      })
-      .catch((err) => {
-        if (err.response) {
-          setError({
-            headerMessage: '채팅 입장 실패',
-            bodyMessage: err.response.data.message,
-          });
-        } else {
-          setError({
-            headerMessage: '채팅 입장 실패',
-            bodyMessage: err.message,
-          });
-        }
-      });
-  }, [roomId, navigate, password, queryClient, setError, setSuccess, myId]);
+    if (state.socketState !== SocketState.CONNECTED) return;
+    if (isSuccess) return;
+    if (request?.type === ChatStateRequestType.JOIN) {
+      mutation.mutate();
+    } else {
+      queryClient.invalidateQueries(['channels']);
+      setSuccess(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    request,
+    roomId,
+    setError,
+    setSuccess,
+    queryClient,
+    state.socketState,
+    isSuccess,
+  ]);
 
   return (
     <>

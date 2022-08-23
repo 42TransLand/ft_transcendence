@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { ChatController } from './chat.controller';
 import { TypeOrmExModule } from 'src/custom/typeorm.module';
@@ -16,7 +16,7 @@ import { GameService } from 'src/game/game.service';
     TypeOrmExModule.forCustomRepository([ChatUserRepository]),
     TypeOrmExModule.forCustomRepository([GameRepository]),
     TypeOrmExModule.forCustomRepository([UserRepository]),
-    SocketModule,
+    forwardRef(() => SocketModule),
   ],
   controllers: [ChatController],
   providers: [ChatService, GameService, UsersService],

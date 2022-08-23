@@ -8,6 +8,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 import ChannelType from '../../../Props/ChannelType';
+import {
+  ChatStateRequestType,
+  useChatState,
+} from '../../../Hooks/useChatState';
 
 type CreateChannelProps = {
   name: string;
@@ -29,6 +33,7 @@ function CreateChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { setRequest } = useChatState();
   const onSubmitHandler = React.useCallback(
     (
       { name, password }: CreateChannelProps,
@@ -44,6 +49,7 @@ function CreateChannel() {
           actions.resetForm();
           actions.setSubmitting(false);
           queryClient.invalidateQueries(['channels']);
+          setRequest({ type: ChatStateRequestType.CREATE });
           navigate(`/chat/${response.data}`);
         })
         .catch((err) => {
@@ -61,7 +67,7 @@ function CreateChannel() {
           actions.setSubmitting(false);
         });
     },
-    [setError, navigate, queryClient],
+    [queryClient, setRequest, navigate, setError],
   );
 
   return (

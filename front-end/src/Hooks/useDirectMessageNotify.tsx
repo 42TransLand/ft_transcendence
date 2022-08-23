@@ -5,21 +5,21 @@ import DirectMessageToastContent from '../UI/Molecules/DirectMessageToastContent
 import ChatMessageProps from '../WebSockets/dto/res/chat.message.notify.dto';
 import SocketEventName from '../WebSockets/dto/constants/socket.events.enum';
 
-const DirectMessageTargetContext = React.createContext<
+const DirectMessageContext = React.createContext<
   [string, React.Dispatch<React.SetStateAction<string>>] | null
 >(null);
 
-export function useDirectMessageTarget() {
-  const context = React.useContext(DirectMessageTargetContext);
+export function useDirectMessage() {
+  const context = React.useContext(DirectMessageContext);
   if (!context) {
     throw new Error(
-      'useDirectMessageTarget must be used within a DirectMessageTargetProvider',
+      'useDirectMessage must be used within a DirectMessageProvider',
     );
   }
   return context;
 }
 
-export function DirectMessageTargetProvider({
+export function DirectMessageProvider({
   children,
 }: {
   children: JSX.Element | null;
@@ -67,8 +67,8 @@ export function DirectMessageTargetProvider({
   );
 
   return (
-    <DirectMessageTargetContext.Provider value={val}>
+    <DirectMessageContext.Provider value={val}>
       {children}
-    </DirectMessageTargetContext.Provider>
+    </DirectMessageContext.Provider>
   );
 }

@@ -9,11 +9,15 @@ import {
   PopoverTrigger,
   Text,
 } from '@chakra-ui/react';
-import { ErrorMessage, Field, Form, Formik, FormikHelpers } from 'formik';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import ChannelElement from '../ChannelElement';
 import ChannelType from '../../../Props/ChannelType';
+import {
+  ChatStateRequestType,
+  useChatState,
+} from '../../../Hooks/useChatState';
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -25,18 +29,13 @@ const validationSchema = Yup.object().shape({
 function PasswordValidation(props: { chatRoomId: string }) {
   const { chatRoomId } = props;
   const navigate = useNavigate();
-
+  const { setRequest } = useChatState();
   const onSubmitHandler = React.useCallback(
-    (
-      { password }: { password: string },
-      helper: FormikHelpers<{ password: string }>,
-    ) => {
-      localStorage.setItem(chatRoomId, password);
+    ({ password }: { password: string }) => {
+      setRequest({ type: ChatStateRequestType.JOIN, password: { password } });
       navigate(`/chat/${chatRoomId}`);
-      helper.resetForm();
-      helper.setSubmitting(false);
     },
-    [chatRoomId, navigate],
+    [chatRoomId, navigate, setRequest],
   );
   return (
     <Formik
