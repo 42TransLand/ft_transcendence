@@ -18,6 +18,8 @@ import WarningDialogProps from '../../../Props/WarningDialogProps';
 import ChatModal from '../ChatModal';
 import ChatMemberRole from '../../../Props/ChatMemberRole';
 import ChatJoinNotifyProps from '../../../WebSockets/dto/res/chat.join.notify.dto';
+import ChatUpdateUserNotifyProps from '../../../WebSockets/dto/res/chat.update.user.notify.dto';
+import ChatUserUpdate from '../../../WebSockets/dto/constants/chat.user.update.enum';
 
 export default function ChatMessageContent({
   setError,
@@ -87,7 +89,7 @@ export default function ChatMessageContent({
     },
     [chatRoomId, queryClient, setError],
   );
-  const { isLoading, error, data } = useQuery(CHAT_USERS_GET(chatRoomId));
+  const { isLoading, error /* data */ } = useQuery(CHAT_USERS_GET(chatRoomId));
   const {
     error: roomInfoError,
     isLoading: roomInfoLoading,
@@ -147,20 +149,6 @@ export default function ChatMessageContent({
           muted: false,
           blocked: false,
         });
-        if (dto.nickname === nickname) {
-          data
-            ?.filter((m) => m.user.nickname !== nickname)
-            .forEach((member) => {
-              upsertRoomMember({
-                userId: member.user.id,
-                name: member.user.nickname,
-                profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
-                role: member.role,
-                muted: false,
-                blocked: false,
-              });
-            });
-        }
       },
     );
     state.socket?.on(
@@ -185,14 +173,28 @@ export default function ChatMessageContent({
         );
       },
     );
+    state.socket?.on(
+      SocketEventName.CHAT_UPDATE_USER_NOTIFY,
+      (dto: ChatUpdateUserNotifyProps) => {
+        if (
+          dto.type === ChatUserUpdate.KICK ||
+          dto.type === ChatUserUpdate.BAN
+        ) {
+          deleteRoomMember(dto.nickname);
+          if (dto.nickname === nickname) {
+            window.location.href = `http://${window.location.host}`;
+          }
+        }
+      },
+    );
     return () => {
       state.socket?.off(SocketEventName.CHAT_JOIN_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_LEAVE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY);
+      state.socket?.off(SocketEventName.CHAT_UPDATE_USER_NOTIFY);
     };
   }, [
-    data,
     nickname,
     state.socket,
     upsertRoomMember,
