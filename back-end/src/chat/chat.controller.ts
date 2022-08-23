@@ -77,25 +77,35 @@ export class ChatController {
     return this.chatService.findChatRoomUsers(id);
   }
 
-  @ApiOperation({ summary: '채팅방 유저 역할 변경' })
+  @ApiOperation({ summary: '채팅방 관리자 위임' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 401, description: '유저 권한이 잘못된 경우' })
   @ApiResponse({ status: 404, description: '없는 채팅방일 경우' })
+  @ApiResponse({ status: 409, description: '이미 관리자인 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
-  @ApiResponse({
-    status: 409,
-    description: 'admin으로 줄 유저가 이미 admin일 경우',
-  })
   @Patch('/role/:id')
   updateRole(
     @GetUser() user: User,
     @Param('id') id: string,
-    @Body() updateRoleDto: UpdateRoleDto,
+    @Body() { nickname }: UpdateRoleDto,
   ): Promise<void> {
-    return this.chatService.updateRole(id, user, updateRoleDto);
+    return this.chatService.updateRole(id, user, nickname);
   }
 
-  // 게임 유저 나감
+  @ApiOperation({ summary: '채팅방 관리자 해제' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '해당 유저가 관리자가 아닌 경우' })
+  @ApiResponse({ status: 401, description: '유저 권한이 잘못된 경우' })
+  @ApiResponse({ status: 404, description: '없는 채팅방일 경우' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Patch('/unrole/:id')
+  deleteRole(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() { nickname }: UpdateRoleDto,
+  ): Promise<void> {
+    return this.chatService.deleteRole(id, user, nickname);
+  }
 
   @ApiOperation({ summary: '채팅방 참석' })
   @ApiResponse({ status: 201, description: '성공' })
