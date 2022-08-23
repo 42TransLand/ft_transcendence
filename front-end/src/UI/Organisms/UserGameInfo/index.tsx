@@ -66,7 +66,7 @@ function UserGameInfo(props: {
           <Text>(RP {userRating})</Text>
         </HStack>
         <HStack>
-          <Text>승률</Text>
+          <Text>랭크승률</Text>
           <Text fontSize="xl" as="strong">
             {' '}
             {userWinRate.toFixed(2)}%

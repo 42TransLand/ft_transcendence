@@ -108,6 +108,7 @@ export default function UserContextMenu({
       flag |= UserContextMenuFlag.LOGOUT;
     } else {
       const isFriend = friends.filter((f) => f.id === userId).length > 0;
+      /* isBlocked 가 친구로 가져오면 안됨. 친구일떄만 차단하기 차단해제가 가능해짐. */
       const isBlocked =
         friends.filter((f) => f.id === userId && f.isBlocked).length > 0;
       if (mode === 'chat') {
