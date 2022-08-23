@@ -100,11 +100,14 @@ export class SocketService {
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
+          // this.handleLeaveChatRoom(
+          //   userContext.user.id,
+          //   ChatUserUpdateType.LEAVE,
+          // );
           await this.chatService.leaveChatRoom(
             userContext.chatRoom,
             userContext.user,
           );
-          //this.handleLeaveChatRoom(userContext.user.id, false);
         }
         this.socketStorageService.removeUserSocket(userContext.user.id);
         this.socketStorageService.removeUserContext(client.id);
@@ -135,12 +138,12 @@ export class SocketService {
     }
   }
 
-  handleLeaveChatRoom(userId: string, is_kick: boolean): void {
+  handleLeaveChatRoom(userId: string, type: ChatUserUpdateType): void {
     try {
       const usersSocket = this.socketStorageService.getUserSocket(userId);
       const userContext = this.socketStorageService.getUserContext(usersSocket);
       if (userContext) {
-        if (is_kick) {
+        if (type === ChatUserUpdateType.KICK) {
           userContext.server
             .to(userContext.chatRoom)
             .emit(SocketEventName.CHAT_UPDATE_USER_NOTIFY, <
@@ -150,11 +153,19 @@ export class SocketService {
               type: ChatUserUpdateType.KICK,
               status: true,
             });
-        } else {
+        } else if (type === ChatUserUpdateType.LEAVE) {
           userContext.server
             .to(userContext.chatRoom)
             .emit(SocketEventName.CHAT_LEAVE_NOTIFY, <ChatLeaveNotifyDto>{
               nickname: userContext.user.nickname,
+            });
+        } else if (type === ChatUserUpdateType.BAN) {
+          userContext.server
+            .to(userContext.chatRoom)
+            .emit(SocketEventName.CHAT_UPDATE_USER_NOTIFY, <ChatLeaveNotifyDto>{
+              nickname: userContext.user.nickname,
+              type: ChatUserUpdateType.BAN,
+              status: true,
             });
         }
         userContext.socket.leave(userContext.chatRoom);

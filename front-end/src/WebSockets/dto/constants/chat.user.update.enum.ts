@@ -1,8 +1,9 @@
-export enum ChatUserUpdateType {
+enum ChatUserUpdate {
   KICK = 'KICK',
+  BAN = 'BAN',
   MUTE = 'MUTE',
   ADMIN = 'ADMIN',
   OWNER = 'OWNER',
-  BAN = 'BAN',
-  LEAVE = 'LEAVE',
 }
+
+export default ChatUserUpdate;

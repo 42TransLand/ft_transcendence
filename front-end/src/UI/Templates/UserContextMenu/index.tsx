@@ -14,7 +14,7 @@ import {
   FaUserSlash,
   FaUserTimes,
 } from 'react-icons/fa';
-import { GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
+import { GiBootKick, GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
 import { TbCrown, TbCrownOff } from 'react-icons/tb';
 import styled from 'styled-components';
 import { ContextMenu } from '../../Organisms/ContextMenu';
@@ -32,6 +32,7 @@ import { useSocket } from '../../../Hooks/useSocket';
 import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 import ChatMemberProps from '../../../Props/ChatMemberProps';
 import ChatMemberRole from '../../../Props/ChatMemberRole';
+import KickMenu from '../../Molecules/KickMenu';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -43,16 +44,22 @@ enum UserContextMenuFlag {
   BLOCK_REMOVE = 1 << 4,
   GAME_INVITE = 1 << 5,
   GAME_SPECTATE = 1 << 6,
-  CHAT_BAN = 1 << 7,
-  CHAT_MUTE = 1 << 8,
-  CHAT_UNMUTE = 1 << 9,
-  ADMIN_APPROVE = 1 << 10,
-  ADMIN_UNAPPROVE = 1 << 11,
-  LOGOUT = 1 << 12,
+  CHAT_KICK = 1 << 7,
+  CHAT_BAN = 1 << 8,
+  CHAT_MUTE = 1 << 9,
+  CHAT_UNMUTE = 1 << 10,
+  ADMIN_APPROVE = 1 << 11,
+  ADMIN_UNAPPROVE = 1 << 12,
+  LOGOUT = 1 << 13,
 
   FRIEND = FRIEND_ADD | BLOCK_ADD | BLOCK_REMOVE,
   GAME = GAME_INVITE | GAME_SPECTATE,
-  CHAT = CHAT_BAN | CHAT_MUTE | CHAT_UNMUTE | ADMIN_APPROVE | ADMIN_UNAPPROVE,
+  CHAT = CHAT_KICK |
+    CHAT_BAN |
+    CHAT_MUTE |
+    CHAT_UNMUTE |
+    ADMIN_APPROVE |
+    ADMIN_UNAPPROVE,
 }
 
 const ChildView = styled.div`
@@ -109,6 +116,7 @@ export default function UserContextMenu({
           me?.role === ChatMemberRole.OWNER ||
           (me?.role === ChatMemberRole.ADMIN && role === ChatMemberRole.MEMBER)
         ) {
+          flag |= UserContextMenuFlag.CHAT_KICK;
           flag |= UserContextMenuFlag.CHAT_BAN;
           if (muted) {
             flag |= UserContextMenuFlag.CHAT_UNMUTE;
@@ -201,6 +209,9 @@ export default function UserContextMenu({
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT}>
                 <MenuDivider />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.CHAT_KICK}>
+                <KickMenu icon={GiBootKick} label="추방하기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_BAN}>
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />

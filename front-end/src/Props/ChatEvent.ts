@@ -1,5 +1,6 @@
 export default interface ChatEvent {
   type:
+    | 'kicked'
     | 'banned'
     | 'muted'
     | 'unmuted'
