@@ -292,20 +292,23 @@ export class ChatService {
     setTimeout(async () => {
       chatUser.unmutedAt = null;
       await this.chatUserRepository.save(chatUser);
-      this.socketService.handleUpdateChatUser(
-        this.socketGateway.server,
-        chatUser.chatRoom.id,
-        chatUser.user.id,
-        nickname,
-        ChatUserUpdateType.MUTE,
-        false,
-      );
+      // 체크가 더 필요함.
+      if (chatUser.chatRoom !== undefined) {
+        this.socketService.handleUpdateChatUser(
+          this.socketGateway.server,
+          chatUser.chatRoom.id,
+          opponent.id,
+          nickname,
+          ChatUserUpdateType.MUTE,
+          false,
+        );
+      }
     }, muteMinutes * 60 * 1000);
 
     this.socketService.handleUpdateChatUser(
       this.socketGateway.server,
       id,
-      chatUser.user.id,
+      opponent.id,
       nickname,
       ChatUserUpdateType.MUTE,
       true,
@@ -347,7 +350,7 @@ export class ChatService {
     this.socketService.handleUpdateChatUser(
       this.socketGateway.server,
       id,
-      chatUser.user.id,
+      opponent.id,
       nickname,
       ChatUserUpdateType.MUTE,
       false,
