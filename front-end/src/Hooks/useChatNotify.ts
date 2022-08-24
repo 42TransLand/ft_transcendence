@@ -61,26 +61,39 @@ export default function useChatNotify() {
     state.socket?.on(
       SocketEventName.CHAT_UPDATE_USER_NOTIFY,
       (updatedMember: ChatUpdateUserNotifyProps) => {
-        if (
-          updatedMember.type === ChatUserUpdate.KICK ||
-          updatedMember.type === ChatUserUpdate.BAN
-        ) {
-          deleteRoomMember(updatedMember.nickname);
-          if (updatedMember.nickname === myNickname) {
-            window.location.href = `http://${window.location.host}`;
+        switch (updatedMember.type) {
+          case ChatUserUpdate.KICK || ChatUserUpdate.BAN: {
+            deleteRoomMember(updatedMember.nickname);
+            if (updatedMember.nickname === myNickname) {
+              window.location.href = `http://${window.location.host}`;
+            }
+            break;
           }
-        } else if (updatedMember.type === ChatUserUpdate.MUTE) {
-          updateRoomMember({
-            userId: updatedMember.id,
-            muted: updatedMember.status,
-          });
-        } else if (updatedMember.type === ChatUserUpdate.ADMIN) {
-          updateRoomMember({
-            userId: updatedMember.id,
-            role: updatedMember.status
-              ? ChatMemberRole.ADMIN
-              : ChatMemberRole.MEMBER,
-          });
+          case ChatUserUpdate.MUTE: {
+            updateRoomMember({
+              userId: updatedMember.id,
+              muted: updatedMember.status,
+            });
+            break;
+          }
+          case ChatUserUpdate.ADMIN: {
+            updateRoomMember({
+              userId: updatedMember.id,
+              role: updatedMember.status
+                ? ChatMemberRole.ADMIN
+                : ChatMemberRole.MEMBER,
+            });
+            break;
+          }
+          case ChatUserUpdate.OWNER: {
+            updateRoomMember({
+              userId: updatedMember.id,
+              role: ChatMemberRole.OWNER,
+            });
+            break;
+          }
+          default:
+            break;
         }
       },
     );
