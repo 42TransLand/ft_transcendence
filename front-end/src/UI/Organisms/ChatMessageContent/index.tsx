@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { FormikHelpers } from 'formik';
 import axios from 'axios';
 import useMe from '../../../Hooks/useMe';
@@ -8,8 +7,8 @@ import useMessage from '../../../Hooks/useMessage';
 import ChatModal from '../ChatModal';
 import useChatNotify from '../../../Hooks/useChatNotify';
 import useChatRoomInfo from '../../../Hooks/useChatRoomInfo';
-import CHAT_USERS_GET from '../../../Queries/ChatUsers/All';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
+import ChatUserProps from '../../../Props/ChatUserProps';
 
 export default function ChatMessageContent() {
   const { dispatchChat, insertRoomMember } = useMessage();
@@ -19,21 +18,23 @@ export default function ChatMessageContent() {
   useChatRoomInfo();
   useChatNotify();
 
-  // user info fetch (only once)
-  const { isLoading, data, error } = useQuery(CHAT_USERS_GET(chatRoomId, true));
   useEffect(() => {
-    if (isLoading || error) return;
-    data.forEach((member) => {
-      insertRoomMember({
-        userId: member.user.id,
-        name: member.user.nickname,
-        profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
-        role: member.role,
-        muted: false,
-        blocked: false,
+    axios
+      .get(`/chat/users/${chatRoomId}`)
+      .then((response: { data: ChatUserProps[] }) => {
+        const result = response.data;
+        result.forEach((member) => {
+          insertRoomMember({
+            userId: member.user.id,
+            name: member.user.nickname,
+            profileImg: `${process.env.REACT_APP_API_HOST}/${member.user.profileImg}`,
+            role: member.role,
+            muted: false,
+            blocked: false,
+          });
+        });
       });
-    });
-  }, [insertRoomMember, data, isLoading, error]);
+  }, [insertRoomMember, chatRoomId]);
 
   // send
   const { setError, WarningDialogComponent } = useWarningDialog();
@@ -44,7 +45,6 @@ export default function ChatMessageContent() {
     ) => {
       const { message } = values;
       if (message.length === 0) return;
-      if (isLoading || error) return;
       axios
         .post(`/chat/send/${chatRoomId}`, { content: message })
         .then(() => {
@@ -54,7 +54,7 @@ export default function ChatMessageContent() {
       helper.resetForm();
       helper.setSubmitting(false);
     },
-    [chatRoomId, dispatchChat, error, isLoading, nickname, setError],
+    [chatRoomId, dispatchChat, nickname, setError],
   );
 
   // default error
