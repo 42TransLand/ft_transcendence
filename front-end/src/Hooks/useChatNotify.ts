@@ -11,6 +11,7 @@ import ChatMessageProps from '../WebSockets/dto/res/chat.message.notify.dto';
 import ChatUpdateProtectionNotifyProps from '../WebSockets/dto/res/chat.update.protection.notify.dto';
 import ChatUpdateUserNotifyProps from '../WebSockets/dto/res/chat.update.user.notify.dto';
 import ChatUserUpdate from '../WebSockets/dto/constants/chat.user.update.enum';
+import useBlocks from './useBlocks';
 
 export default function useChatNotify() {
   const { state } = useSocket();
@@ -22,6 +23,7 @@ export default function useChatNotify() {
     updateRoomMember,
   } = useMessage();
   const { nickname: myNickname } = useMe();
+  const blocks = useBlocks();
   React.useEffect(() => {
     state.socket?.on(
       SocketEventName.CHAT_JOIN_NOTIFY,
@@ -38,23 +40,28 @@ export default function useChatNotify() {
     );
     state.socket?.on(
       SocketEventName.CHAT_LEAVE_NOTIFY,
-      (joinedMember: ChatLeaveNotifyProps) => {
-        deleteRoomMember(joinedMember.nickname);
+      (leavingMember: ChatLeaveNotifyProps) => {
+        deleteRoomMember(leavingMember.nickname);
       },
     );
     state.socket?.on(
       SocketEventName.CHAT_MESSAGE_NOTIFY,
-      (joinedMember: ChatMessageProps) => {
-        if (joinedMember.nickname !== myNickname) {
-          dispatchChat(joinedMember.nickname, joinedMember.content);
+      (sendMember: ChatMessageProps) => {
+        if (sendMember.nickname !== myNickname) {
+          if (
+            blocks.filter((block) => block.nickname === sendMember.nickname)
+              .length === 0
+          ) {
+            dispatchChat(sendMember.nickname, sendMember.content);
+          }
         }
       },
     );
     state.socket?.on(
       SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY,
-      (joinedMember: ChatUpdateProtectionNotifyProps) => {
+      (modifiedChannel: ChatUpdateProtectionNotifyProps) => {
         dispatchRoomProtection(
-          joinedMember.status ? ChannelType.PUBLIC : ChannelType.PROTECT,
+          modifiedChannel.status ? ChannelType.PUBLIC : ChannelType.PROTECT,
         );
       },
     );
@@ -112,5 +119,6 @@ export default function useChatNotify() {
     myNickname,
     state.socket,
     updateRoomMember,
+    blocks,
   ]);
 }
