@@ -67,7 +67,7 @@ export default function ChatMessage() {
 
   return (
     <>
-      {isSuccess && <ChatMessageContent setError={setError} />}
+      {isSuccess && <ChatMessageContent />}
       {WarningDialogComponent}
     </>
   );

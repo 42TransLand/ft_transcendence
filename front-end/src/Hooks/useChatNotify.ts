@@ -65,9 +65,15 @@ export default function useChatNotify() {
           updatedMember.type === ChatUserUpdate.KICK ||
           updatedMember.type === ChatUserUpdate.BAN
         ) {
+          deleteRoomMember(updatedMember.nickname);
           if (updatedMember.nickname === myNickname) {
             window.location.href = `http://${window.location.host}`;
           }
+        } else if (updatedMember.type === ChatUserUpdate.MUTE) {
+          updateRoomMember({
+            userId: updatedMember.id,
+            muted: updatedMember.status,
+          });
         } else if (updatedMember.type === ChatUserUpdate.ADMIN) {
           updateRoomMember({
             userId: updatedMember.id,
@@ -83,6 +89,7 @@ export default function useChatNotify() {
       state.socket?.off(SocketEventName.CHAT_LEAVE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY);
+      state.socket?.off(SocketEventName.CHAT_UPDATE_USER_NOTIFY);
     };
   }, [
     deleteRoomMember,

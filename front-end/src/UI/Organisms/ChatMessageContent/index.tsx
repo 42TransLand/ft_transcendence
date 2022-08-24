@@ -2,21 +2,16 @@ import React, { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { FormikHelpers } from 'formik';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import useMe from '../../../Hooks/useMe';
 import useMessage from '../../../Hooks/useMessage';
-import WarningDialogProps from '../../../Props/WarningDialogProps';
 import ChatModal from '../ChatModal';
 import useChatNotify from '../../../Hooks/useChatNotify';
 import useChatRoomInfo from '../../../Hooks/useChatRoomInfo';
 import CHAT_USERS_GET from '../../../Queries/ChatUsers/All';
+import useWarningDialog from '../../../Hooks/useWarningDialog';
 
-
-export default function ChatMessageContent({
-  setError,
-}: {
-  setError: (props: WarningDialogProps | AxiosError<any, any>) => void;
-}) {
+export default function ChatMessageContent() {
   const { dispatchChat, insertRoomMember } = useMessage();
   const { nickname } = useMe();
   const { id } = useParams();
@@ -41,6 +36,7 @@ export default function ChatMessageContent({
   }, [insertRoomMember, data, isLoading, error]);
 
   // send
+  const { setError, WarningDialogComponent } = useWarningDialog();
   const onSubmitHandler = useCallback(
     (
       values: { message: string },
@@ -53,9 +49,10 @@ export default function ChatMessageContent({
         .post(`/chat/send/${chatRoomId}`, { content: message })
         .then(() => {
           dispatchChat(nickname, message);
-          helper.resetForm();
         })
         .catch(setError);
+      helper.resetForm();
+      helper.setSubmitting(false);
     },
     [chatRoomId, dispatchChat, error, isLoading, nickname, setError],
   );
@@ -69,6 +66,10 @@ export default function ChatMessageContent({
       });
   }, [chatRoomId, setError]);
 
-
-  return <ChatModal onSubmitHandler={onSubmitHandler} />;
+  return (
+    <>
+      <ChatModal onSubmitHandler={onSubmitHandler} />
+      {WarningDialogComponent}
+    </>
+  );
 }
