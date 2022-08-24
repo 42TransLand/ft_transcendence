@@ -111,6 +111,7 @@ export default function UserContextMenu({
     } else {
       const isFriend = friends.filter((f) => f.id === userId).length > 0;
       const isBlocked = blocks.filter((b) => b.id === userId).length > 0;
+      if (mode === 'friend' && name === me?.name) return flag;
       if (mode === 'chat') {
         if (name === me?.name) return flag;
         if (

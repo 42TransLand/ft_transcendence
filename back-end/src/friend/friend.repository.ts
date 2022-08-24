@@ -223,6 +223,7 @@ export class FriendRepository extends Repository<Friend> {
       if (param.requestor.id === user.id) {
         blockList.push({
           id: param.receiver.id,
+          nickname: param.receiver.nickname,
         });
       }
     });
