@@ -39,8 +39,8 @@ function FriendTab() {
           .map((f) => (
             <UserContextMenu
               key={f.id}
-              target={f.id}
-              targetName={f.nickname}
+              userId={f.id}
+              name={f.nickname}
               mode="friend"
             >
               <FriendElement

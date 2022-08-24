@@ -14,7 +14,7 @@ import {
   FaUserSlash,
   FaUserTimes,
 } from 'react-icons/fa';
-import { GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
+import { GiBootKick, GiSpeaker, GiSpeakerOff } from 'react-icons/gi';
 import { TbCrown, TbCrownOff } from 'react-icons/tb';
 import styled from 'styled-components';
 import { ContextMenu } from '../../Organisms/ContextMenu';
@@ -30,6 +30,10 @@ import LogoutMenu from '../../Molecules/LogoutMenu';
 import useFriends from '../../../Hooks/useFriends';
 import { useSocket } from '../../../Hooks/useSocket';
 import UserState from '../../../WebSockets/dto/constants/user.state.enum';
+import ChatMemberProps from '../../../Props/ChatMemberProps';
+import ChatMemberRole from '../../../Props/ChatMemberRole';
+import KickMenu from '../../Molecules/KickMenu';
+import useBlocks from '../../../Hooks/useBlocks';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -41,17 +45,22 @@ enum UserContextMenuFlag {
   BLOCK_REMOVE = 1 << 4,
   GAME_INVITE = 1 << 5,
   GAME_SPECTATE = 1 << 6,
-  CHAT_BAN = 1 << 7,
-  CHAT_MUTE = 1 << 8,
-  CHAT_UNMUTE = 1 << 9,
-  ADMIN_APPROVE = 1 << 10,
-  ADMIN_UNAPPROVE = 1 << 11,
-  LOGOUT = 1 << 12,
+  CHAT_KICK = 1 << 7,
+  CHAT_BAN = 1 << 8,
+  CHAT_MUTE = 1 << 9,
+  CHAT_UNMUTE = 1 << 10,
+  ADMIN_APPROVE = 1 << 11,
+  ADMIN_UNAPPROVE = 1 << 12,
+  LOGOUT = 1 << 13,
 
   FRIEND = FRIEND_ADD | BLOCK_ADD | BLOCK_REMOVE,
   GAME = GAME_INVITE | GAME_SPECTATE,
-  CHAT = CHAT_BAN | CHAT_MUTE | CHAT_UNMUTE | ADMIN_APPROVE | ADMIN_UNAPPROVE,
-  ALL = PROFILE | OTP_SETTING | FRIEND | GAME | CHAT | LOGOUT,
+  CHAT = CHAT_KICK |
+    CHAT_BAN |
+    CHAT_MUTE |
+    CHAT_UNMUTE |
+    ADMIN_APPROVE |
+    ADMIN_UNAPPROVE,
 }
 
 const ChildView = styled.div`
@@ -72,30 +81,60 @@ function UserContextMenuItem({
 }
 
 export default function UserContextMenu({
-  target,
-  targetName,
+  userId,
+  name,
+  role,
+  muted,
   mode,
   children,
   env,
+  me,
 }: {
-  target: string;
-  targetName: string;
+  userId: string;
+  name: string;
+  role?: ChatMemberRole;
+  muted?: boolean;
   mode: UserContextMenuType;
   children: React.ReactNode;
   env?: EventListenerEnv;
+  me?: ChatMemberProps | undefined;
 }) {
   const { state } = useSocket();
   const friends = useFriends();
-  const friendState = state.friendState[target];
+  const blocks = useBlocks();
+  const friendState = state.friendState[userId];
   const menuFlag = React.useMemo(() => {
     let flag = UserContextMenuFlag.PROFILE;
     if (mode === 'self') {
       flag |= UserContextMenuFlag.OTP_SETTING;
       flag |= UserContextMenuFlag.LOGOUT;
     } else {
-      const isFriend = friends.filter((f) => f.id === target).length > 0;
-      const isBlocked =
-        friends.filter((f) => f.id === target && f.isBlocked).length > 0;
+      const isFriend = friends.filter((f) => f.id === userId).length > 0;
+      const isBlocked = blocks.filter((b) => b.id === userId).length > 0;
+      if (mode === 'friend' && name === me?.name) return flag;
+      if (mode === 'chat') {
+        if (name === me?.name) return flag;
+        if (
+          me?.role === ChatMemberRole.OWNER ||
+          (me?.role === ChatMemberRole.ADMIN && role === ChatMemberRole.MEMBER)
+        ) {
+          flag |= UserContextMenuFlag.CHAT_KICK;
+          flag |= UserContextMenuFlag.CHAT_BAN;
+          if (muted) {
+            flag |= UserContextMenuFlag.CHAT_UNMUTE;
+          } else {
+            flag |= UserContextMenuFlag.CHAT_MUTE;
+          }
+        }
+        if (me?.role === ChatMemberRole.OWNER) {
+          if (role === ChatMemberRole.ADMIN) {
+            flag |= UserContextMenuFlag.ADMIN_UNAPPROVE;
+          } else {
+            flag |= UserContextMenuFlag.ADMIN_APPROVE;
+          }
+        }
+        flag |= UserContextMenuFlag.GAME_INVITE;
+      }
       if (!isFriend) {
         flag |= UserContextMenuFlag.FRIEND_ADD;
       }
@@ -110,30 +149,35 @@ export default function UserContextMenu({
       if (friendState === UserState.INGAME) {
         flag |= UserContextMenuFlag.GAME_SPECTATE;
       }
-      if (mode === 'chat') {
-        flag |= UserContextMenuFlag.CHAT;
-        flag |= UserContextMenuFlag.GAME_INVITE;
-      }
-      // TODO: 추후 유저 온라인 상태가 구현되면 삭제
-      flag |= UserContextMenuFlag.GAME;
     }
     return flag;
-  }, [mode, friends, target, friendState]);
+  }, [
+    mode,
+    friends,
+    friendState,
+    userId,
+    name,
+    me?.name,
+    me?.role,
+    role,
+    muted,
+    blocks,
+  ]);
 
   return (
     <flagContext.Provider value={menuFlag}>
-      <TargetUserProvider userId={target} userName={targetName}>
+      <TargetUserProvider userId={userId} userName={name}>
         <ContextMenu
           env={env ?? document}
           renderMenu={(isRendered: boolean) => (
             <MenuList>
               <UserContextMenuItem flag={UserContextMenuFlag.PROFILE}>
-                <Link to={`user/${targetName}`}>
+                <Link to={`user/${name}`}>
                   <MenuItem icon={<FaUserCircle />}>정보보기</MenuItem>
                 </Link>
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.OTP_SETTING}>
-                <Link to={`/otp/${targetName}`}>
+                <Link to={`/otp/${name}`}>
                   <MenuItem icon={<FaUserEdit />}>OTP 설정</MenuItem>
                 </Link>
               </UserContextMenuItem>
@@ -147,14 +191,14 @@ export default function UserContextMenu({
                 <BlockMenu
                   icon={FaUserSlash}
                   label="차단하기"
-                  targetName={targetName}
+                  targetName={name}
                 />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.BLOCK_REMOVE}>
                 <BlockMenu
                   icon={FaUserSlash}
                   label="차단해제"
-                  targetName={targetName}
+                  targetName={name}
                 />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME}>
@@ -164,19 +208,22 @@ export default function UserContextMenu({
                 <InviteGameMenu isRendered={isRendered} />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.GAME_SPECTATE}>
-                <SpectateMenu targetName={targetName} />
+                <SpectateMenu targetName={name} />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT}>
                 <MenuDivider />
+              </UserContextMenuItem>
+              <UserContextMenuItem flag={UserContextMenuFlag.CHAT_KICK}>
+                <KickMenu icon={GiBootKick} label="추방하기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_BAN}>
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_MUTE}>
-                <MuteMenu icon={GiSpeakerOff} label="음소거시키기" cast />
+                <MuteMenu icon={GiSpeakerOff} label="음소거시키기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_UNMUTE}>
-                <MuteMenu icon={GiSpeaker} label="음소거해제" cast={false} />
+                <MuteMenu icon={GiSpeaker} label="음소거해제" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.ADMIN_APPROVE}>
                 <AdminApproveMenu icon={TbCrown} label="관리자임명" cast />
@@ -207,4 +254,7 @@ export default function UserContextMenu({
 
 UserContextMenu.defaultProps = {
   env: document,
+  role: ChatMemberRole.MEMBER,
+  muted: false,
+  me: undefined,
 };

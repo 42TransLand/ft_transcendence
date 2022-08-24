@@ -1,19 +1,21 @@
 import React from 'react';
 import axios from 'axios';
 import { useChat } from './useChat';
-import useMe from './useMe';
-import ChatMemberRole from '../Props/ChatMemberRole';
 import ChatMemberProps from '../Props/ChatMemberProps';
 import ChatInfoProps from '../Props/ChatInfoProps';
+import ChannelType from '../Props/ChannelType';
 
 interface ChatMessageProps {
   senderNickName: string;
   content: string;
 }
 
+type UpdateChatMemberProps = {
+  userId: string;
+} & Partial<ChatMemberProps>;
+
 export default function useMessage() {
-  const [, dispatch] = useChat();
-  const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
+  const [state, dispatch] = useChat();
 
   const insertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
@@ -23,6 +25,55 @@ export default function useMessage() {
       });
     },
     [dispatch],
+  );
+  const updateRoomMember = React.useCallback(
+    (chatMember: UpdateChatMemberProps) => {
+      const found = state.chatMembers.find(
+        (u) => u.userId === chatMember.userId,
+      );
+      if (!found) return;
+      dispatch({
+        action: 'updateMember',
+        chatMember: {
+          ...found,
+          ...chatMember,
+        },
+      });
+    },
+    [dispatch, state.chatMembers],
+  );
+
+  const upsertRoomMember = React.useCallback(
+    (chatMember: ChatMemberProps) => {
+      const found = state.chatMembers.find(
+        (u) => u.userId === chatMember.userId,
+      );
+      if (found) {
+        updateRoomMember(chatMember);
+      } else {
+        insertRoomMember(chatMember);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.chatMembers],
+  );
+  const deleteRoomMember = React.useCallback(
+    (name: string) => {
+      dispatch({
+        action: 'deleteMember',
+        name,
+      });
+    },
+    [dispatch],
+  );
+  const dispatchRoomProtection = React.useCallback(
+    (roomType: ChannelType) => {
+      dispatch({
+        action: 'updateInfo',
+        chatInfo: { roomType, channelName: state.chatInfo.channelName },
+      });
+    },
+    [state.chatInfo.channelName, dispatch],
   );
   const dispatchRoomInfo = React.useCallback(
     (chanInfoProps: ChatInfoProps) => {
@@ -35,19 +86,16 @@ export default function useMessage() {
   );
   const displayDMHistory = React.useCallback(
     (targetName: string) => {
-      axios
-        .get(`/dm/${targetName}`)
-        .then((response) => {
-          const DMList: ChatMessageProps[] = response.data;
-          DMList.forEach((dm) => {
-            dispatch({
-              action: 'chat',
-              name: dm.senderNickName,
-              message: dm.content,
-            });
+      axios.get(`/dm/${targetName}`).then((response) => {
+        const DMList: ChatMessageProps[] = response.data;
+        DMList.forEach((dm) => {
+          dispatch({
+            action: 'chat',
+            name: dm.senderNickName,
+            message: dm.content,
           });
-        })
-        .catch((err) => console.log(err));
+        });
+      });
     },
     [dispatch],
   );
@@ -62,22 +110,14 @@ export default function useMessage() {
     [dispatch],
   );
 
-  React.useEffect(() => {
-    if (myId === '0') return;
-    insertRoomMember({
-      userId: myId,
-      name: myName,
-      profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
-      role: ChatMemberRole.MEMBER,
-      muted: false,
-      blocked: false,
-    });
-  }, [insertRoomMember, dispatch, myId, myName, myProfileImg]);
-
   return {
     dispatchRoomInfo,
     dispatchChat,
     displayDMHistory,
     insertRoomMember,
+    updateRoomMember,
+    upsertRoomMember,
+    deleteRoomMember,
+    dispatchRoomProtection,
   };
 }

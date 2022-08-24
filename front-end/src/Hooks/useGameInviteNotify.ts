@@ -31,7 +31,7 @@ export default function useGameInviteNotify() {
       state.socket.on(SocketEventName.GAME_INVITE_NOTIFY, onInviteNotify);
     }
     return () => {
-      state.socket?.off(SocketEventName.GAME_INVITE_NOTIFY);
+      state.socket?.off(SocketEventName.GAME_INVITE_NOTIFY, onInviteNotify);
     };
   }, [state.socket, onInviteNotify]);
   React.useEffect(() => {

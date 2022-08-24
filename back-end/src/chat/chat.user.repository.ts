@@ -58,22 +58,32 @@ export class ChatUserRepository extends Repository<ChatUser> {
 
   async updateAdminRole(
     newAdmin: ChatUser,
-    oldAdmin?: ChatUser | null,
-  ): Promise<void> {
-    newAdmin.role = ChatRole.ADMIN;
-    if (oldAdmin !== null) {
-      oldAdmin.role = ChatRole.PARTICIPANT;
-      try {
-        await this.save(oldAdmin);
-      } catch (error) {
-        throw new InternalServerErrorException();
-      }
+    chatRoom: ChatRoom,
+  ): Promise<ChatUser> {
+    const chatUser = await this.findOne({
+      relations: {
+        user: true,
+      },
+      where: {
+        chatRoom: { id: Equal(chatRoom.id) },
+        role: ChatRole.ADMIN,
+      },
+    });
+    if (chatUser !== null) {
+      await this.update(chatUser.id, { role: ChatRole.PARTICIPANT });
     }
-    try {
-      await this.save(newAdmin);
-    } catch (error) {
-      throw new InternalServerErrorException();
-    }
+    await this.update(newAdmin.id, { role: ChatRole.ADMIN });
+    return chatUser;
+  }
+
+  async deleteAdminRole(chatRoom: ChatRoom): Promise<void> {
+    await this.update(
+      {
+        chatRoom: { id: Equal(chatRoom.id) },
+        role: ChatRole.ADMIN,
+      },
+      { role: ChatRole.PARTICIPANT },
+    );
   }
 
   async updateOwnerRole(user: ChatUser): Promise<void> {
@@ -97,6 +107,18 @@ export class ChatUserRepository extends Repository<ChatUser> {
     return checkAllUsers[0];
   }
 
+  async findChatUserNickname(user: ChatUser): Promise<User> {
+    const chatUser = await this.findOne({
+      relations: {
+        user: true,
+      },
+      where: {
+        id: Equal(user.id),
+      },
+    });
+    return chatUser.user;
+  }
+
   async joinChatRoom(
     user: User,
     chatRoom: ChatRoom,
@@ -112,7 +134,7 @@ export class ChatUserRepository extends Repository<ChatUser> {
       ) {
         validation = await bcrypt.compare(password, chatRoom.password);
       }
-    }
+    } else validation = true;
     if (validation !== true) {
       throw new NotFoundException('패스워드가 올바르지 않습니다.');
     }
