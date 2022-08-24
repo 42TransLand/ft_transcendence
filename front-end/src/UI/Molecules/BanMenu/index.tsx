@@ -14,22 +14,19 @@ function BanMenu({ icon, label }: { icon: IconType; label: string }) {
   const { setError, WarningDialogComponent } = useWarningDialog();
 
   const handleMenuClick = React.useCallback(() => {
-    axios
-      .post(`/chat/ban/${id}/${userName}`)
-      .then(() => {})
-      .catch((err) => {
-        if (err.response) {
-          setError({
-            headerMessage: '오류 발생',
-            bodyMessage: err.response.data.message,
-          });
-        } else {
-          setError({
-            headerMessage: '오류 발생',
-            bodyMessage: err.message,
-          });
-        }
-      });
+    axios.post(`/chat/ban/${id}/${userName}`).catch((err) => {
+      if (err.response) {
+        setError({
+          headerMessage: '오류 발생',
+          bodyMessage: err.response.data.message,
+        });
+      } else {
+        setError({
+          headerMessage: '오류 발생',
+          bodyMessage: err.message,
+        });
+      }
+    });
   }, [id, setError, userName]);
 
   return (
