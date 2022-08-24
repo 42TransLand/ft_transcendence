@@ -22,18 +22,10 @@ export default function ChatMembers() {
         <Text fontSize="sm">{chat.chatMembers.length}</Text>
       </HStack>
       <ScrollableVStack h="70vh" w="full" paddingRight="0.5em">
-        {chat.chatMembers.map((member) => (
-          <UserContextMenu
-            env={ref?.current ?? document}
-            userId={member.userId}
-            name={member.name}
-            muted={member.muted}
-            role={member.role}
-            key={member.name}
-            mode={chat.chatInfo.roomType === 'PRIVATE' ? 'friend' : 'chat'}
-            me={me}
-          >
+        {chat.chatMembers.map((member) =>
+          member.name === myName ? (
             <ChatMemberElement
+              key={member.userId}
               userId={member.userId}
               profileImg={member.profileImg}
               name={member.name}
@@ -41,8 +33,28 @@ export default function ChatMembers() {
               muted={member.muted}
               blocked={member.blocked}
             />
-          </UserContextMenu>
-        ))}
+          ) : (
+            <UserContextMenu
+              env={ref?.current ?? document}
+              userId={member.userId}
+              name={member.name}
+              muted={member.muted}
+              role={member.role}
+              key={member.name}
+              mode={chat.chatInfo.roomType === 'PRIVATE' ? 'friend' : 'chat'}
+              me={me}
+            >
+              <ChatMemberElement
+                userId={member.userId}
+                profileImg={member.profileImg}
+                name={member.name}
+                role={member.role}
+                muted={member.muted}
+                blocked={member.blocked}
+              />
+            </UserContextMenu>
+          ),
+        )}
       </ScrollableVStack>
     </VStack>
   );
