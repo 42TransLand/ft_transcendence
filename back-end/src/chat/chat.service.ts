@@ -127,7 +127,29 @@ export class ChatService {
     if (newAdmin.role === ChatRole.ADMIN) {
       throw new ConflictException(`이미 관리자입니다.`);
     }
-    await this.chatUserRepository.updateAdminRole(newAdmin, chatRoom);
+
+    const deleteUser = await this.chatUserRepository.updateAdminRole(
+      newAdmin,
+      chatRoom,
+    );
+    if (deleteUser !== null) {
+      this.socketService.handleUpdateChatUser(
+        this.socketGateway.server,
+        id,
+        deleteUser.user.id,
+        deleteUser.user.nickname,
+        ChatUserUpdateType.ADMIN,
+        false,
+      );
+    }
+    this.socketService.handleUpdateChatUser(
+      this.socketGateway.server,
+      id,
+      findUser.id,
+      nickname,
+      ChatUserUpdateType.ADMIN,
+      true,
+    );
   }
 
   async deleteRole(id: string, user: User, nickname: string): Promise<void> {
@@ -144,6 +166,14 @@ export class ChatService {
       throw new BadRequestException(`해당 유저는 관리자가 아닙니다.`);
     }
     await this.chatUserRepository.deleteAdminRole(chatRoom);
+    this.socketService.handleUpdateChatUser(
+      this.socketGateway.server,
+      id,
+      findUser.id,
+      nickname,
+      ChatUserUpdateType.ADMIN,
+      false,
+    );
   }
 
   async joinChatRoom(id: string, user: User, password: string): Promise<void> {
@@ -185,6 +215,7 @@ export class ChatService {
       this.socketService.handleUpdateChatUser(
         this.socketGateway.server,
         id,
+        user.id,
         newOwnerUser.nickname,
         ChatUserUpdateType.OWNER,
         true,
@@ -293,7 +324,8 @@ export class ChatService {
       await this.chatUserRepository.save(chatUser);
       this.socketService.handleUpdateChatUser(
         this.socketGateway.server,
-        chatUser.chatRoom.id,
+        id,
+        opponent.id,
         nickname,
         ChatUserUpdateType.MUTE,
         false,
@@ -303,6 +335,7 @@ export class ChatService {
     this.socketService.handleUpdateChatUser(
       this.socketGateway.server,
       id,
+      opponent.id,
       nickname,
       ChatUserUpdateType.MUTE,
       true,
@@ -344,6 +377,7 @@ export class ChatService {
     this.socketService.handleUpdateChatUser(
       this.socketGateway.server,
       id,
+      opponent.id,
       nickname,
       ChatUserUpdateType.MUTE,
       false,
