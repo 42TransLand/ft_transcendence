@@ -20,7 +20,6 @@ export default function useChatNotify() {
     deleteRoomMember,
     dispatchRoomProtection,
     updateRoomMember,
-    updateMemberRole,
   } = useMessage();
   const { nickname: myNickname } = useMe();
   React.useEffect(() => {
@@ -70,7 +69,12 @@ export default function useChatNotify() {
             window.location.href = `http://${window.location.host}`;
           }
         } else if (updatedMember.type === ChatUserUpdate.ADMIN) {
-          updateMemberRole(updatedMember.nickname);
+          updateRoomMember({
+            userId: updatedMember.id,
+            role: updatedMember.status
+              ? ChatMemberRole.ADMIN
+              : ChatMemberRole.MEMBER,
+          });
         }
       },
     );
@@ -87,7 +91,6 @@ export default function useChatNotify() {
     insertRoomMember,
     myNickname,
     state.socket,
-    updateMemberRole,
     updateRoomMember,
   ]);
 }
