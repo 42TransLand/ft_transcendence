@@ -225,14 +225,25 @@ export class ChatService {
   async kickChatUser(id: string, user: User, nickname: string): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
     const findChatUser = await this.findChatUser(user, chatRoom);
+    const kickUser = await this.userService.findByNickname(nickname);
+    const kickChatUser = await this.findChatUser(kickUser, chatRoom);
 
-    if (findChatUser.role !== ChatRole.OWNER) {
+    if (
+      !(
+        findChatUser.role === ChatRole.OWNER ||
+        findChatUser.role === ChatRole.ADMIN
+      )
+    ) {
       throw new UnauthorizedException(`권한이 없습니다.`);
     }
-    if (user.nickname === nickname) {
-      throw new ConflictException(`자기 자신을 추방할 수 없습니다.`);
+    if (
+      user.nickname === nickname ||
+      kickChatUser.role === ChatRole.OWNER ||
+      (findChatUser.role === ChatRole.ADMIN &&
+        kickChatUser.role === ChatRole.ADMIN)
+    ) {
+      throw new BadRequestException(`추방할 수 없습니다.`);
     }
-    const kickUser = await this.userService.findByNickname(nickname);
     await this.chatUserRepository.leaveChatRoom(kickUser, chatRoom);
     await this.chatRoomRepository.updateCount(chatRoom, CountType.LEAVE);
     this.socketService.handleLeaveChatRoom(
@@ -245,15 +256,27 @@ export class ChatService {
     const chatRoom = await this.findChatRoomById(id);
     const findChatUser = await this.findChatUser(user, chatRoom);
     const banUser = await this.userService.findByNickname(nickname);
+    const banChatUser = await this.findChatUser(banUser, chatRoom);
 
-    if (findChatUser.role !== ChatRole.OWNER) {
+    if (
+      !(
+        findChatUser.role === ChatRole.OWNER ||
+        findChatUser.role === ChatRole.ADMIN
+      )
+    ) {
       throw new UnauthorizedException(`권한이 없습니다.`);
     }
-    if (user.nickname === nickname) {
-      throw new ConflictException(`자기 자신을 추방할 수 없습니다.`);
+    if (
+      user.nickname === nickname ||
+      banChatUser.role === ChatRole.OWNER ||
+      (findChatUser.role === ChatRole.ADMIN &&
+        banChatUser.role === ChatRole.ADMIN)
+    ) {
+      throw new BadRequestException(`영구 추방할 수 없습니다.`);
     }
+
     if (await this.chatRoomRepository.findBannedUser(id, banUser)) {
-      throw new ConflictException(`이미 추방된 유저입니다.`);
+      throw new ConflictException(`이미 영구 추방된 유저입니다.`);
     }
     await this.chatUserRepository.leaveChatRoom(banUser, chatRoom);
     await this.chatRoomRepository.banChatRoom(chatRoom, banUser);
@@ -289,20 +312,20 @@ export class ChatService {
   ): Promise<void> {
     const chatRoom = await this.findChatRoomById(id);
     const myChatUser = await this.findChatUser(user, chatRoom);
-
-    if (user.nickname === nickname) {
-      throw new ConflictException(`자기 자신을 음소거 할 수 없습니다.`);
-    }
     const opponent = await this.userService.findByNickname(nickname);
     const chatUser = await this.findChatUser(opponent, chatRoom);
 
     if (
       !(
-        (myChatUser.role === ChatRole.OWNER ||
-          myChatUser.role === ChatRole.ADMIN) &&
-        chatUser.role !== ChatRole.OWNER &&
-        chatUser.role !== ChatRole.ADMIN
+        myChatUser.role === ChatRole.OWNER || myChatUser.role === ChatRole.ADMIN
       )
+    ) {
+      throw new UnauthorizedException(`권한이 없습니다.`);
+    }
+    if (
+      user.nickname === nickname ||
+      chatUser.role === ChatRole.OWNER ||
+      (myChatUser.role === ChatRole.ADMIN && chatUser.role === ChatRole.ADMIN)
     ) {
       throw new BadRequestException(`해당 유저에게 mute를 할 수 없습니다.`);
     }
@@ -354,11 +377,15 @@ export class ChatService {
 
     if (
       !(
-        (myChatUser.role === ChatRole.OWNER ||
-          myChatUser.role === ChatRole.ADMIN) &&
-        chatUser.role !== ChatRole.OWNER &&
-        chatUser.role !== ChatRole.ADMIN
+        myChatUser.role === ChatRole.OWNER || myChatUser.role === ChatRole.ADMIN
       )
+    ) {
+      throw new UnauthorizedException(`권한이 없습니다.`);
+    }
+    if (
+      user.nickname === nickname ||
+      chatUser.role === ChatRole.OWNER ||
+      (myChatUser.role === ChatRole.ADMIN && chatUser.role === ChatRole.ADMIN)
     ) {
       throw new BadRequestException(`해당 유저에게 unMute를 할 수 없습니다.`);
     }
