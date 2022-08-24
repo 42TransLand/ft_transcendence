@@ -40,9 +40,9 @@ export default function useMessage() {
         },
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dispatch],
+    [dispatch, state.chatMembers],
   );
+
   const upsertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
       const found = state.chatMembers.find(

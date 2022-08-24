@@ -9,6 +9,8 @@ import ChatJoinNotifyProps from '../WebSockets/dto/res/chat.join.notify.dto';
 import ChatLeaveNotifyProps from '../WebSockets/dto/res/chat.leave.notify.dto';
 import ChatMessageProps from '../WebSockets/dto/res/chat.message.notify.dto';
 import ChatUpdateProtectionNotifyProps from '../WebSockets/dto/res/chat.update.protection.notify.dto';
+import ChatUpdateUserNotifyProps from '../WebSockets/dto/res/chat.update.user.notify.dto';
+import ChatUserUpdate from '../WebSockets/dto/constants/chat.user.update.enum';
 
 export default function useChatNotify() {
   const { state } = useSocket();
@@ -17,6 +19,7 @@ export default function useChatNotify() {
     insertRoomMember,
     deleteRoomMember,
     dispatchRoomProtection,
+    updateRoomMember,
   } = useMessage();
   const { nickname: myNickname } = useMe();
   React.useEffect(() => {
@@ -55,6 +58,26 @@ export default function useChatNotify() {
         );
       },
     );
+    state.socket?.on(
+      SocketEventName.CHAT_UPDATE_USER_NOTIFY,
+      (updatedMember: ChatUpdateUserNotifyProps) => {
+        if (
+          updatedMember.type === ChatUserUpdate.KICK ||
+          updatedMember.type === ChatUserUpdate.BAN
+        ) {
+          if (updatedMember.nickname === myNickname) {
+            window.location.href = `http://${window.location.host}`;
+          }
+        } else if (updatedMember.type === ChatUserUpdate.ADMIN) {
+          updateRoomMember({
+            userId: updatedMember.id,
+            role: updatedMember.status
+              ? ChatMemberRole.ADMIN
+              : ChatMemberRole.MEMBER,
+          });
+        }
+      },
+    );
     return () => {
       state.socket?.off(SocketEventName.CHAT_JOIN_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_LEAVE_NOTIFY);
@@ -65,8 +88,9 @@ export default function useChatNotify() {
     deleteRoomMember,
     dispatchChat,
     dispatchRoomProtection,
+    insertRoomMember,
     myNickname,
     state.socket,
-    insertRoomMember,
+    updateRoomMember,
   ]);
 }
