@@ -42,6 +42,7 @@ export default function useMessage() {
     },
     [dispatch, state.chatMembers],
   );
+
   const upsertRoomMember = React.useCallback(
     (chatMember: ChatMemberProps) => {
       const found = state.chatMembers.find(

@@ -74,6 +74,13 @@ export default function useChatNotify() {
             userId: updatedMember.id,
             muted: updatedMember.status,
           });
+        } else if (updatedMember.type === ChatUserUpdate.ADMIN) {
+          updateRoomMember({
+            userId: updatedMember.id,
+            role: updatedMember.status
+              ? ChatMemberRole.ADMIN
+              : ChatMemberRole.MEMBER,
+          });
         }
       },
     );
@@ -88,9 +95,9 @@ export default function useChatNotify() {
     deleteRoomMember,
     dispatchChat,
     dispatchRoomProtection,
+    insertRoomMember,
     myNickname,
     state.socket,
-    insertRoomMember,
     updateRoomMember,
   ]);
 }
