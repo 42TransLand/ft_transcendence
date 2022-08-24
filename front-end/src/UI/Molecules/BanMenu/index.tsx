@@ -16,7 +16,6 @@ function BanMenu({ icon, label }: { icon: IconType; label: string }) {
   const handleMenuClick = React.useCallback(() => {
     axios
       .post(`/chat/ban/${id}/${userName}`)
-      .then(() => {})
       .catch((err) => {
         if (err.response) {
           setError({
