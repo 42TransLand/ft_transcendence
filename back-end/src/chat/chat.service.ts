@@ -16,7 +16,6 @@ import { ChatType, CountType } from './constants/chat.type.enum';
 import { UsersService } from 'src/users/users.service';
 import { ChatUserRepository } from './chat.user.repository';
 import { ChatRole } from './constants/chat.role.enum';
-import { UpdateRoleDto } from './dto/update.role.dto';
 import { ChatUser } from './entities/chat.user.entity';
 import { User } from 'src/users/entities/user.entity';
 import { ChatInfoDto } from './dto/chat.info.dto';
@@ -215,7 +214,7 @@ export class ChatService {
       this.socketService.handleUpdateChatUser(
         this.socketGateway.server,
         id,
-        user.id,
+        newOwnerUser.id,
         newOwnerUser.nickname,
         ChatUserUpdateType.OWNER,
         true,
