@@ -70,7 +70,6 @@ export default function useChatNotify() {
             window.location.href = `http://${window.location.host}`;
           }
         } else if (updatedMember.type === ChatUserUpdate.MUTE) {
-          console.log('updatedMember = ', updatedMember);
           updateRoomMember({
             userId: updatedMember.id,
             muted: updatedMember.status,
