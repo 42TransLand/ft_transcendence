@@ -69,7 +69,14 @@ export default function useChatNotify() {
       SocketEventName.CHAT_UPDATE_USER_NOTIFY,
       (updatedMember: ChatUpdateUserNotifyProps) => {
         switch (updatedMember.type) {
-          case ChatUserUpdate.KICK || ChatUserUpdate.BAN: {
+          case ChatUserUpdate.KICK: {
+            deleteRoomMember(updatedMember.nickname);
+            if (updatedMember.nickname === myNickname) {
+              window.location.href = `http://${window.location.host}`;
+            }
+            break;
+          }
+          case ChatUserUpdate.BAN: {
             deleteRoomMember(updatedMember.nickname);
             if (updatedMember.nickname === myNickname) {
               window.location.href = `http://${window.location.host}`;
