@@ -142,7 +142,7 @@ function OTPRevise() {
           )}`,
         );
       });
-  }, [isEnabled]);
+  }, []);
 
   return (
     <RoutedModal>
