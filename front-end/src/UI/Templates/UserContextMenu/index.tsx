@@ -219,10 +219,10 @@ export default function UserContextMenu({
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_MUTE}>
-                <MuteMenu icon={GiSpeakerOff} label="음소거시키기" cast />
+                <MuteMenu icon={GiSpeakerOff} label="음소거시키기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_UNMUTE}>
-                <MuteMenu icon={GiSpeaker} label="음소거해제" cast={false} />
+                <MuteMenu icon={GiSpeaker} label="음소거해제" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.ADMIN_APPROVE}>
                 <AdminApproveMenu icon={TbCrown} label="관리자임명" cast />
