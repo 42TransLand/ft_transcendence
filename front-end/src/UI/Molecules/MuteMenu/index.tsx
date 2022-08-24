@@ -1,24 +1,13 @@
 import React from 'react';
 import { Icon } from '@chakra-ui/icons';
 import { IconType } from 'react-icons';
-
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { MenuItem, Text, useToast } from '@chakra-ui/react';
-// import { useChat } from '../../../Hooks/useChat';
 import { useTargetUser } from '../../../Hooks/useTargetUser';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
-function MuteMenu({
-  icon,
-  label,
-}: // cast,
-{
-  icon: IconType;
-  label: string;
-  // cast: boolean;
-}) {
-  // const [, dispatch] = useChat();
+function MuteMenu({ icon, label }: { icon: IconType; label: string }) {
   const { userName } = useTargetUser();
   const { id } = useParams();
   const { setError, WarningDialogComponent } = useWarningDialog();
@@ -32,14 +21,6 @@ function MuteMenu({
     axios
       .patch(url)
       .then(() => {
-        // dispatch({
-        //   action: 'enqueueEvent',
-        //   event: {
-        //     type: label === '음소거시키키기' ? 'muted' : 'unmuted',
-        //     target: userName,
-        //     commandSuccessful: true,
-        //   },
-        // });
         toast({
           title: `${label}`,
           description: `${userName}님을 ${label}에 성공했습니다.`,

@@ -5,12 +5,10 @@ import { IconType } from 'react-icons';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { MenuItem, Text } from '@chakra-ui/react';
-// import { useChat } from '../../../Hooks/useChat';
 import { useTargetUser } from '../../../Hooks/useTargetUser';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
 
 function BanMenu({ icon, label }: { icon: IconType; label: string }) {
-  // const [, dispatch] = useChat();
   const { id } = useParams();
   const { userName } = useTargetUser();
   const { setError, WarningDialogComponent } = useWarningDialog();
@@ -18,8 +16,7 @@ function BanMenu({ icon, label }: { icon: IconType; label: string }) {
   const handleMenuClick = React.useCallback(() => {
     axios
       .post(`/chat/ban/${id}/${userName}`)
-      .then(() => {
-      })
+      .then(() => {})
       .catch((err) => {
         if (err.response) {
           setError({
@@ -33,16 +30,6 @@ function BanMenu({ icon, label }: { icon: IconType; label: string }) {
           });
         }
       });
-    // dispatch({
-    //   action: 'enqueueEvent',
-    //   event: {
-    //     type: 'banned',
-    //     target: userName,
-    //     commandSuccessful: [true, false, undefined][
-    //       Math.floor(Math.random() * 3)
-    //     ],
-    //   },
-    // });
   }, [id, setError, userName]);
 
   return (
