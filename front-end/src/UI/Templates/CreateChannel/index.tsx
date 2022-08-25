@@ -7,11 +7,6 @@ import * as Yup from 'yup';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
-import ChannelType from '../../../Props/ChannelType';
-import {
-  ChatStateRequestType,
-  useChatState,
-} from '../../../Hooks/useChatState';
 
 type CreateChannelProps = {
   name: string;
@@ -33,7 +28,6 @@ function CreateChannel() {
   const { setError, WarningDialogComponent } = useWarningDialog();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { setRequest } = useChatState();
   const onSubmitHandler = React.useCallback(
     (
       { name, password }: CreateChannelProps,
@@ -42,32 +36,26 @@ function CreateChannel() {
       axios
         .post('/chat/create', {
           name,
-          type: password.length ? ChannelType.PROTECT : ChannelType.PUBLIC,
+          type: password.length ? 'PROTECT' : 'PUBLIC', // TODO
           password: password ?? '',
         })
         .then((response) => {
           actions.resetForm();
           actions.setSubmitting(false);
           queryClient.invalidateQueries(['channels']);
-          setRequest({ type: ChatStateRequestType.CREATE });
           navigate(`/chat/${response.data}`);
         })
         .catch((err) => {
-          if (err.response) {
+          if (err.response.status === 500) {
             setError({
               headerMessage: '채널 생성 실패',
-              bodyMessage: err.response.data.message,
+              bodyMessage: '채널 생성에 실패했습니다.',
             });
-          } else {
-            setError({
-              headerMessage: '채널 생성 실패',
-              bodyMessage: err.message,
-            });
+            actions.setSubmitting(false);
           }
-          actions.setSubmitting(false);
         });
     },
-    [queryClient, setRequest, navigate, setError],
+    [setError, navigate, queryClient],
   );
 
   return (

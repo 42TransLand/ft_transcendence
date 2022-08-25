@@ -9,7 +9,7 @@ import useMe from '../../../Hooks/useMe';
 
 function Profile() {
   const { id: chatid, userName, name } = useParams();
-  const { nickname: myNickname } = useMe();
+  const { nickname: myNickname, rankScore } = useMe();
   const { data, isLoading, error } = useQuery(
     USERS_PROFILE_GET(name ?? myNickname),
   );
@@ -23,15 +23,13 @@ function Profile() {
     return '/';
   }, [chatid, userName]);
 
-  const { nickname, profileImg, gameRecord, winCount, loseCount, rankScore } =
-    data ?? {
-      rankScore: 0,
-      nickname: '',
-      profileImg: '',
-      gameRecord: [],
-      winCount: 0,
-      loseCount: 0,
-    };
+  const { nickname, profileImg, gameRecord, winCount, loseCount } = data ?? {
+    nickname: '',
+    profileImg: '',
+    gameRecord: [],
+    winCount: 0,
+    loseCount: 0,
+  };
   let modalBody;
 
   if (isLoading) {

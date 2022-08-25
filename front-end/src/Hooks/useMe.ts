@@ -10,7 +10,6 @@ export default function useMe() {
       profileImg: 'https://cdn.intra.42.fr/users/3b3.jpg',
       rankScore: 0,
       tfaEnabled: false,
-      isFirstLogin: false,
     };
   }
   if (error) {
@@ -20,7 +19,6 @@ export default function useMe() {
       profileImg: 'https://cdn.intra.42.fr/users/3b3.jpg',
       rankScore: 0,
       tfaEnabled: false,
-      isFirstLogin: false,
     };
   }
   return data;

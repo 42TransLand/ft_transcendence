@@ -3,7 +3,6 @@ import ChatMemberProps from '../Props/ChatMemberProps';
 import ChatInfoProps from '../Props/ChatInfoProps';
 import ChatElementProps from '../Props/ChatElementProps';
 import ChatEvent from '../Props/ChatEvent';
-import ChannelType from '../Props/ChannelType';
 
 export interface ChatStateType {
   chatInfo: ChatInfoProps;
@@ -87,7 +86,7 @@ function useChat(): [ChatStateType, React.Dispatch<ChatActionType>] {
 function ChatProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(ChatReducer, {
     chatInfo: {
-      roomType: ChannelType.PRIVATE,
+      roomType: 'private',
       channelName: '채팅방',
     },
     chatMembers: [],

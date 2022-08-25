@@ -9,8 +9,6 @@ import OTPRevise from '../OTPRevise';
 import Profile from '../Profile';
 import Chat from '../Chat';
 import useGameInviteNotify from '../../../Hooks/useGameInviteNotify';
-import { DirectMessageProvider } from '../../../Hooks/useDirectMessageNotify';
-import { ChatStateProvider } from '../../../Hooks/useChatState';
 
 function Main() {
   const { state } = useSocket();
@@ -30,34 +28,30 @@ function Main() {
   }
 
   return (
-    <DirectMessageProvider>
-      <ChatStateProvider>
-        <Flex h="100vh" flexDirection={{ base: 'column', lg: 'row' }}>
-          <Box
-            display={{ base: 'flex', lg: 'flex' }}
-            width="full"
-            justifyContent="center"
-          >
-            <MainStandby />
-          </Box>
-          <Box
-            minW={{ base: 'full', lg: '400px' }}
-            maxW="400px"
-            height="full"
-            bgColor="white"
-          >
-            <MainSocial />
-          </Box>
-          <Routes>
-            <Route path="/otp/:name" element={<OTPRevise />} />
-            <Route path="/user/:name" element={<Profile />} />
-            <Route path="/chat/:id/*" element={<Chat dm={false} />} />
-            <Route path="/dm/:userName/*" element={<Chat dm />} />
-          </Routes>
-          {WarningDialogComponent}
-        </Flex>
-      </ChatStateProvider>
-    </DirectMessageProvider>
+    <Flex h="100vh" flexDirection={{ base: 'column', lg: 'row' }}>
+      <Box
+        display={{ base: 'flex', lg: 'flex' }}
+        width="full"
+        justifyContent="center"
+      >
+        <MainStandby />
+      </Box>
+      <Box
+        minW={{ base: 'full', lg: '400px' }}
+        maxW="400px"
+        height="full"
+        bgColor="white"
+      >
+        <MainSocial />
+      </Box>
+      <Routes>
+        <Route path="/otp/:name" element={<OTPRevise />} />
+        <Route path="/user/:name" element={<Profile />} />
+        <Route path="/chat/:id/*" element={<Chat dm={false} />} />
+        <Route path="/dm/:userName/*" element={<Chat dm />} />
+      </Routes>
+      {WarningDialogComponent}
+    </Flex>
   );
 }
 

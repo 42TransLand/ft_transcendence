@@ -4,14 +4,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 export default function BuildQuery<
   TData = any,
   TQueryKey extends QueryKey = QueryKey,
->(
-  queryKey: TQueryKey,
-  queryFn: () => Promise<AxiosResponse<TData, any>>,
-  options?: Omit<
-    UseQueryOptions<Promise<TData>, AxiosError, TData, TQueryKey>,
-    'initialData, queryKey, queryFn'
-  >,
-) {
+>(queryKey: TQueryKey, queryFn: () => Promise<AxiosResponse<TData, any>>) {
   return <
     Omit<
       UseQueryOptions<Promise<TData>, AxiosError, TData, TQueryKey>,
@@ -20,6 +13,5 @@ export default function BuildQuery<
   >{
     queryKey,
     queryFn: async () => (await queryFn()).data,
-    ...options,
   };
 }

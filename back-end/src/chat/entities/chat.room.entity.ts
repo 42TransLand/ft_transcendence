@@ -58,10 +58,4 @@ export class ChatRoom extends BaseEntity {
   })
   @Column()
   count: number;
-
-  @ApiProperty({
-    description: '영구추방된 유저',
-  })
-  @Column('simple-array')
-  bannedUsers: string[];
 }

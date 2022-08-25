@@ -16,7 +16,7 @@ export class SocketStateService {
   async onChangeState(
     user: UserContext,
     state: UserState,
-    notificationTargetUserIds: string[],
+    notificationTargetUserIds?: string[],
   ) {
     let connectedUser = this.connectedUsers.get(user.id);
     if (state === UserState.ONLINE) {
@@ -35,7 +35,6 @@ export class SocketStateService {
 
   async retrieveState(selfUserId: string, desiredToKnowUserIds: string[]) {
     const self = this.findByUserId(selfUserId);
-
     if (!self) return;
 
     this.executeTargets(desiredToKnowUserIds, (entry) => {

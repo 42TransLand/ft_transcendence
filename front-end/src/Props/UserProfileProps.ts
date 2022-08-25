@@ -5,5 +5,4 @@ export default interface UserProfileProps extends UserInfoProps {
   gameRecord: RecordProps[];
   winCount: number;
   loseCount: number;
-  rankScore: number;
 }

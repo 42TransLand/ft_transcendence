@@ -27,12 +27,12 @@ export function useApp() {
     setCookie('Authentication', '', { path: '/' });
     setAuthCookie('');
   }, [setAuthCookie]);
-  const { isFirstLogin } = useMe();
+  const { id: firstLogin } = useMe();
   const status = React.useMemo(() => {
     const err = error as AxiosError<any, any> | null;
     if (!authCookie) return AppStatus.NeedLogin;
     if (isLoading) return AppStatus.NowLoading;
-    if (isFirstLogin) return AppStatus.NeedInitialSetup;
+    if (!firstLogin) return AppStatus.NeedInitialSetup;
     if (err?.response?.status === 401) {
       if (err?.response?.data.message === 'TFA not authenticated')
         return AppStatus.NeedOTPLogin;
@@ -41,6 +41,6 @@ export function useApp() {
     }
     if (error) return AppStatus.Error;
     return AppStatus.Authenticated;
-  }, [isFirstLogin, isLoading, error, logout, authCookie]);
+  }, [firstLogin, isLoading, error, logout, authCookie]);
   return { status, logout };
 }

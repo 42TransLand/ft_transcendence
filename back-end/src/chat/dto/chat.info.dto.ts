@@ -1,4 +1,4 @@
-import { ChatType } from '../constants/chat.type.enum';
+import { ChatType } from "../constants/chat.type.enum";
 
 export class ChatInfoDto {
   id: string;

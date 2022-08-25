@@ -1,11 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FriendService } from 'src/friend/friend.service';
-import { SocketService } from 'src/socket/socket.service';
+import { SocketGateway } from 'src/socket/socket.gateway';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { DMRepository } from './dm.repository';
 import { DmDto } from './dto/dm.dto';
+import { Dm } from './entities/dm.entity';
 
 @Injectable()
 export class DmService {
@@ -14,7 +15,7 @@ export class DmService {
     private readonly dmRepository: DMRepository,
     private readonly userService: UsersService,
     private readonly friendService: FriendService,
-    private readonly socketService: SocketService,
+    private readonly socketGateway: SocketGateway,
   ) {}
 
   // 아직 미완성
@@ -37,6 +38,6 @@ export class DmService {
       throw new NotFoundException('차단된 사용자입니다.');
     }
     await this.dmRepository.createDM(senderUser, receiverUser, content);
-    this.socketService.handleSendDM(senderUser.id, receiverUser.id, content);
+    this.socketGateway.handleSendDM(senderUser.id, receiverUser.id, content);
   }
 }
