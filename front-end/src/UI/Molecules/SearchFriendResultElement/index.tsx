@@ -9,14 +9,13 @@ function SearchFriendResultElement({
   nickname,
   profileImg,
 }: UserSearchResultProps) {
-  const { isSubmitting, onAddFriend, WarningDialogComponent } = useAddFriend(
-    id,
-    nickname,
-  );
+  const { isSubmitting, onAddFriend, WarningDialogComponent } =
+    useAddFriend(nickname);
 
   return (
     <>
       <HStack
+        key={id}
         fontSize="xl"
         borderWidth="1px"
         borderRadius="md"
