@@ -205,7 +205,6 @@ export class FriendRepository extends Repository<Friend> {
   }
 
   async blockList(user: User): Promise<BlockListDto[]> {
-    // 관계 NONE 인데 차단한 경우
     const Block = await this.find({
       relations: {
         requestor: true,
