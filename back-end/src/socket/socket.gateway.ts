@@ -42,8 +42,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.socketService.handleDisconnect(client);
   }
 
-  // 채팅방
-
   // 게임
   @SubscribeMessage(SocketEventName.GAME_ENQUEUE_MATCH_REQ)
   handleGameEnqueueMatch(@ConnectedSocket() client: Socket) {

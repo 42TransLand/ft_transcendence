@@ -53,13 +53,6 @@ export class FriendRepository extends Repository<Friend> {
   }
 
   async acceptFriend(requestor: User, receiver: User): Promise<void> {
-    // friend DB에 관계가 있는지 확인
-    // PENDDING -> FRIEND (Update)
-    // accept 무조건 1번만 들어온다고 가정. (재요청 불가)
-    // 친구 요청자가 requestor
-    // console.log(requestor.id);
-    // console.log(4);
-    // console.log(receiver.id);
     const foundUpdate: Friend = await this.findRow(requestor, receiver);
     const foundCreate: Friend = await this.findRow(receiver, requestor);
 

@@ -119,7 +119,6 @@ export class Room {
     if (this.state !== GameState.WAITING) {
       this.state = GameState.ENDED;
     }
-    // this.players.delete(user.id);
   }
 
   public leaveSpectator(user: UserContext) {

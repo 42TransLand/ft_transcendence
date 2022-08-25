@@ -100,10 +100,6 @@ export class SocketService {
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
-          // this.handleLeaveChatRoom(
-          //   userContext.user.id,
-          //   ChatUserUpdateType.LEAVE,
-          // );
           await this.chatService.leaveChatRoom(
             userContext.chatRoom,
             userContext.user,
@@ -357,8 +353,6 @@ export class SocketService {
             client.id,
           );
           const { gameMode, scoreForWin } = opponentContext.gameReservation;
-
-          // TODO: 초대한 시점과 시간을 비교해서 초대가 만료되었는지 검사?
 
           this.socketGameService.createGame(
             opponentContext,
