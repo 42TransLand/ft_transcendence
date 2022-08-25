@@ -44,7 +44,10 @@ export default function ChatMessageContent() {
       helper: FormikHelpers<{ message: string }>,
     ) => {
       const { message } = values;
-      if (message.length === 0) return;
+      if (message.length === 0) {
+        helper.setSubmitting(false);
+        return;
+      }
       axios
         .post(`/chat/send/${chatRoomId}`, { content: message })
         .then(() => {
