@@ -57,7 +57,7 @@ export class Room {
       this.players[1]?.reset();
       this.broadcast(SocketEventName.BALL_MOVE_NOTIFY, this.ball.dto);
     } else if (value === GameState.PLAYING) {
-      this.ball.begin();
+      this.ball.begin(this.gameMode);
       this.broadcast(SocketEventName.BALL_MOVE_NOTIFY, this.ball.dto);
     } else if (value === GameState.ENDED) {
       this.determineWinner();
