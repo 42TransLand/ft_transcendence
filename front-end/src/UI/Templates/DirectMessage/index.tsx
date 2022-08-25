@@ -78,7 +78,10 @@ export default function DirectMessage() {
       helper: FormikHelpers<{ message: string }>,
     ) => {
       const { message } = values;
-      if (message.length === 0) return;
+      if (message.length === 0) {
+        helper.setSubmitting(false);
+        return;
+      }
       axios
         .post(`/dm/send/${targetName}`, { content: message })
         .then(() => {
@@ -86,6 +89,7 @@ export default function DirectMessage() {
         })
         .catch(setError);
       helper.resetForm();
+      helper.setSubmitting(false);
     },
     [dispatchChat, myName, targetName, setError],
   );
