@@ -34,6 +34,12 @@ export class FriendRepository extends Repository<Friend> {
         throw new ConflictException([`이미 친구 요청 보냈습니다.`]);
       }
     }
+    const findRequest = await this.findRow(receiver, requestor);
+    if (findRequest !== null) {
+      if (findRequest.status === FriendStatus.PENDDING) {
+        throw new ConflictException([`상대방이 이미 친구 요청을 보냈습니다.`]);
+      }
+    }
     const friend = this.create({
       requestor,
       receiver,
