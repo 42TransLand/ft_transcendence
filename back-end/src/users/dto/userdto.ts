@@ -15,6 +15,6 @@ export class UserDto {
   @Matches(/^[^\s]+(\s+[^\s]+)*$/, {
     message: '앞뒤로 공백을 사용할 수 없습니다.',
   })
-  @Matches(/^[^\\%]+$/, { message: '유효하지 않는 글자(\\, %)입니다.' })
+  @Matches(/^\w+$/, { message: '특수문자는 사용 할 수 없습니다.' })
   nickname: string;
 }
