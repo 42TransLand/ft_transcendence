@@ -11,11 +11,12 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement,
 );
 root.render(
-  <QueryClientProvider client={queryClient}>
-    <ChakraProvider theme={theme}>
-      <Box backgroundColor="#000">
+  <ChakraProvider theme={theme}>
+    <Box backgroundColor="#000">
+      <QueryClientProvider client={queryClient}>
         <App />
-      </Box>
-    </ChakraProvider>
-  </QueryClientProvider>
+      </QueryClientProvider>
+      ,
+    </Box>
+  </ChakraProvider>,
 );

@@ -31,7 +31,7 @@ function ProfileContent({
 function MyProfile() {
   const { id, nickname, profileImg } = useMe();
   return (
-    <UserContextMenu userId={id} name={nickname} mode="self">
+    <UserContextMenu target={id} targetName={nickname} mode="self">
       <ProfileContent
         nickname={nickname}
         profileImg={`${process.env.REACT_APP_API_HOST}/${profileImg}`}

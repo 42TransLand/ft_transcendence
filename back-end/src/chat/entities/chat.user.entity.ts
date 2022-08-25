@@ -18,7 +18,7 @@ export class ChatUser extends BaseEntity {
   id: number;
 
   @ApiProperty({
-    description: '기본키',
+    description: '유저 아이디',
   })
   @ManyToOne(() => User, (user) => user.id)
   user: User;

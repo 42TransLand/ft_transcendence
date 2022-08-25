@@ -7,16 +7,16 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
 import useWarningDialog from '../../../Hooks/useWarningDialog';
-import ChannelType from '../../../Props/ChannelType';
 
 type ChangePasswordProps = {
   password: string;
 };
 
 const ChangePasswordChannelScheme = Yup.object().shape({
-  password: Yup.string()
-    .min(3, '입장 비밀번호는 3자 이상이어야 합니다.')
-    .max(10, '입장 비밀번호는 10자를 초과할 수 없습니다.'),
+  password: Yup.string().max(
+    100,
+    '입장 비밀번호는 100자를 초과할 수 없습니다.',
+  ),
 });
 
 function ChangePasswordChannel() {
@@ -31,7 +31,7 @@ function ChangePasswordChannel() {
       axios
         .patch(`chat/${id}`, {
           password,
-          type: password.length ? ChannelType.PROTECT : ChannelType.PUBLIC,
+          type: password.length ? 'PROTECT' : 'PUBLIC',
         })
         .then(() => {
           actions.resetForm();

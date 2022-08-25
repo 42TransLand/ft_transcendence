@@ -13,7 +13,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/users/get.user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { FriendListDto } from './dto/friend.list.dto';
-import { BlockListDto } from './dto/friend.block.list.dto';
 
 @ApiTags('Friend')
 @Controller('friend')
@@ -96,13 +95,5 @@ export class FriendController {
     @GetUser() user: User,
   ): Promise<void> {
     return this.friendService.unblockFriend(user, nickname);
-  }
-
-  @ApiOperation({ summary: '본인 기준 차단 리스트' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 500, description: '서버 에러' })
-  @Get('block')
-  blockList(@GetUser() user: User): Promise<BlockListDto[]> {
-    return this.friendService.blockList(user);
   }
 }

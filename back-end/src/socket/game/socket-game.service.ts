@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Interval } from '@nestjs/schedule';
 import { GameMode } from 'src/game/constants/game.mode.enum';
 import { GameService } from 'src/game/game.service';
+import { User } from 'src/users/entities/user.entity';
 import { UserContext } from '../class/user.class';
 import { Room } from './class/room.class';
 import {
@@ -27,8 +28,8 @@ type DequeueFalseType = {
 @Injectable()
 export class SocketGameService {
   constructor(
-    private readonly userService: UsersService,
     private readonly gameService: GameService,
+    private readonly userService: UsersService,
   ) {}
 
   private rooms: Map<string, Room> = new Map<string, Room>();
@@ -133,10 +134,8 @@ export class SocketGameService {
     await this.gameService.updateGame(gameResult);
     const winner = await this.userService.findById(winnerId);
     const loser = await this.userService.findById(loserId);
-    if (gameResult.isLadder) {
-      await this.userService.updateUser(winner, null, null, 100);
-      await this.userService.updateUser(loser, null, null, -100);
-    }
+    await this.userService.updateUser(winner, null, null, 100);
+    await this.userService.updateUser(loser, null, null, -100);
   }
 
   @Interval(GAME_TIME_INTERVAL)

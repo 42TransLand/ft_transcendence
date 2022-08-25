@@ -1,8 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ChatRole } from '../constants/chat.role.enum';
 
 export class UpdateRoleDto {
   @ApiProperty({
-    description: '지정해줄 Admin 유저 닉네임',
+    description: '과거 어드민 유저 닉네임',
   })
-  nickname: string;
+  oldAdmin: string;
+
+  @ApiProperty({
+    description: '미래 어드민 유저 닉네임',
+  })
+  newAdmin: string;
 }

@@ -10,7 +10,6 @@ import { CustomRepository } from '../custom/typeorm.decorator';
 import { Friend } from './entities/friend.entity';
 import { FriendStatus } from './constants/friend.enum';
 import { FriendListDto } from './dto/friend.list.dto';
-import { BlockListDto } from './dto/friend.block.list.dto';
 
 @CustomRepository(Friend)
 export class FriendRepository extends Repository<Friend> {
@@ -202,31 +201,5 @@ export class FriendRepository extends Repository<Friend> {
     });
 
     return friends;
-  }
-
-  async blockList(user: User): Promise<BlockListDto[]> {
-    // 관계 NONE 인데 차단한 경우
-    const Block = await this.find({
-      relations: {
-        requestor: true,
-        receiver: true,
-      },
-      where: [
-        {
-          requestor: { id: Equal(user.id) },
-          block: true,
-        },
-      ],
-    });
-    const blockList: BlockListDto[] = [];
-    Block.forEach((param) => {
-      if (param.requestor.id === user.id) {
-        blockList.push({
-          id: param.receiver.id,
-          nickname: param.receiver.nickname,
-        });
-      }
-    });
-    return blockList;
   }
 }

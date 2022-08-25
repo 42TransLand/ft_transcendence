@@ -3,8 +3,6 @@ import { Text, HStack, Icon, Square } from '@chakra-ui/react';
 import { LockIcon } from '@chakra-ui/icons';
 import { IoIosChatbubbles } from 'react-icons/io';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import ChannelType from '../../../Props/ChannelType';
 
 const FullSquare = styled(Square)`
   min-height: 100%;
@@ -12,13 +10,12 @@ const FullSquare = styled(Square)`
 `;
 
 function ChannelElement(props: {
-  roomType: ChannelType.PUBLIC | ChannelType.PROTECT;
+  roomType: 'PUBLIC' | 'PROTECT';
   channelName: string;
   currentHeadCount: number;
-  chatRoomId: string;
+  /* maxHeadCount: number; */
 }) {
-  const { roomType, channelName, currentHeadCount, chatRoomId } = props;
-  const navigate = useNavigate();
+  const { roomType, channelName, currentHeadCount /* maxHeadCount */ } = props;
 
   return (
     <HStack
@@ -27,28 +24,20 @@ function ChannelElement(props: {
       h="4em"
       w="full"
       justifyContent="space-between"
-      onClick={
-        roomType === ChannelType.PUBLIC
-          ? () => navigate(`/chat/${chatRoomId}`)
-          : undefined
-      }
-      cursor="pointer"
     >
       <HStack h="full">
         <FullSquare centerContent minHeight="100%">
           <Icon
-            as={roomType === ChannelType.PROTECT ? LockIcon : IoIosChatbubbles}
+            as={roomType === 'PROTECT' ? LockIcon : IoIosChatbubbles}
             boxSize="1.75em"
           />
         </FullSquare>
         <Text fontSize="xl" marginX="0!important" noOfLines={1}>
-          {channelName.length > 14
-            ? channelName.substring(0, 14).concat('...')
-            : channelName}
+          {channelName}
         </Text>
       </HStack>
       <Text fontSize="xl" textAlign="center" paddingX="0.5em">
-        {`${currentHeadCount}명`}
+        {`${currentHeadCount}명`} {/* /{maxHeadCount} */}
       </Text>
     </HStack>
   );
