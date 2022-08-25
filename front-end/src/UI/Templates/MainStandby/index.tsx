@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Center } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
-// import LoginBody from '../LoginBody';
 
 function MainStandby() {
   return (
