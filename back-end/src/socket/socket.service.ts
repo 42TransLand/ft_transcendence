@@ -24,6 +24,7 @@ import GameReservation from './class/game.reservation.class';
 import { GameMode } from 'src/game/constants/game.mode.enum';
 import PlayerMoveReqDto from './game/dto/req/player.move.req.dto';
 import { ChatService } from 'src/chat/chat.service';
+import GameStateNotifyDto from './game/dto/res/game.state.notify.dto';
 
 @Injectable()
 export class SocketService {
@@ -100,10 +101,6 @@ export class SocketService {
         this.socketGameService.disconnect(userContext);
 
         if (userContext.chatRoom) {
-          // this.handleLeaveChatRoom(
-          //   userContext.user.id,
-          //   ChatUserUpdateType.LEAVE,
-          // );
           await this.chatService.leaveChatRoom(
             userContext.chatRoom,
             userContext.user,
@@ -358,8 +355,6 @@ export class SocketService {
           );
           const { gameMode, scoreForWin } = opponentContext.gameReservation;
 
-          // TODO: 초대한 시점과 시간을 비교해서 초대가 만료되었는지 검사?
-
           this.socketGameService.createGame(
             opponentContext,
             userContext,
@@ -446,6 +441,9 @@ export class SocketService {
           room.joinSpectator(user);
           client.emit(SocketEventName.GAME_SPECTATE_RES, <GameSpectateResDto>{
             success: true,
+          });
+          client.emit(SocketEventName.GAME_STATE_NOTIFY, <GameStateNotifyDto>{
+            state: room.state,
           });
           await this.changeUserState(user, UserState.OBSERVE);
         }

@@ -101,7 +101,7 @@ export default function InitialSetup() {
       {({ isSubmitting, setFieldValue }) => (
         <Center w="100%" h="100vh">
           <VStack h="100%" justifyContent="center">
-            <Image src="logo.svg" alt="Atomic Pong" mb="4em" />
+            <Image src="/logo.svg" alt="Atomic Pong" mb="4em" />
             <Box boxSize="sm" p={10}>
               <Avatar src={currentProfileImg} size="full">
                 <AvatarBadge borderWidth={0}>

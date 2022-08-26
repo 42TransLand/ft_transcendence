@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
 import useWarningDialog from './useWarningDialog';
 
-export default function useAddFriend(id: number, nickname: string) {
+export default function useAddFriend(nickname: string) {
   const toast = useToast();
   const [isSubmitting, setSubmitting] = React.useState(false);
   const { setError, WarningDialogComponent } = useWarningDialog();

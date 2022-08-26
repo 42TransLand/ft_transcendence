@@ -185,7 +185,11 @@ export default function UserContextMenu({
                 <MenuDivider />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.FRIEND_ADD}>
-                <FriendMenu icon={FaUserPlus} label="친구추가" />
+                <FriendMenu
+                  icon={FaUserPlus}
+                  label="친구추가"
+                  targetName={name}
+                />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.BLOCK_ADD}>
                 <BlockMenu
