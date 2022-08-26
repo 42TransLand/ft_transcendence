@@ -7,6 +7,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -84,11 +85,9 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file', loaclOptions))
   updateUser(
     @GetUser() user: User,
-    //@Body() { nickname }: UserDto,
-    @Body() userDto: UserDto,
+    @Body(ValidationPipe) { nickname }: UserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    console.log(userDto);
-    return this.usersService.updateUser(user, userDto.nickname, file?.path);
+    return this.usersService.updateUser(user, nickname, file?.path);
   }
 }

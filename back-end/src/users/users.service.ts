@@ -58,7 +58,6 @@ export class UsersService {
     profileImg?: string,
     score?: number,
   ): Promise<User> {
-    console.log(nickName);
     return this.userRepository.updateUser(user, nickName, profileImg, score);
   }
 
