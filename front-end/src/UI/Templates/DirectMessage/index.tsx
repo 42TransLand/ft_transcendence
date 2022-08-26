@@ -25,7 +25,7 @@ export default function DirectMessage() {
   } = useMessage();
   const navigate = useNavigate();
   const { setError, WarningDialogComponent } = useWarningDialog(() =>
-    navigate(-1),
+    navigate('/'),
   );
   const { id: myId, nickname: myName, profileImg: myProfileImg } = useMe();
   const { userName } = useParams();

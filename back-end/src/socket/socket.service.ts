@@ -24,6 +24,7 @@ import GameReservation from './class/game.reservation.class';
 import { GameMode } from 'src/game/constants/game.mode.enum';
 import PlayerMoveReqDto from './game/dto/req/player.move.req.dto';
 import { ChatService } from 'src/chat/chat.service';
+import GameStateNotifyDto from './game/dto/res/game.state.notify.dto';
 
 @Injectable()
 export class SocketService {
@@ -440,6 +441,9 @@ export class SocketService {
           room.joinSpectator(user);
           client.emit(SocketEventName.GAME_SPECTATE_RES, <GameSpectateResDto>{
             success: true,
+          });
+          client.emit(SocketEventName.GAME_STATE_NOTIFY, <GameStateNotifyDto>{
+            state: room.state,
           });
           await this.changeUserState(user, UserState.OBSERVE);
         }
