@@ -36,7 +36,7 @@ function UserMatch(props: {
         <Text as="sup" color="red.500">
           {isRankedGame ? '랭크' : ''}
         </Text>
-        <Text>{isNormalMode ? '기본모드' : '부스터모드'}</Text>
+        <Text>{isNormalMode ? '기본모드' : '스피드모드'}</Text>
       </Box>
       <Spacer />
       <Text color={isUserWinner ? 'blue.400' : 'red.300'} fontSize="3xl">
