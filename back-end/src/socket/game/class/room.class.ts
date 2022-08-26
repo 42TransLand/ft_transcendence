@@ -108,9 +108,6 @@ export class Room {
 
   public joinSpectator(user: UserContext) {
     this.spectators.set(user.id, user);
-    user.socket.emit(SocketEventName.GAME_STATE_NOTIFY, <GameStateNotifyDto>{
-      state: this.state,
-    });
   }
 
   public leave(user: UserContext) {
