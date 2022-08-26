@@ -133,16 +133,18 @@ function OTPRevise() {
 
   const [img, setImg] = useState('');
   useEffect(() => {
-    axios
-      .post('/tfa/generate', {}, { responseType: 'arraybuffer' })
-      .then((res) => {
-        setImg(
-          `data:image/png;base64,${Buffer.from(res.data, 'binary').toString(
-            'base64',
-          )}`,
-        );
-      });
-  }, []);
+    if (isEnabled === false) {
+      axios
+        .post('/tfa/generate', {}, { responseType: 'arraybuffer' })
+        .then((res) => {
+          setImg(
+            `data:image/png;base64,${Buffer.from(res.data, 'binary').toString(
+              'base64',
+            )}`,
+          );
+        });
+    }
+  }, [isEnabled]);
 
   return (
     <RoutedModal>
