@@ -84,9 +84,11 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file', loaclOptions))
   updateUser(
     @GetUser() user: User,
-    @Body() { nickname }: UserDto,
+    //@Body() { nickname }: UserDto,
+    @Body() userDto: UserDto,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    return this.usersService.updateUser(user, nickname, file?.path);
+    console.log(userDto);
+    return this.usersService.updateUser(user, userDto.nickname, file?.path);
   }
 }
