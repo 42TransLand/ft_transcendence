@@ -33,6 +33,7 @@ import UserState from '../../../WebSockets/dto/constants/user.state.enum';
 import ChatMemberProps from '../../../Props/ChatMemberProps';
 import ChatMemberRole from '../../../Props/ChatMemberRole';
 import KickMenu from '../../Molecules/KickMenu';
+import useBlocks from '../../../Hooks/useBlocks';
 
 export type UserContextMenuType = 'friend' | 'chat' | 'self';
 
@@ -100,6 +101,7 @@ export default function UserContextMenu({
 }) {
   const { state } = useSocket();
   const friends = useFriends();
+  const blocks = useBlocks();
   const friendState = state.friendState[userId];
   const menuFlag = React.useMemo(() => {
     let flag = UserContextMenuFlag.PROFILE;
@@ -108,8 +110,8 @@ export default function UserContextMenu({
       flag |= UserContextMenuFlag.LOGOUT;
     } else {
       const isFriend = friends.filter((f) => f.id === userId).length > 0;
-      const isBlocked =
-        friends.filter((f) => f.id === userId && f.isBlocked).length > 0;
+      const isBlocked = blocks.filter((b) => b.id === userId).length > 0;
+      if (mode === 'friend' && name === me?.name) return flag;
       if (mode === 'chat') {
         if (name === me?.name) return flag;
         if (
@@ -159,6 +161,7 @@ export default function UserContextMenu({
     me?.role,
     role,
     muted,
+    blocks,
   ]);
 
   return (
@@ -182,7 +185,11 @@ export default function UserContextMenu({
                 <MenuDivider />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.FRIEND_ADD}>
-                <FriendMenu icon={FaUserPlus} label="친구추가" />
+                <FriendMenu
+                  icon={FaUserPlus}
+                  label="친구추가"
+                  targetName={name}
+                />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.BLOCK_ADD}>
                 <BlockMenu
@@ -217,10 +224,10 @@ export default function UserContextMenu({
                 <BanMenu icon={FaUserTimes} label="영구추방하기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_MUTE}>
-                <MuteMenu icon={GiSpeakerOff} label="음소거시키기" cast />
+                <MuteMenu icon={GiSpeakerOff} label="음소거시키기" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.CHAT_UNMUTE}>
-                <MuteMenu icon={GiSpeaker} label="음소거해제" cast={false} />
+                <MuteMenu icon={GiSpeaker} label="음소거해제" />
               </UserContextMenuItem>
               <UserContextMenuItem flag={UserContextMenuFlag.ADMIN_APPROVE}>
                 <AdminApproveMenu icon={TbCrown} label="관리자임명" cast />

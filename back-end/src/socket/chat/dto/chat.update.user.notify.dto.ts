@@ -3,6 +3,11 @@ import { ChatUserUpdateType } from '../constants/chat.user.update.type.enum';
 
 export class ChatUpdateUserNotifyDto {
   @ApiProperty({
+    description: '유저 아이디',
+  })
+  id: string;
+
+  @ApiProperty({
     description: '유저 닉네임',
   })
   nickname: string;

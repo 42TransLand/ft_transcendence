@@ -24,7 +24,6 @@ export class GameRecord extends BaseEntity {
     description: '왼쪽 유저 아이디',
     type: () => User,
   })
-  // @ManyToOne(() =>User, () => User)
   @ManyToOne(() => User, (user) => user.id)
   winUser: User;
 
@@ -46,13 +45,6 @@ export class GameRecord extends BaseEntity {
   })
   @Column({ default: 0 })
   loseUserScore: number;
-
-  // @ApiProperty({
-  //   example: 1,
-  //   description: '왼쪽 유저의 승패 여부 (0: 패배, 1: 승리)',
-  // })
-  // @Column({ default: 0 })
-  // result: number;
 
   @ApiProperty({
     example: false,

@@ -18,7 +18,7 @@ jobs:
           script: |
             whoami
             cd ~/ft_transcendence
-            git pull origin master
+            git pull origin release
             docker container prune -f
             docker image prune -f
             docker-compose up --build -d

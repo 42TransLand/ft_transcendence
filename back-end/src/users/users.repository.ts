@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
@@ -84,6 +85,10 @@ export class UserRepository extends Repository<User> {
     score?: number,
   ): Promise<User> {
     if (nickName) {
+      const matches = /^[a-z|A-Z|0-9|]+$/;
+      if (!matches.test(nickName)) {
+        throw new BadRequestException(`특수문자는 사용 할 수 없습니다.`);
+      }
       user.nickname = nickName;
     }
     if (profileImg) {
@@ -111,7 +116,7 @@ export class UserRepository extends Repository<User> {
       await this.save(user);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException(`nickname already exists`);
+        throw new ConflictException(`이미 존재하는 닉네임입니다.`);
       } else {
         throw new InternalServerErrorException();
       }

@@ -152,6 +152,9 @@ function SocketProvider({
       dispatch({ action: 'connected' });
     });
     socket.connect();
+    return () => {
+      socket.disconnect();
+    };
   }, [nickname]);
   React.useEffect(() => {
     if (state.socket && state.socketState === SocketState.CONNECTED)

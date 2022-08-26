@@ -12,6 +12,7 @@ import {
 } from '../constants/game.constants';
 import BallDirection from '../constants/ball.enum';
 import { Player } from './player.class';
+import { GameMode } from 'src/game/constants/game.mode.enum';
 
 export class Ball {
   private x: number = GAME_SCREEN_WIDTH / 2;
@@ -52,13 +53,17 @@ export class Ball {
     this.vecY = 0;
   }
 
-  public begin() {
+  public begin(mode: GameMode) {
     const initAngle =
       Math.round(Math.random()) * Math.PI +
       ((Math.random() * Math.PI) / 3 - Math.PI / 6);
-
-    this.vecX = Math.cos(initAngle) * BALL_INITIAL_SPEED;
-    this.vecY = Math.sin(initAngle) * BALL_INITIAL_SPEED;
+    if (mode === 'CLASSIC') {
+      this.vecX = Math.cos(initAngle) * BALL_INITIAL_SPEED;
+      this.vecY = Math.sin(initAngle) * BALL_INITIAL_SPEED;
+    } else if (mode === 'SPEED') {
+      this.vecX = Math.cos(initAngle) * BALL_INITIAL_SPEED * 1.5;
+      this.vecY = Math.sin(initAngle) * BALL_INITIAL_SPEED * 1.5;
+    }
   }
 
   public update(players: (Player | null)[]) {

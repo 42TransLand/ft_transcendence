@@ -77,25 +77,35 @@ export class ChatController {
     return this.chatService.findChatRoomUsers(id);
   }
 
-  @ApiOperation({ summary: '채팅방 유저 역할 변경' })
+  @ApiOperation({ summary: '채팅방 관리자 위임' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 401, description: '유저 권한이 잘못된 경우' })
   @ApiResponse({ status: 404, description: '없는 채팅방일 경우' })
+  @ApiResponse({ status: 409, description: '이미 관리자인 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
-  @ApiResponse({
-    status: 409,
-    description: 'admin으로 줄 유저가 이미 admin일 경우',
-  })
   @Patch('/role/:id')
   updateRole(
     @GetUser() user: User,
     @Param('id') id: string,
-    @Body() updateRoleDto: UpdateRoleDto,
+    @Body() { nickname }: UpdateRoleDto,
   ): Promise<void> {
-    return this.chatService.updateRole(id, user, updateRoleDto);
+    return this.chatService.updateRole(id, user, nickname);
   }
 
-  // 게임 유저 나감
+  @ApiOperation({ summary: '채팅방 관리자 해제' })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '해당 유저가 관리자가 아닌 경우' })
+  @ApiResponse({ status: 401, description: '유저 권한이 잘못된 경우' })
+  @ApiResponse({ status: 404, description: '없는 채팅방일 경우' })
+  @ApiResponse({ status: 500, description: '서버 에러' })
+  @Patch('/unrole/:id')
+  deleteRole(
+    @GetUser() user: User,
+    @Param('id') id: string,
+    @Body() { nickname }: UpdateRoleDto,
+  ): Promise<void> {
+    return this.chatService.deleteRole(id, user, nickname);
+  }
 
   @ApiOperation({ summary: '채팅방 참석' })
   @ApiResponse({ status: 201, description: '성공' })
@@ -125,6 +135,7 @@ export class ChatController {
 
   @ApiOperation({ summary: '채팅방 강퇴' })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '강퇴 할 수 없는 경우' })
   @ApiResponse({ status: 401, description: '권한이 없는 경우' })
   @ApiResponse({ status: 404, description: '채팅방, 유저 없는 경우' })
   @Delete('/kick/:id/:nickname')
@@ -138,11 +149,12 @@ export class ChatController {
 
   @ApiOperation({ summary: '채팅방 영구 추방' })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '영구 추방 할 수 없는 경우' })
   @ApiResponse({ status: 401, description: '권한이 없는 경우' })
   @ApiResponse({ status: 404, description: '채팅방, 유저 없는 경우' })
   @ApiResponse({
     status: 409,
-    description: '자기 자신 추방 및 이미 추방된 경우',
+    description: '이미 추방된 경우',
   })
   @Post('/ban/:id/:nickname')
   banChatUser(
@@ -168,6 +180,7 @@ export class ChatController {
 
   @ApiOperation({ summary: '해당 유저 음소거' })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '음소거 할 수 없는 경우' })
   @ApiResponse({ status: 401, description: '권한이 없는 경우' })
   @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
@@ -182,7 +195,8 @@ export class ChatController {
 
   @ApiOperation({ summary: '해당 유저 음소거 해제' })
   @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 400, description: '권한이 없는 경우' })
+  @ApiResponse({ status: 400, description: '음소거 해제 할 수 없는 경우' })
+  @ApiResponse({ status: 401, description: '권한이 없는 경우' })
   @ApiResponse({ status: 404, description: '채팅방에 없는 유저인 경우' })
   @ApiResponse({ status: 500, description: '서버 에러' })
   @Patch('/unmute/:id/:nickname/')

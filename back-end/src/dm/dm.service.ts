@@ -17,7 +17,6 @@ export class DmService {
     private readonly socketService: SocketService,
   ) {}
 
-  // 아직 미완성
   async getDMsByUser(user: User, nickname: string): Promise<DmDto[]> {
     const oppositeUser = await this.userService.findByNickname(nickname);
     return this.dmRepository.getDMsByOpposite(user, oppositeUser);

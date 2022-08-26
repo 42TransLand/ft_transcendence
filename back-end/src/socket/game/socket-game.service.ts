@@ -77,7 +77,6 @@ export class SocketGameService {
     return { success: true, user1, user2 };
   }
 
-  // 테스트용. 실제 서버에서는 아래 메서드를 사용하지 않음.
   private roomIdCounter = 0;
 
   private testCreateRoom(): { id: number } {
@@ -98,8 +97,7 @@ export class SocketGameService {
       user2.user,
       gameMode,
       ladder,
-    ); // TODO 실제 DB에서 생성된 방의 ID를 반환받아야 함.
-    // this.logger.debug(dbRecordRoom); // 테스트 필요
+    );
     const room = new Room(dbRecordRoom, gameMode, ladder, scoreForWin);
 
     room.join(user1, 0);
@@ -146,7 +144,6 @@ export class SocketGameService {
       room.update();
       if (room.state === GameState.ENDED || room.isEmpty()) {
         if (room.state === GameState.ENDED) {
-          // TODO 게임이 종료되어, 게임 결과를 저장해야 함
           const { user: winnerUser, score: winnerScore } = room.winner;
           const { user: loserUser, score: loserScore } = room.loser;
           const gameResult: GameResult = {

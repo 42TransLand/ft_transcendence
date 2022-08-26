@@ -10,6 +10,7 @@ import { CustomRepository } from '../custom/typeorm.decorator';
 import { Friend } from './entities/friend.entity';
 import { FriendStatus } from './constants/friend.enum';
 import { FriendListDto } from './dto/friend.list.dto';
+import { BlockListDto } from './dto/friend.block.list.dto';
 
 @CustomRepository(Friend)
 export class FriendRepository extends Repository<Friend> {
@@ -33,6 +34,12 @@ export class FriendRepository extends Repository<Friend> {
         throw new ConflictException([`이미 친구 요청 보냈습니다.`]);
       }
     }
+    const findRequest = await this.findRow(receiver, requestor);
+    if (findRequest !== null) {
+      if (findRequest.status === FriendStatus.PENDDING) {
+        throw new ConflictException([`상대방이 이미 친구 요청을 보냈습니다.`]);
+      }
+    }
     const friend = this.create({
       requestor,
       receiver,
@@ -46,13 +53,6 @@ export class FriendRepository extends Repository<Friend> {
   }
 
   async acceptFriend(requestor: User, receiver: User): Promise<void> {
-    // friend DB에 관계가 있는지 확인
-    // PENDDING -> FRIEND (Update)
-    // accept 무조건 1번만 들어온다고 가정. (재요청 불가)
-    // 친구 요청자가 requestor
-    // console.log(requestor.id);
-    // console.log(4);
-    // console.log(receiver.id);
     const foundUpdate: Friend = await this.findRow(requestor, receiver);
     const foundCreate: Friend = await this.findRow(receiver, requestor);
 
@@ -201,5 +201,30 @@ export class FriendRepository extends Repository<Friend> {
     });
 
     return friends;
+  }
+
+  async blockList(user: User): Promise<BlockListDto[]> {
+    const Block = await this.find({
+      relations: {
+        requestor: true,
+        receiver: true,
+      },
+      where: [
+        {
+          requestor: { id: Equal(user.id) },
+          block: true,
+        },
+      ],
+    });
+    const blockList: BlockListDto[] = [];
+    Block.forEach((param) => {
+      if (param.requestor.id === user.id) {
+        blockList.push({
+          id: param.receiver.id,
+          nickname: param.receiver.nickname,
+        });
+      }
+    });
+    return blockList;
   }
 }

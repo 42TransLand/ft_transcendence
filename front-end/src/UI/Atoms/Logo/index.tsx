@@ -128,7 +128,7 @@ export default function Logo() {
   return (
     <Container>
       <GameView id="game-view" />
-      <LogoImg src="logo.svg" alt="Atomic Pong" />
+      <LogoImg src="/logo.svg" alt="Atomic Pong" />
     </Container>
   );
 }

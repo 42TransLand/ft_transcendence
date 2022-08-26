@@ -16,8 +16,13 @@ import { useDirectMessage } from '../../../Hooks/useDirectMessageNotify';
 import ChannelType from '../../../Props/ChannelType';
 
 export default function DirectMessage() {
-  const { dispatchRoomInfo, dispatchChat, displayDMHistory, upsertRoomMember } =
-    useMessage();
+  const {
+    dispatchRoomInfo,
+    dispatchChat,
+    displayDMHistory,
+    insertRoomMember,
+    upsertRoomMember,
+  } = useMessage();
   const navigate = useNavigate();
   const { setError, WarningDialogComponent } = useWarningDialog(() =>
     navigate(-1),
@@ -30,7 +35,7 @@ export default function DirectMessage() {
       roomType: ChannelType.PRIVATE,
       channelName: targetName,
     });
-    upsertRoomMember({
+    insertRoomMember({
       userId: myId,
       name: myName,
       profileImg: `${process.env.REACT_APP_API_HOST}/${myProfileImg}`,
@@ -44,7 +49,7 @@ export default function DirectMessage() {
     myName,
     myProfileImg,
     targetName,
-    upsertRoomMember,
+    insertRoomMember,
   ]);
   useQuery({
     ...USERS_PROFILE_GET(targetName),
@@ -73,13 +78,20 @@ export default function DirectMessage() {
       helper: FormikHelpers<{ message: string }>,
     ) => {
       const { message } = values;
-      if (message.length === 0) return;
-      axios.post(`/dm/send/${targetName}`, { content: message }).then(() => {
-        dispatchChat(myName, message);
-      });
+      if (message.length === 0) {
+        helper.setSubmitting(false);
+        return;
+      }
+      axios
+        .post(`/dm/send/${targetName}`, { content: message })
+        .then(() => {
+          dispatchChat(myName, message);
+        })
+        .catch(setError);
       helper.resetForm();
+      helper.setSubmitting(false);
     },
-    [dispatchChat, myName, targetName],
+    [dispatchChat, myName, targetName, setError],
   );
   const onChatNotify = React.useCallback(
     (dto: ChatMessageProps) => {

@@ -9,6 +9,9 @@ import ChatJoinNotifyProps from '../WebSockets/dto/res/chat.join.notify.dto';
 import ChatLeaveNotifyProps from '../WebSockets/dto/res/chat.leave.notify.dto';
 import ChatMessageProps from '../WebSockets/dto/res/chat.message.notify.dto';
 import ChatUpdateProtectionNotifyProps from '../WebSockets/dto/res/chat.update.protection.notify.dto';
+import ChatUpdateUserNotifyProps from '../WebSockets/dto/res/chat.update.user.notify.dto';
+import ChatUserUpdate from '../WebSockets/dto/constants/chat.user.update.enum';
+import useBlocks from './useBlocks';
 
 export default function useChatNotify() {
   const { state } = useSocket();
@@ -17,8 +20,10 @@ export default function useChatNotify() {
     insertRoomMember,
     deleteRoomMember,
     dispatchRoomProtection,
+    updateRoomMember,
   } = useMessage();
   const { nickname: myNickname } = useMe();
+  const blocks = useBlocks();
   React.useEffect(() => {
     state.socket?.on(
       SocketEventName.CHAT_JOIN_NOTIFY,
@@ -35,24 +40,75 @@ export default function useChatNotify() {
     );
     state.socket?.on(
       SocketEventName.CHAT_LEAVE_NOTIFY,
-      (joinedMember: ChatLeaveNotifyProps) => {
-        deleteRoomMember(joinedMember.nickname);
+      (leavingMember: ChatLeaveNotifyProps) => {
+        deleteRoomMember(leavingMember.nickname);
       },
     );
     state.socket?.on(
       SocketEventName.CHAT_MESSAGE_NOTIFY,
-      (joinedMember: ChatMessageProps) => {
-        if (joinedMember.nickname !== myNickname) {
-          dispatchChat(joinedMember.nickname, joinedMember.content);
+      (sendMember: ChatMessageProps) => {
+        if (sendMember.nickname !== myNickname) {
+          if (
+            blocks.filter((block) => block.nickname === sendMember.nickname)
+              .length === 0
+          ) {
+            dispatchChat(sendMember.nickname, sendMember.content);
+          }
         }
       },
     );
     state.socket?.on(
       SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY,
-      (joinedMember: ChatUpdateProtectionNotifyProps) => {
+      (modifiedChannel: ChatUpdateProtectionNotifyProps) => {
         dispatchRoomProtection(
-          joinedMember.status ? ChannelType.PUBLIC : ChannelType.PROTECT,
+          modifiedChannel.status ? ChannelType.PUBLIC : ChannelType.PROTECT,
         );
+      },
+    );
+    state.socket?.on(
+      SocketEventName.CHAT_UPDATE_USER_NOTIFY,
+      (updatedMember: ChatUpdateUserNotifyProps) => {
+        switch (updatedMember.type) {
+          case ChatUserUpdate.KICK: {
+            deleteRoomMember(updatedMember.nickname);
+            if (updatedMember.nickname === myNickname) {
+              window.location.href = `http://${window.location.host}`;
+            }
+            break;
+          }
+          case ChatUserUpdate.BAN: {
+            deleteRoomMember(updatedMember.nickname);
+            if (updatedMember.nickname === myNickname) {
+              window.location.href = `http://${window.location.host}`;
+            }
+            break;
+          }
+          case ChatUserUpdate.MUTE: {
+            updateRoomMember({
+              userId: updatedMember.id,
+              muted: updatedMember.status,
+            });
+            break;
+          }
+          case ChatUserUpdate.ADMIN: {
+            updateRoomMember({
+              userId: updatedMember.id,
+              role: updatedMember.status
+                ? ChatMemberRole.ADMIN
+                : ChatMemberRole.MEMBER,
+            });
+            break;
+          }
+          case ChatUserUpdate.OWNER: {
+            updateRoomMember({
+              userId: updatedMember.id,
+              role: ChatMemberRole.OWNER,
+            });
+            break;
+          }
+          default:
+            break;
+        }
       },
     );
     return () => {
@@ -60,13 +116,16 @@ export default function useChatNotify() {
       state.socket?.off(SocketEventName.CHAT_LEAVE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_MESSAGE_NOTIFY);
       state.socket?.off(SocketEventName.CHAT_UPDATE_PROTECTION_NOTIFY);
+      state.socket?.off(SocketEventName.CHAT_UPDATE_USER_NOTIFY);
     };
   }, [
     deleteRoomMember,
     dispatchChat,
     dispatchRoomProtection,
+    insertRoomMember,
     myNickname,
     state.socket,
-    insertRoomMember,
+    updateRoomMember,
+    blocks,
   ]);
 }
