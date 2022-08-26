@@ -25,7 +25,9 @@ export class CreateChatRoomDto {
   @Matches(/^[^\s]+(\s+[^\s]+)*$/, {
     message: '제목 앞뒤로 공백을 사용할 수 없습니다.',
   })
-  @Matches(/^\w+$/, { message: '특수문자는 사용 할 수 없습니다.' })
+  @Matches(/^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|]+$/, {
+    message: '특수문자는 사용 할 수 없습니다.',
+  })
   name: string;
 
   @ApiProperty({
