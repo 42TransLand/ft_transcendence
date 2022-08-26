@@ -31,19 +31,7 @@ export default function ChatMessage() {
           setSuccess(true);
           setRequest({ type: ChatStateRequestType.JOIN });
         },
-        onError: (err) => {
-          if (err.response) {
-            setError({
-              headerMessage: '채팅 입장 실패',
-              bodyMessage: err.response.data.message,
-            });
-          } else {
-            setError({
-              headerMessage: '채팅 입장 실패',
-              bodyMessage: err.message,
-            });
-          }
-        },
+        onError: setError,
         retry: 10,
         retryDelay: 100,
       },
